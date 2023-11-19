@@ -49,7 +49,7 @@
                         }
                         echo '</div>';
                         echo '<div class="english">' . $english . '</div>';
-                    } else if ($type == "sentense") {
+                    } else if ($type == "sentence") {
                         echo '<div class="english">' . $english . '</div>';
                         echo '<div class="chinese">' . $chinese . '</div>';
                     } else if ($type == "word") {

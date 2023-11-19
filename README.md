@@ -12,7 +12,7 @@
 
 ### 指令
 - 用 ~ { } 开头的行表示指令
-- ~sentense 声明接下去的内容为句子
+- ~sentence 声明接下去的内容为句子
 - ~word     声明接下去的内容为词汇
 - { 声明分组开始
 - } 声明分组结束
@@ -24,7 +24,7 @@
 - 数据行属性默认为 sentence，如果是词汇，在前一行使用 ~word
 
 ## 指令对视频的影响
-- ~sentense
+- ~sentence
 - 中文 显示盲听slide，女声中文，男声中文，显示字幕slide，女声读英文翻译，女声中文，男声中文
 - 英文 显示盲听slide，女声英文，男声英文，显示字幕slide，女声读中文翻译，女声英文，男声英文
 - ~word
@@ -83,7 +83,7 @@ CREATE TABLE 'archive' (
 - 视频生成完成后，内容会存档到archive表并清空material表
 - 视频制作完成后，背景图片移入archive文件夹存档
 - phonetic字段，chinese lesson下，为chinese字段翻译的拼音
-- english lesson + sentensetype, phonetic为空
+- english lesson + sentence type, phonetic为空
 - english lesson + word type, phonetic为词汇的音标
 - english lesson + word type, chinese为词典翻译（非api）
 - english lesson + word type, 没有cn_male.mp3 和 cn_female.mp3
@@ -100,3 +100,12 @@ CREATE TABLE 'archive' (
 - CET4 English          - c40001
 - CET6 English          - c60001
 - Postgraduate English  - pe0001
+
+## 环境配置
+- PHP.ini里，有可能被设置成production模式，确保 variables_order = "EGPCS"
+- cmd用管理员启动，然后执行下面的命令存入 API KEY
+- setx /m AZURE_SPEECH_KEY xxxxxx
+- setx /m AZURE_SPEECH_REGION xxxxxx
+- setx /m BAIDU_APP_ID xxxxxx
+- setx /m BAIDU_SEC_KEY xxxxxx
+- npm run server 把工具助手运行起来
