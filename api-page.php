@@ -48,9 +48,7 @@
                             echo '<span class="char"><ruby><rb class="cn">' . $value . '</rb><rt class="py">' . $pyarr[$key] . '</rt></ruby></span>';
                         }
                         echo '</div>';
-                        if ($type != "practice") {
-                            echo '<div class="english">' . $english . '</div>';
-                        }
+                        echo '<div class="english">' . $english . '</div>';
                     } else if ($type == "sentense") {
                         echo '<div class="english">' . $english . '</div>';
                         echo '<div class="chinese">' . $chinese . '</div>';

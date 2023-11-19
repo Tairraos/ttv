@@ -14,7 +14,6 @@
 - 用 ~ { } 开头的行表示指令
 - ~sentense 声明接下去的内容为句子
 - ~word     声明接下去的内容为词汇
-- ~practice 声明接下去的内容为练习
 - { 声明分组开始
 - } 声明分组结束
 
@@ -32,9 +31,6 @@
 - 中文 显示字幕slide，女声中文，男声中文，女声读英文翻译
 - 英文 显示字幕slide，女声英文，男声英文
 - 因为英文词汇的翻译会有很多词性，所以没有中文读音
-- ~practice
-- 中文 显示字幕slide，女声读英文说明，女声中文，男声中文
-- 英文 显示字幕slide，女声读中文说明，女声英文，男声英文
 - { } 
 - 分组的内容会被渲染在同一个slide
 - 中文 显示字幕slide，以 女声中文，男声中文，女声读英文翻译 的顺序读完整屏
@@ -86,9 +82,11 @@ CREATE TABLE 'archive' (
 - 每次导入语料，id会使用material和archive中，最大的id+1开始
 - 视频生成完成后，内容会存档到archive表并清空material表
 - 视频制作完成后，背景图片移入archive文件夹存档
-- chinese lesson下，phonetic字段为chinese字段翻译的拼音
-- english lesson下，sentense和practice对应的phonetic为空
-- english lesson下，word对应的phonetic为词汇的音标
+- phonetic字段，chinese lesson下，为chinese字段翻译的拼音
+- english lesson + sentensetype, phonetic为空
+- english lesson + word type, phonetic为词汇的音标
+- english lesson + word type, chinese为词典翻译（非api）
+- english lesson + word type, 没有cn_male.mp3 和 cn_female.mp3
 
 ### projectid设计
 - 视频名字和背景图片名字和同projectid
