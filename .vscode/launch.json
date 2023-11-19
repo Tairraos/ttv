@@ -1,0 +1,44 @@
+{
+    "version": "0.2.0",
+    "configurations": [{
+            "name": "使用Node调试当前文件",
+            "type": "node",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "使用Pythony调试当前文件",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "使用Jest测试当前文件",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+            "args": [
+                "--runInBand",
+                "--config", "${workspaceFolder}/jest.config.json",
+                "--collectCoverage",
+                "${file}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "使用Eslint修复错误",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/node_modules/eslint/bin/eslint",
+            "args": [
+                "--fix",
+                "${file}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        }
+    ]
+}

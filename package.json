@@ -1,0 +1,22 @@
+{
+  "name": "ttv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "node.exe server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "microsoft-cognitiveservices-speech-sdk": "^1.32.0",
+    "puppeteer": "^21.4.1",
+    "socks-proxy-agent": "^8.0.2",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "eslint": ">=5.16.0",
+    "eslint-config-google": "^0.14.0"
+  }
+}

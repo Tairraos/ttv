@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Text to video tool</title>
+        <link rel="stylesheet" href="lib/style.css" />
+    </head>
+
+    <body>
+        <nav id="nav">
+            <h1>摩耳视频生成助手</h1>
+            <div class="controls">
+                <div>
+                    <h3>工程信息</h3>
+                    <ul>
+                        <li class="menu">
+                            <input type="text" id="theme" />
+                            <!--  -->
+                        </li>
+                        <li class="menu lesson-container">
+                            <span class="lesson">
+                                <input type="radio" name="lesson" value="chinese" />Chinese<br />
+                                <input type="radio" name="lesson" value="english" />English
+                            </span>
+                            <button id="createProject">确认</button>
+                        </li>
+                        <li class="menu"><img id="preview" src="lib/notheme.png" /></li>
+                        <li class="menu"><div id="basket">拖放导入数据</div></li>
+                        <li class="menu"><button id="popAdmin">数据库管理</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>开始生成</h3>
+                    <ul>
+                        <li class="menu"><button id="doTranslate">1.素材翻译</button></li>
+                        <li class="menu"><button id="doGenPhonetic">2.拼音音标</button></li>
+                        <li class="menu"><button id="doGenAudio">3.语音MP3</button></li>
+                        <li class="menu"><button id="doCaptureSlide">4.生成slide</button></li>
+                        <li class="menu"><button id="doPrepare">5.准备任务</button></li>
+                        <li class="menu"><button id="doGenVideo" disabled>6.生成视频</button></li>
+                        <li class="menu"><button id="doGenNotes">7.复制课件</button></li>
+                        <li class="menu"><button id="doArchive">8.清理数据</button></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="console">
+                <div id="log"></div>
+            </div>
+        </nav>
+        <div id="content">
+            <table id="material">
+                <tr>
+                    <th>id</th>
+                    <th>type</th>
+                    <th>group</th>
+                    <th>chinese</th>
+                    <th>english</th>
+                    <th>phonetic</th>
+                    <th>cn_male</th>
+                    <th>cn_female</th>
+                    <th>en_male</th>
+                    <th>en_female</th>
+                    <th>slide</th>
+                    <th>isready</th>
+                </tr>
+            </table>
+        </div>
+    </body>
+    <script src="lib/pinyin.js"></script>
+    <script src="lib/tool-util.js"></script>
+    <script src="lib/tool-action.js"></script>
+    <script src="lib/tool-ui.js"></script>
+    <script>
+        util.initMaterial();
+    </script>
+</html>

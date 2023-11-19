@@ -1,0 +1,184 @@
+body {
+    margin-left: 0;
+}
+
+#nav {
+    width: 350px;
+    position: fixed;
+    text-align: center;
+    display: flex;
+    border-right: 1px solid #888;
+    flex-direction: column;
+    align-content: center;
+}
+
+#nav h1 {
+    margin: 0 0 10px;
+}
+
+#nav h3 {
+    margin: 10px 0 0;
+}
+
+#nav li {
+    list-style-type: none;
+}
+
+#nav ul {
+    padding: 0;
+    margin: 0;
+}
+
+#content {
+    margin-left: 360px;
+}
+
+#material {
+    border-collapse: collapse;
+    margin: 0 auto;
+    font-size: 13px;
+    line-height: 20px;
+    width: 100%;
+}
+
+#material td,
+#material th {
+    border: 1px solid #cad9ea;
+    padding: 4px 6px;
+    text-align: center;
+    cursor: pointer;
+}
+
+#material tr:nth-child(odd) {
+    background: #eee;
+}
+
+#material tr:nth-child(even) {
+    background: #fff;
+}
+
+#material tr.ready:nth-child(odd) {
+    background: #ded;
+}
+
+#material tr.ready:nth-child(even) {
+    background: #efe;
+}
+
+#material th {
+    background: #666;
+    color: #fff;
+}
+
+#basket {
+    width: 130px;
+    display: inline-block;
+    transition: background-color 1s, height 0s;
+    border: 2px dashed #333;
+    border-radius: 10px;
+    padding: 30px 5px;
+    font-size: 20px;
+    line-height: 30px;
+    text-align: center;
+    color: #bf4ff0;
+    margin: 5px 0 4px;
+}
+
+#basket.dragover {
+    background: #d2baff;
+    border-style: dotted;
+}
+
+#theme {
+    width: 140px;
+    text-align: center;
+    margin: 5px 0 0;
+    height: 24px;
+}
+
+.menu button {
+    font: 16px/16px bold;
+    padding: 5px 10px;
+    margin: 5px 0;
+}
+
+.menu input[type="radio"] {
+    width: 12px;
+    height: 12px;
+    margin: 0 5px 0 3px;
+    vertical-align: middle;
+}
+.menu.lesson-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 5px 0 0;
+}
+
+.menu .lesson {
+    display: inline-block;
+    font: 12px/15px verdana;
+    text-align: left;
+    vertical-align: top;
+    margin: 5px 0;
+}
+#preview {
+    width: 144px;
+    height: 81px;
+    background: #3333;
+    border-radius: 4px;
+    margin: 5px 0;
+    border: 1px solid #333;
+    cursor: pointer;
+}
+
+.controls {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-evenly;
+}
+.console {
+    width: 300px;
+    margin: 10px auto;
+    background: #333;
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #888;
+}
+#log {
+    height: 320px;
+    overflow-y: scroll;
+    text-align: left;
+    color: #ddd;
+    font: 14px/20px consolas;
+}
+#log::-webkit-scrollbar {
+    width: 0;
+}
+
+.phonetic {
+    font-family: "Mulish";
+    font-weight: 600;
+}
+
+.done {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: 10px;
+    vertical-align: text-bottom;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiM4ZjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIyLjUiIGQ9Ik0yMCA3TDEwIDE3bC01LTUiLz48L3N2Zz4=");
+}
+
+.error {
+    color: #f88;
+}
+
+.pass {
+    color: #8f8;
+}
+
+.highlight {
+    color: #ff0;
+}
