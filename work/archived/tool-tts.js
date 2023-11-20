@@ -147,7 +147,7 @@ function makeSSML(text, voice = "zh-CN-XiaoxiaoNeural", /* express = "", role = 
 /** 程序入口 */
 (async () => {
     let fs = require("fs"),
-        child_process = require("child_process"),
+        thread = require("child_process"),
         arg = initArgs(),
         progress = "",
         filename = arg["-filename"] || "测试文字转语音.mp3",
@@ -168,10 +168,10 @@ function makeSSML(text, voice = "zh-CN-XiaoxiaoNeural", /* express = "", role = 
         fs.writeFileSync("__tts_temp__.mp3", result);
 
         progress = `正在转换格式...`;
-        child_process.execSync(`ffmpeg -i __tts_temp__.mp3 -acodec libmp3lame -ac 2 -ar 48000 -b:a 128k -v quiet -y ${filename}`);
+        thread.execSync(`ffmpeg -i __tts_temp__.mp3 -acodec libmp3lame -ac 2 -ar 48000 -b:a 128k -v quiet -y ${filename}`);
 
         progress = `正在获取时长...`;
-        let stdout = child_process.execSync(`ffprobe -i "${filename}" -show_entries format=duration -v quiet -of csv="p=0"`);
+        let stdout = thread.execSync(`ffprobe -i "${filename}" -show_entries format=duration -v quiet -of csv="p=0"`);
 
         progress = `正在删除临时文件...`;
         await fs.unlinkSync("__tts_temp__.mp3");

@@ -15,11 +15,11 @@
 
 exports.textToSpeech = async function (args) {
     let fs = require("fs"),
-        // child_process = require("child_process"),
+        // thread = require("child_process"),
         ssml = [
             `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US">`,
             `<voice name="${args.voice}">`,
-            +args.rate ? `<prosody rate="+${+args.rate}%">` : "",
+            +args.rate ? `<prosody rate="${args.rate > 0 ? "+" : ""}${+args.rate}%">` : "",
             `<break time="500ms" />${args.text}<break time="500ms" />`,
             +args.rate ? "</prosody>" : "",
             `</voice>`,
@@ -38,7 +38,7 @@ exports.textToSpeech = async function (args) {
         speechConfig.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio48Khz192KBitRateMonoMp3;
         let speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig, audio_config);
 
-        progress = `正在生成语音... ${JSON.stringify(args)}`;
+        progress = `通过API生成语音：${args.text}`;
         let result = await new Promise((resolve, reject) => {
             speechSynthesizer.speakSsmlAsync(
                 ssml,
@@ -55,23 +55,11 @@ exports.textToSpeech = async function (args) {
             );
         });
 
-        progress = `正在写入文件...`;
+        progress = `保存MP3文件：${args.filename}`;
         fs.writeFileSync(`media/material/${args.filename}`, result);
 
-        // 因为azure生成的Mp3是VBR的，时长有问题
-        // progress = `正在转换格式...`;
-        // child_process.execSync(`ffmpeg -i "__tts_temp__.wav" -acodec libmp3lame -ac 2 -ar 48000 -b:a 96k -v quiet -y "media/material/${args.filename}"`);
-
-        // progress = `正在删除临时文件...`;
-        // await fs.unlinkSync("__tts_temp__.mp3");
-
-        // progress = `正在获取时长...`;
-        // result = child_process.execSync(`ffprobe -i "media/material/${args.filename}" -show_entries format=duration -v quiet -of csv="p=0"`);
-
-        // return { result: "success", filename: args.filename, duration: +String(result).trim() };
         return { result: "success", filename: args.filename };
     } catch (error) {
         return { result: "failed", progress: progress, data: error };
     }
 };
-

@@ -5,7 +5,7 @@
  * 3 生成空白
  * 封装服务，把mp3和png文件封装成视频
  * @param {*} args
- * @param {string} args.action      <slide | mp4> slide 转 mp4 | mp4 合并
+ * @param {string} args.action      <slide | mp4 | duration> slide 转 mp4 | mp4 合并 | media 时长
  * @param {string} args.target      保存的文件名
  * @param {string} args.slidename   slide 素材
  * @param {string} args.mp3name     mp3 素材
@@ -19,13 +19,15 @@
 
 exports.mp4Generator = async function (args) {
     let fs = require("fs"),
-        child_process = require("child_process"),
+        thread = require("child_process"),
         basePath = process.cwd();
 
     console.log(`视频生成参数: ${JSON.stringify(args)}`);
     if (args.action === "slide") {
         process.chdir("media/material");
-        await child_process.execSync(`ffmpeg -loop 1 -i "${args.slidename}" -i "${args.mp3name}" -c:a copy -c:v libx264 -shortest -v quiet -y "../video/${args.target}"`);
+        await thread.execSync(
+            `ffmpeg -loop 1 -i "${args.slidename}" -i "${args.mp3name}" -c:a copy -c:v libx264 -shortest -v quiet -y "../video/${args.target}"`
+        );
         // await fs.renameSync(args.slidename, `../archive/${args.slidename}`);
         // await fs.renameSync(args.mp3name, `../archive/${args.mp3name}`);
         // await fs.unlinkSync(args.mp3name);
@@ -35,13 +37,16 @@ exports.mp4Generator = async function (args) {
         let mp4list = args.mp4list.split("|");
         process.chdir("media/video");
         await fs.writeFileSync("filelist.txt", mp4list.map((line) => `file '${line}'`).join("\n"));
-        await child_process.execSync(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "../dist/${args.target}"`);
+        await thread.execSync(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "../dist/${args.target}"`);
         // await fs.unlinkSync("filelist.txt");
         // for (let file of mp4list) {
         //     await fs.unlinkSync(file);
         // }
         process.chdir(basePath);
         return { result: "success", action: args.action, filename: args.target };
+    } else if (args.action === "duration") {
+        let result = await thread.execSync(`ffprobe -i "${args.target}" -show_entries format=duration -v quiet -of csv="p=0"`);
+        return { result: "success", filename: args.target, duration: +String(result).trim() };
     } else {
         return { result: "failed", action: args.action, reason: "unknown action" };
     }
