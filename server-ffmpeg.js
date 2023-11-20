@@ -10,6 +10,7 @@
  * @param {string} args.slidename   slide 素材
  * @param {string} args.mp3name     mp3 素材
  * @param {string} args.mp4list     要合并的 mp4 列表
+ * @param {string} args.mp3list     求长度的 mp3 列表
  * @return {JSON}
  *
  * voice 参数可用值参考：https://learn.microsoft.com/zh-cn/azure/ai-services/speech-service/language-support?tabs=tts
@@ -28,9 +29,6 @@ exports.mp4Generator = async function (args) {
         await thread.execSync(
             `ffmpeg -loop 1 -i "${args.slidename}" -i "${args.mp3name}" -c:a copy -c:v libx264 -shortest -v quiet -y "../video/${args.target}"`
         );
-        // await fs.renameSync(args.slidename, `../archive/${args.slidename}`);
-        // await fs.renameSync(args.mp3name, `../archive/${args.mp3name}`);
-        // await fs.unlinkSync(args.mp3name);
         process.chdir(basePath);
         return { result: "success", action: args.action, filename: args.target };
     } else if (args.action === "mp4") {
@@ -38,15 +36,18 @@ exports.mp4Generator = async function (args) {
         process.chdir("media/video");
         await fs.writeFileSync("filelist.txt", mp4list.map((line) => `file '${line}'`).join("\n"));
         await thread.execSync(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "../dist/${args.target}"`);
-        // await fs.unlinkSync("filelist.txt");
-        // for (let file of mp4list) {
-        //     await fs.unlinkSync(file);
-        // }
+        let result = await thread.execSync(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "../dist/${args.target}"`);
         process.chdir(basePath);
-        return { result: "success", action: args.action, filename: args.target };
+        return { result: "success", action: args.action, filename: args.target, duration: +(+result).toFixed(3) };
     } else if (args.action === "duration") {
-        let result = await thread.execSync(`ffprobe -i "${args.target}" -show_entries format=duration -v quiet -of csv="p=0"`);
-        return { result: "success", filename: args.target, duration: +String(result).trim() };
+        let totalDuration = 0;
+        process.chdir("media/material");
+        for (const mp3 of args.mp3list.split("|")) {
+            let result = await thread.execSync(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${mp3}`);
+            totalDuration += +result;
+        }
+        //把media/image/
+        return { result: "success", duration: +totalDuration.toFixed(3) };
     } else {
         return { result: "failed", action: args.action, reason: "unknown action" };
     }

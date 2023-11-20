@@ -5,6 +5,7 @@ $SEC_KEY = $_ENV["BAIDU_SEC_KEY"];
 $to = $_REQUEST['to'] ?? "zh";
 $from = $_REQUEST['from'] ?? "auto";
 
+header('Content-Type: application/json');
 // 可以同时翻译多句话，text里句子使用回车隔开
 if (isset($_REQUEST['text'])) {
     $translated_raw = translate_baidu($_REQUEST['text'], $from, $to);

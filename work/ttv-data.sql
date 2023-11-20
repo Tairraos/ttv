@@ -23,12 +23,15 @@ CREATE TABLE 'material' (
 );
 
 
-DROP TABLE IF EXISTS "archive";
+DROP TABLE IF EXISTS "'id'，'type'，'group'，'chinese'，'english'，'phonetic'，";
 CREATE TABLE 'archive' (
     'id'        INTEGER PRIMARY KEY, 
     'type'      TEXT NOT NULL DEFAULT 'sentence',
+    'group'     INTEGER NOT NULL DEFAULT 0,
     'chinese'   TEXT NOT NULL DEFAULT '',
     'english'   TEXT NOT NULL DEFAULT '', 
     'phonetic'  TEXT NOT NULL DEFAULT '', 
     'projectid' TEXT NOT NULL DEFAULT ''
 );
+
+
