@@ -1,8 +1,7 @@
 let plugins = {
         "/tts": require("./server-tts.js").textToSpeech,
         "/slide": require("./server-slide.js").captureSlide,
-        "/ffmpeg": require("./server-ffmpeg.js").mp4Generator,
-        "/clean": require("./server-clean.js").clean,
+        "/ffmpeg": require("./server-ffmpeg.js").mp4Generator
     },
     entries = Object.keys(plugins);
 

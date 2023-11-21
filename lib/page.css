@@ -67,11 +67,16 @@ body {
     font-weight: 600;
 }
 
-.py,
-.phonetic {
+.py {
     font-size: 35px;
     font-weight: 500;
     font-family: "Mulish";
+}
+.phonetic {
+
+    font-weight: 500;
+    font-style: italic;
+    font-family: "Noto Sans";
 }
 
 .en,
@@ -81,7 +86,7 @@ body {
     font-weight: 600;
 }
 
-.lesson-chinese .cn{
+.lesson-chinese .cn {
     font-size: 70px;
 }
 
@@ -96,7 +101,7 @@ body {
 }
 
 .lesson-chinese .english,
-.lesson-english .chinese{
+.lesson-english .chinese {
     font-size: 42px;
     color: #fea;
     margin-top: 18px;
