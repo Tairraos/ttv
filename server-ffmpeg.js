@@ -35,7 +35,8 @@ exports.mp4Generator = async function (args) {
         let mp4list = args.mp4list.split("|");
         process.chdir("media/video");
         await fs.writeFileSync("filelist.txt", mp4list.map((line) => `file '${line}'`).join("\n"));
-        await thread.execSync(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "../dist/${args.target}"`);
+        await thread.execSync(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "_tmp.mp4"`);
+        await thread.execSync(`ffmpeg -i "_tmp.mp4" -v quiet -y "../dist/${args.target}"`);
         let result = await thread.execSync(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "../dist/${args.target}"`);
         process.chdir(basePath);
         return { result: "success", action: args.action, filename: args.target, duration: +(+result).toFixed(3) };
@@ -46,7 +47,7 @@ exports.mp4Generator = async function (args) {
             let result = await thread.execSync(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${mp3}`);
             totalDuration += +result;
         }
-        //把media/image/
+        process.chdir(basePath);
         return { result: "success", duration: +totalDuration.toFixed(3) };
     } else {
         return { result: "failed", action: args.action, reason: "unknown action" };
