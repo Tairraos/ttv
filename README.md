@@ -40,18 +40,18 @@
 ## 数据表结构
 ```
 CREATE TABLE 'project' (
-    'projectid'     TEXT NOT NULL DEFAULT '',
-    'projecttype'   TEXT NOT NULL DEFAULT '',
-    'lesson'        TEXT NOT NULL DEFAULT 'chinese',
+    'projectid'     INTEGER NOT NULL DEFAULT 0,
+    'lesson'        TEXT NOT NULL DEFAULT '',
+    'theme'         TEXT NOT NULL DEFAULT '',
     'duration'      REAL NOT NULL DEFAULT 0,
     'stamp'         TEXT NOT NULL DEFAULT '',
-    PRIMARY KEY ('projectid', 'projecttype')
+    PRIMARY KEY ('projectid', 'lesson')
 );
 
 CREATE TABLE 'material' (
     'id'            INTEGER NOT NULL DEFAULT 0, 
-    'projecttype'   TEXT NOT NULL DEFAULT '',
-    'type'          TEXT NOT NULL DEFAULT 'sentence',
+    'lesson'        TEXT NOT NULL DEFAULT '',
+    'type'          TEXT NOT NULL DEFAULT '',
     'group'         INTEGER NOT NULL DEFAULT 0,
     'chinese'       TEXT NOT NULL DEFAULT '',
     'english'       TEXT NOT NULL DEFAULT '', 
@@ -62,18 +62,18 @@ CREATE TABLE 'material' (
     'en_female'     TEXT NOT NULL DEFAULT '', 
     'slide'         TEXT NOT NULL DEFAULT '', 
     'isready'       TEXT NOT NULL DEFAULT '',
-    PRIMARY KEY ('id', 'projecttype')
+    PRIMARY KEY ('id', 'lesson')
 );
 
 CREATE TABLE 'archive' (
-    'id'            INTEGER PRIMARY KEY, 
-    'projecttype'   TEXT NOT NULL DEFAULT '',
-    'type'          TEXT NOT NULL DEFAULT 'sentence',
+    'id'            INTEGER NOT NULL DEFAULT 0, 
+    'lesson'        TEXT NOT NULL DEFAULT '',
+    'type'          TEXT NOT NULL DEFAULT '',
     'chinese'       TEXT NOT NULL DEFAULT '',
     'english'       TEXT NOT NULL DEFAULT '', 
     'phonetic'      TEXT NOT NULL DEFAULT '', 
     'projectid'     TEXT NOT NULL DEFAULT '',
-    PRIMARY KEY ('id', 'projecttype')
+    PRIMARY KEY ('id', 'lesson')
 );
 ```
 ### project设计
@@ -94,18 +94,19 @@ CREATE TABLE 'archive' (
 - english lesson + word type, chinese为词典翻译（非api）
 - english lesson + word type, 没有cn_male.mp3 和 cn_female.mp3
 
-### projectid设计
-- 视频名字和背景图片名字和同projectid
-- project id 为 2字母前缀 + 四位顺序数字
-- 前缀区分 考试，生活，旅游，商务 四类
-- Business              - bc0001, be0001
-- Travel                - tc0001, te0001
-- living                - lc0001, le0001
-- 考试类前缀使用各种考试名字缩写
-- HSK Chinese           - hc0001
-- CET4 English          - c40001
-- CET6 English          - c60001
-- Postgraduate English  - pe0001
+### project设计
+- theme 为 背景图片，lesson的缩写 + projectid = theme
+- lesson 分 下面几种
+- Living Chinese
+- Travel Chinese
+- Business Chinese
+- HSK Chinese
+- Live English
+- Travel English
+- Business English
+- CET4 English
+- CET6 English
+- Postgraduate English
 
 ## 环境配置
 - PHP.ini里，有可能被设置成production模式，确保 variables_order = "EGPCS"

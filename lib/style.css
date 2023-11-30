@@ -89,11 +89,18 @@ body {
     border-style: dotted;
 }
 
-#theme {
-    width: 140px;
+#lesson {width: 140px;text-align: center;margin: 5px 0;height: 30px;}
+
+#projectid {
+    width: 50px;
     text-align: center;
-    margin: 5px 0 0;
-    height: 24px;
+    padding: 5px 10px;
+    margin: 5px 10px 0 0;
+    vertical-align: top;
+}
+
+#createProject{
+    vertical-align: top;
 }
 
 .menu button {
@@ -108,20 +115,7 @@ body {
     margin: 0 5px 0 3px;
     vertical-align: middle;
 }
-.menu.lesson-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin: 5px 0 0;
-}
 
-.menu .lesson {
-    display: inline-block;
-    font: 12px/15px verdana;
-    text-align: left;
-    vertical-align: top;
-    margin: 5px 0;
-}
 #preview {
     width: 144px;
     height: 81px;

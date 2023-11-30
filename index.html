@@ -14,15 +14,22 @@
                     <h3>工程信息</h3>
                     <ul id="bigbasket">
                         <li class="menu">
-                            <input type="text" id="theme" />
-                            <!--  -->
+                            <select id="lesson">
+                                <option value="Living Chinese">日常汉语</option>
+                                <option value="Travel Chinese">旅游汉语</option>
+                                <option value="Business Chinese">商务汉语</option>
+                                <option value="HSK Chinese">HSK考试</option>
+                                <option value="Live English">日常英语</option>
+                                <option value="Travel English">旅游英语</option>
+                                <option value="Business English">商务英语</option>
+                                <option value="CET 4 English">CET4考试</option>
+                                <option value="CET 6 English">CET6考试</option>
+                                <option value="Postgraduate English">考研英语</option>
+                            </select>
+
                         </li>
-                        <li class="menu lesson-container">
-                            <span class="lesson">
-                                <input type="radio" name="lesson" value="chinese" />Chinese<br />
-                                <input type="radio" name="lesson" value="english" />English
-                            </span>
-                            <button id="createProject">确认</button>
+                        <li class="menu">
+                            <input type="text" id="projectid" /><button id="createProject">确认</button>
                         </li>
                         <li class="menu"><img id="preview" src="lib/notheme.png" /></li>
                         <li class="menu"><div id="basket">拖放导入数据</div></li>
