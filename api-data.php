@@ -13,13 +13,10 @@ $condition = isset($_REQUEST['id']) ? " WHERE (`id` = $id AND `group` = 0) OR (`
 $results = $db->query("SELECT * FROM `material` $condition");
 $rows = $results->fetchAll(PDO::FETCH_ASSOC);
 
-$results = $db->query("SELECT MAX(`maxid`) as `maxid` FROM ( SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `archive` UNION ALL SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `material`)");
-$maxid = $results->fetchAll(PDO::FETCH_ASSOC);
-
 // 如果是直接访问api就输出结果
 if (realpath(__FILE__) == realpath($_SERVER['SCRIPT_FILENAME'])) {
     header('Content-Type: application/json');
-    echo json_encode(['result' => 'success', 'data' => $rows, 'maxid' => $maxid[0]['maxid']], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['result' => 'success', 'data' => $rows], JSON_UNESCAPED_UNICODE);
 }
 // 如果是其它 php require 则不用返回，程序会来读取 $rows
 

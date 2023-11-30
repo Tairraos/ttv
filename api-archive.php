@@ -11,7 +11,7 @@ rename('media/images/' . $projectid . '.png', 'media/archive/' . $projectid . '.
 $db = new PDO('sqlite:ttv-data.db');
 
 // 插入数据到archive表
-$stmt = $db->prepare("INSERT INTO archive (`id`, `projecttype`, `type`, `group`, `chinese`, `english`, `phonetic`, `projectid`) SELECT `id`, `projecttype`, `type`, `group`, `chinese`, `english`, `phonetic`, :projectid AS projectid FROM material");
+$stmt = $db->prepare("INSERT INTO archive (`id`, `lesson`, `type`, `group`, `chinese`, `english`, `phonetic`, `projectid`) SELECT `id`, `lesson`, `type`, `group`, `chinese`, `english`, `phonetic`, :projectid AS projectid FROM material");
 $stmt->bindParam(':projectid', $projectid);
 $stmt->execute();
 

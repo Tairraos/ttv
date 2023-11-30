@@ -2,7 +2,7 @@
 // ************
 // 工程表API
 // ************
-// 查询/新建/更新 工程记录：{projectid: "dc0001", lesson: "chinese", duration: "300"}
+// 查询/新建/更新 工程记录：{projectid: "0001", lesson: "Living Chinese", duration: "300"}
 // 如果duraion为0，则删除所有同样前缀未完成的记录，并在数据表插入一条新记录，projectid顺延
 // 否则更新duration
 // 无论如何，stamp都会被更新成当前时间，精确到秒
@@ -10,7 +10,7 @@
 
 header('Content-Type: application/json');
 $projectid = $_REQUEST['projectid'] ?? '';
-$lesson = $_REQUEST['lesson'] ?? '';
+$lesson = $_REQUEST['lesson'] ?? 'Living Chinese';
 $duration = $_REQUEST['duration'] ?? 0;
 $stamp = date('Y-m-d H:i:s');
 
@@ -19,51 +19,54 @@ if (!$projectid) {
 }
 
 $db = new PDO('sqlite:ttv-data.db');
-function create_project($projectid)
+function create_project($lesson)
 {
-    global $db, $lesson, $duration, $stamp;
-    $projectid = getNewProjectid($projectid);
-    $lesson = $lesson == '' ? 'chinese' : $lesson;
-    $results = $db->query("INSERT INTO `project` (`projectid`, `lesson`, `duration`, `stamp`) VALUES ('$projectid', '$lesson', 0, '$stamp')");
+    global $db, $duration, $stamp;
+    $projectid = getNewProjectid($lesson);
+    $theme = implode("", array_map(fn($c) => strtoupper($c[0]), explode(" ", $lesson))) . str_pad($projectid, 4, '0', STR_PAD_LEFT);
+    $results = $db->query("INSERT INTO `project` (`projectid`, `lesson`, `theme`, `duration`, `stamp`) VALUES ('$projectid', '$lesson', '$theme', 0, '$stamp')");
     $results->fetchAll(PDO::FETCH_ASSOC);
-    echoProject($projectid);
+    echoProject($projectid, $lesson);
 }
 
-function getNewProjectid($projectid)
+function getNewProjectid($lesson)
 {
     global $db;
-    $projectid = substr($projectid, 0, 2);
-    // 删除同样前缀的未完成记录
-    $db->query("DELETE FROM `project` WHERE SUBSTR(projectid, 1, 2) = '$projectid' AND duration = 0");
+        // 删除同样前缀的未完成记录
+    $db->query("DELETE FROM `project` WHERE lesson = '$lesson' AND duration = 0");
     // 找到合适的projectid
-    $results = $db->query("SELECT IFNULL(MAX(CAST(SUBSTR(projectid, 3) AS INTEGER)),0) AS maxid FROM project WHERE projectid LIKE '$projectid%'");
+    $results = $db->query("SELECT IFNULL(MAX(projectid),0) AS maxid FROM project WHERE lesson = '$lesson'");
     $rows = $results->fetchAll(PDO::FETCH_ASSOC);
-    return $projectid . str_pad($rows[0]['maxid'] + 1, 4, '0', STR_PAD_LEFT);
+    return $rows[0]['maxid'] + 1;
 }
 
-function updateProject($projectid)
+function updateProject($projectid, $lesson)
 {
     global $db, $duration, $stamp;
     // 如果$lesson是null则不更新lesson字段
-    $results = $db->query("UPDATE `project` SET `duration` = '$duration', `stamp` = '$stamp' WHERE projectid = '$projectid'");
-    $rows = $results->fetchAll(PDO::FETCH_ASSOC);
-    echoProject($projectid);
+    $results = $db->query("UPDATE `project` SET `duration` = '$duration', `stamp` = '$stamp' WHERE projectid = '$projectid' AND lesson = '$lesson'");
+    $results->fetchAll(PDO::FETCH_ASSOC);
+    echoProject($projectid, $lesson);
 }
 
 
-function echoProject($projectid)
+function echoProject($projectid, $lesson)
 {
     global $db;
-    $results = $db->query("SELECT * FROM `project` WHERE projectid = '$projectid'");
+
+    $results = $db->query("SELECT MAX(`maxid`) as `maxid` FROM ( SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `archive` WHERE `lesson` = '$lesson' UNION ALL SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `material` WHERE `lesson` = '$lesson')");
+    $maxid = $results->fetchAll(PDO::FETCH_ASSOC);
+
+    $results = $db->query("SELECT * FROM `project` WHERE projectid = '$projectid' AND lesson = '$lesson'");
     $rows = $results->fetchAll(PDO::FETCH_ASSOC);
-    echo json_encode(['result' => 'success', 'data' => $rows[0]], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['result' => 'success', 'data' => $rows[0], 'maxid' => $maxid[0]['maxid']], JSON_UNESCAPED_UNICODE);
 }
 
 
 if ($duration == 0) {
-    create_project($projectid); // 不是完整id，取前2位做前缀重新生成记录
+    create_project($lesson);
 } else {
-    updateProject($projectid);
+    updateProject($projectid, $lesson);
 }
 $db = NULL;
 ?>
