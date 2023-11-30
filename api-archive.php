@@ -6,12 +6,12 @@
 
 $projectid = $_REQUEST['projectid'];
 
-rename('media/images/' . $projectid . '.jpg', 'media/archive/' . $projectid . '.jpg');
+rename('media/images/' . $projectid . '.png', 'media/archive/' . $projectid . '.png');
 
 $db = new PDO('sqlite:ttv-data.db');
 
 // 插入数据到archive表
-$stmt = $db->prepare("INSERT INTO archive (id, type, `group`, chinese, english, phonetic, projectid) SELECT id, type, `group`, chinese, english, phonetic, :projectid AS projectid FROM material;");
+$stmt = $db->prepare("INSERT INTO archive (`id`, `projecttype`, `type`, `group`, `chinese`, `english`, `phonetic`, `projectid`) SELECT `id`, `projecttype`, `type`, `group`, `chinese`, `english`, `phonetic`, :projectid AS projectid FROM material");
 $stmt->bindParam(':projectid', $projectid);
 $stmt->execute();
 
