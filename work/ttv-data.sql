@@ -1,37 +1,39 @@
 DROP TABLE IF EXISTS "project";
 CREATE TABLE 'project' (
-    'projectid' TEXT PRIMARY KEY,
-    'lesson'    TEXT NOT NULL DEFAULT 'chinese',
-    'duration'  REAL NOT NULL DEFAULT 0,
-    'stamp'     TEXT NOT NULL DEFAULT ''
+    'projectid'     TEXT NOT NULL DEFAULT '',
+    'projecttype'   TEXT NOT NULL DEFAULT '',
+    'lesson'        TEXT NOT NULL DEFAULT 'chinese',
+    'duration'      REAL NOT NULL DEFAULT 0,
+    'stamp'         TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY ('projectid', 'projecttype')
 );
 
 DROP TABLE IF EXISTS "material";
 CREATE TABLE 'material' (
-    'id'        INTEGER PRIMARY KEY, 
-    'type'      TEXT NOT NULL DEFAULT 'sentence',
-    'group'     INTEGER NOT NULL DEFAULT 0,
-    'chinese'   TEXT NOT NULL DEFAULT '',
-    'english'   TEXT NOT NULL DEFAULT '', 
-    'phonetic'  TEXT NOT NULL DEFAULT '', 
-    'cn_male'   TEXT NOT NULL DEFAULT '', 
-    'cn_female' TEXT NOT NULL DEFAULT '', 
-    'en_male'   TEXT NOT NULL DEFAULT '', 
-    'en_female' TEXT NOT NULL DEFAULT '', 
-    'slide'     TEXT NOT NULL DEFAULT '', 
-    'isready'   TEXT NOT NULL DEFAULT ''
+    'id'            INTEGER NOT NULL DEFAULT 0, 
+    'projecttype'   TEXT NOT NULL DEFAULT '',
+    'type'          TEXT NOT NULL DEFAULT 'sentence',
+    'group'         INTEGER NOT NULL DEFAULT 0,
+    'chinese'       TEXT NOT NULL DEFAULT '',
+    'english'       TEXT NOT NULL DEFAULT '', 
+    'phonetic'      TEXT NOT NULL DEFAULT '', 
+    'cn_male'       TEXT NOT NULL DEFAULT '', 
+    'cn_female'     TEXT NOT NULL DEFAULT '', 
+    'en_male'       TEXT NOT NULL DEFAULT '', 
+    'en_female'     TEXT NOT NULL DEFAULT '', 
+    'slide'         TEXT NOT NULL DEFAULT '', 
+    'isready'       TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY ('id', 'projecttype')
 );
 
-
-DROP TABLE IF EXISTS "'id'，'type'，'group'，'chinese'，'english'，'phonetic'，";
+DROP TABLE IF EXISTS "archive";
 CREATE TABLE 'archive' (
-    'id'        INTEGER PRIMARY KEY, 
-    'type'      TEXT NOT NULL DEFAULT 'sentence',
-    'group'     INTEGER NOT NULL DEFAULT 0,
-    'chinese'   TEXT NOT NULL DEFAULT '',
-    'english'   TEXT NOT NULL DEFAULT '', 
-    'phonetic'  TEXT NOT NULL DEFAULT '', 
-    'projectid' TEXT NOT NULL DEFAULT ''
+    'id'            INTEGER PRIMARY KEY, 
+    'projecttype'   TEXT NOT NULL DEFAULT '',
+    'type'          TEXT NOT NULL DEFAULT 'sentence',
+    'chinese'       TEXT NOT NULL DEFAULT '',
+    'english'       TEXT NOT NULL DEFAULT '', 
+    'phonetic'      TEXT NOT NULL DEFAULT '', 
+    'projectid'     TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY ('id', 'projecttype')
 );
-
-

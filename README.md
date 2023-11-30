@@ -40,35 +40,40 @@
 ## 数据表结构
 ```
 CREATE TABLE 'project' (
-    'projectid' TEXT PRIMARY KEY,
-    'lesson'    TEXT NOT NULL DEFAULT 'chinese',
-    'duration'  REAL NOT NULL DEFAULT 0,
-    'stamp'     TEXT NOT NULL DEFAULT ''
+    'projectid'     TEXT NOT NULL DEFAULT '',
+    'projecttype'   TEXT NOT NULL DEFAULT '',
+    'lesson'        TEXT NOT NULL DEFAULT 'chinese',
+    'duration'      REAL NOT NULL DEFAULT 0,
+    'stamp'         TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY ('projectid', 'projecttype')
 );
 
 CREATE TABLE 'material' (
-    'id'        INTEGER PRIMARY KEY, 
-    'type'      TEXT NOT NULL DEFAULT 'sentence',
-    'group'     INTEGER NOT NULL DEFAULT 0,
-    'chinese'   TEXT NOT NULL DEFAULT '',
-    'english'   TEXT NOT NULL DEFAULT '', 
-    'phonetic'  TEXT NOT NULL DEFAULT '', 
-    'cn_male'   TEXT NOT NULL DEFAULT '', 
-    'cn_female' TEXT NOT NULL DEFAULT '', 
-    'en_male'   TEXT NOT NULL DEFAULT '', 
-    'en_female' TEXT NOT NULL DEFAULT '', 
-    'slide'     TEXT NOT NULL DEFAULT '', 
-    'isready'   TEXT NOT NULL DEFAULT ''
+    'id'            INTEGER NOT NULL DEFAULT 0, 
+    'projecttype'   TEXT NOT NULL DEFAULT '',
+    'type'          TEXT NOT NULL DEFAULT 'sentence',
+    'group'         INTEGER NOT NULL DEFAULT 0,
+    'chinese'       TEXT NOT NULL DEFAULT '',
+    'english'       TEXT NOT NULL DEFAULT '', 
+    'phonetic'      TEXT NOT NULL DEFAULT '', 
+    'cn_male'       TEXT NOT NULL DEFAULT '', 
+    'cn_female'     TEXT NOT NULL DEFAULT '', 
+    'en_male'       TEXT NOT NULL DEFAULT '', 
+    'en_female'     TEXT NOT NULL DEFAULT '', 
+    'slide'         TEXT NOT NULL DEFAULT '', 
+    'isready'       TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY ('id', 'projecttype')
 );
 
-
 CREATE TABLE 'archive' (
-    'id'        INTEGER PRIMARY KEY, 
-    'type'      TEXT NOT NULL DEFAULT 'sentence',
-    'chinese'   TEXT NOT NULL DEFAULT '',
-    'english'   TEXT NOT NULL DEFAULT '', 
-    'phonetic'  TEXT NOT NULL DEFAULT '', 
-    'projectid' TEXT NOT NULL DEFAULT ''
+    'id'            INTEGER PRIMARY KEY, 
+    'projecttype'   TEXT NOT NULL DEFAULT '',
+    'type'          TEXT NOT NULL DEFAULT 'sentence',
+    'chinese'       TEXT NOT NULL DEFAULT '',
+    'english'       TEXT NOT NULL DEFAULT '', 
+    'phonetic'      TEXT NOT NULL DEFAULT '', 
+    'projectid'     TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY ('id', 'projecttype')
 );
 ```
 ### project设计
@@ -110,3 +115,24 @@ CREATE TABLE 'archive' (
 - setx /m BAIDU_APP_ID xxxxxx
 - setx /m BAIDU_SEC_KEY xxxxxx
 - npm run server 把工具助手运行起来
+
+
+
+
+CREATE TABLE 'test' (
+    'id'        INTEGER NOT NULL DEFAULT 0,
+    'projecttype'   TEXT NOT NULL DEFAULT 'lc',
+    'type'      TEXT NOT NULL DEFAULT 'sentence',
+    'group'     INTEGER NOT NULL DEFAULT 0,
+    'chinese'   TEXT NOT NULL DEFAULT '',
+    'english'   TEXT NOT NULL DEFAULT '', 
+    'phonetic'  TEXT NOT NULL DEFAULT '', 
+    'cn_male'   TEXT NOT NULL DEFAULT '', 
+    'cn_female' TEXT NOT NULL DEFAULT '', 
+    'en_male'   TEXT NOT NULL DEFAULT '', 
+    'en_female' TEXT NOT NULL DEFAULT '', 
+    'slide'     TEXT NOT NULL DEFAULT '', 
+    'isready'   TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY (id, projecttype)
+);
+
