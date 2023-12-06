@@ -21,6 +21,7 @@
             if (!isset($_REQUEST['lesson'])) {
                 echo '缺少参数 lesson';
             } else if (!($_REQUEST['id'] ?? 0)) {
+                mt_srand(round(microtime(true) * 1000000));
                 ?>
                     <div class="listen-container">
                         <object type="image/svg+xml" data="lib/listen<?= rand(1, 100) % 4 + 1; ?>.svg"
@@ -42,7 +43,7 @@
                     $cnarr = preg_split('//u', $row['chinese'], -1, PREG_SPLIT_NO_EMPTY);
                     $pyarr = array_map(fn($item) => mb_ereg_replace('[，。？！]', ' ', $item), explode(' ', $row['phonetic']));
 
-                    echo '<div class="subtitle vol-'.$vol.'">';
+                    echo '<div class="subtitle vol-' . $vol . '">';
                     echo '<div class="subtitle-id">';
                     echo $id;
                     echo '</div>';

@@ -15,7 +15,7 @@
 
 exports.textToSpeech = async function (args) {
     let fs = require("fs"),
-        // thread = require("child_process"),
+        thread = require("child_process"),
         ssml = [
             `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US">`,
             `<voice name="${args.voice}">`,
@@ -56,7 +56,13 @@ exports.textToSpeech = async function (args) {
         });
 
         progress = `保存MP3文件：${args.filename}`;
-        fs.writeFileSync(`media/material/${args.filename}`, result);
+
+        await fs.writeFileSync(`_temp_${args.filename}`, result);
+        // 删除头尾空白
+        await thread.execSync(
+            `ffmpeg -i "_temp_${args.filename}" -filter_complex "silenceremove=start_periods=1:start_duration=0:start_threshold=-60dB:start_silence=0.4:detection=peak,areverse,silenceremove=start_periods=1:start_duration=0:start_threshold=-60dB:start_silence=0.4:detection=peak,areverse" -ar 44100 -ac 2 -v quiet -y "media/material/${args.filename}"`
+        );
+        await fs.unlinkSync(`_temp_${args.filename}`);
 
         return { result: "success", filename: args.filename };
     } catch (error) {
