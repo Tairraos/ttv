@@ -26,13 +26,14 @@ function create_project($lesson)
     $theme = implode("", array_map(fn($c) => strtoupper($c[0]), explode(" ", $lesson))) . str_pad($projectid, 4, '0', STR_PAD_LEFT);
     $results = $db->query("INSERT INTO `project` (`projectid`, `lesson`, `theme`, `duration`, `stamp`) VALUES ('$projectid', '$lesson', '$theme', 0, '$stamp')");
     $results->fetchAll(PDO::FETCH_ASSOC);
+    prepareBgImg($theme);
     echoProject($projectid, $lesson);
 }
 
 function getNewProjectid($lesson)
 {
     global $db;
-        // 删除同样前缀的未完成记录
+    // 删除同样前缀的未完成记录
     $db->query("DELETE FROM `project` WHERE lesson = '$lesson' AND duration = 0");
     // 找到合适的projectid
     $results = $db->query("SELECT IFNULL(MAX(projectid),0) AS maxid FROM project WHERE lesson = '$lesson'");
@@ -49,7 +50,6 @@ function updateProject($projectid, $lesson)
     echoProject($projectid, $lesson);
 }
 
-
 function echoProject($projectid, $lesson)
 {
     global $db;
@@ -62,6 +62,15 @@ function echoProject($projectid, $lesson)
     echo json_encode(['result' => 'success', 'data' => $rows[0], 'maxid' => $maxid[0]['maxid']], JSON_UNESCAPED_UNICODE);
 }
 
+function prepareBgImg($theme)
+{
+    if (!file_exists("media/images/$theme.png")) {
+        $files = glob("media/images/*.png");
+        if ($files) {
+            rename($files[0], "media/images/$theme.png");
+        }
+    }
+}
 
 if ($duration == 0) {
     create_project($lesson);
