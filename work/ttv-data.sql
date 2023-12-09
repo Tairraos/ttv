@@ -4,6 +4,7 @@ CREATE TABLE 'project' (
     'lesson'        TEXT NOT NULL DEFAULT '',
     'theme'         TEXT NOT NULL DEFAULT '',
     'duration'      REAL NOT NULL DEFAULT 0,
+    'archived'      TEXT NOT NULL DEFAULT '',
     'stamp'         TEXT NOT NULL DEFAULT '',
     PRIMARY KEY ('projectid', 'lesson')
 );
@@ -31,6 +32,7 @@ CREATE TABLE 'archive' (
     'id'            INTEGER NOT NULL DEFAULT 0, 
     'lesson'        TEXT NOT NULL DEFAULT '',
     'type'          TEXT NOT NULL DEFAULT '',
+    'group'         INTEGER NOT NULL DEFAULT 0,
     'chinese'       TEXT NOT NULL DEFAULT '',
     'english'       TEXT NOT NULL DEFAULT '', 
     'phonetic'      TEXT NOT NULL DEFAULT '', 
