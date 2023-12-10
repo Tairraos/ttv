@@ -15,7 +15,6 @@ echo 存档目录准备完成 media\archive 存放用过的素材
 if not exist "common" mkdir "common"
 echo 公用文件目录准备完成 media\common 存放的是公用文件，ding 声音和片头
 
-if not exist "common\ding.mp3" copy "..\work\ding.mp3" "common\ding.mp3"
 if not exist "common\ding.m4a" copy "..\work\ding.m4a" "common\ding.m4a"
 if not exist "common\intro-cn.mp4" copy "..\work\intro-cn.mp4" "common\intro-cn.mp4"
 if not exist "common\intro-en.mp4" copy "..\work\intro-en.mp4" "common\intro-en.mp4"
