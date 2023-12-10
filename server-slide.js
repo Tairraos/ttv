@@ -10,17 +10,27 @@
 
 exports.captureSlide = async function (args) {
     let puppeteer = require("puppeteer"),
+        fs = require("fs"),
+        path = require("path"),
+        basePath = process.cwd(),
         browser = await puppeteer.launch({ headless: "new", args: ["--window-size=1920,1080"] }),
         page = await browser.newPage(),
         query = Object.keys(args)
             .map((s) => `${s}=${args[s]}`)
             .join("&");
+
+    let saveLog = async function (text) {
+        await fs.appendFileSync(path.join(basePath, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
+    };
+
     try {
         console.log(`抓图参数: ${JSON.stringify(args)}`);
         await page.setViewport({ width: 1920, height: 1080 });
         await page.goto(`https://ttv.localweb.com/api-page.php?${query}`);
-        await page.screenshot({ path: `media/material/${args.filename}` });
+        await page.screenshot({ path: `media/material/slide/${args.filename}` });
         await browser.close();
+
+        saveLog(`screenshot: https://ttv.localweb.com/api-page.php?${query} => media/material/slide/${args.filename}`);
         return { result: "success", filename: args.filename, id: args.id };
     } catch (error) {
         return { result: "failed", reason: "遇到错误" };
