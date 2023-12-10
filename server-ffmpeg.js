@@ -37,15 +37,14 @@ exports.mp4Generator = async function (args) {
         /********************************/
 
         let slidename = `slide/${args.slidename}`,
-            mp3name = args.mp3name === "DING" ? "../common/ding.mp3" : `audio/${args.mp3name}`;
+            mp3name = args.mp3name === "DING" ? "../common/ding.m4a" : `audio/${args.mp3name}`;
 
         process.chdir("media/material");
-
         await execCommand(
             [
                 `ffmpeg -loop 1 -i "${slidename}" -i "${mp3name}"`,
                 `-c:v libx264 -tune stillimage -pix_fmt yuv420p`, // 视频用x264编码，stillimage优化静态图像，象素格式yuv420p
-                `-c:a aac -b:a 128k -ac 2`, // 音频用aac编码，128k码率，2声道
+                `-c:a copy`, // 音频直接复制，否则会有bug
                 `-shortest -v quiet -y "video/${args.target}` // 视频长度和mp3一致，静默执行，覆盖目标文件
             ].join(" ")
         );

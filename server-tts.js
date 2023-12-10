@@ -67,16 +67,16 @@ exports.textToSpeech = async function (args) {
             );
         });
 
-        progress = `保存MP3文件：${args.filename}`;
         process.chdir("media/material/audio");
 
-        await fs.writeFileSync(`_temp_${args.filename}`, result); // 写临时文件
-        saveLog(`writeFileSync: _temp_${args.filename}`);
+        progress = `保存文件：${args.filename}.mp3`;
+        await fs.writeFileSync(`${args.filename}.mp3`, result); // 写临时文件
+        saveLog(`writeFileSync: ${args.filename}.mp3`);
 
-        // 删除临时文件头尾空白，存成目标文件名
+        progress = `修正静音，输出成：${args.filename}.m4a`;
         await execCommand(
             [
-                `ffmpeg -i "_temp_${args.filename}"`,
+                `ffmpeg -i "${args.filename}.mp3"`,
                 `-filter_complex`,
                 [
                     `"`,
@@ -96,11 +96,14 @@ exports.textToSpeech = async function (args) {
                     `areverse`, // 反回来
                     `"`
                 ].join(""),
-                `-v quiet -y "${args.filename}"`
+                `-c:a aac -b:a 128k -ar 44100 -ac 2`,
+                `-v quiet -y "${args.filename}.m4a"`
             ].join(" ")
         );
-        await fs.unlinkSync(`_temp_${args.filename}`);
-        saveLog(`unlinkSync: _temp_${args.filename}`);
+
+        progress = `删除mp3源文件：${args.filename}.m4a`;
+        await fs.unlinkSync(`${args.filename}.mp3`);
+        saveLog(`unlinkSync: ${args.filename}.mp3`);
 
         process.chdir(basePath);
         return { result: "success", filename: args.filename };
