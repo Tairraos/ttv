@@ -36,6 +36,6 @@ CREATE TABLE 'archive' (
     'chinese'       TEXT NOT NULL DEFAULT '',
     'english'       TEXT NOT NULL DEFAULT '', 
     'phonetic'      TEXT NOT NULL DEFAULT '', 
-    'projectid'     TEXT NOT NULL DEFAULT '',
+    'projectid'     INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY ('id', 'lesson')
 );

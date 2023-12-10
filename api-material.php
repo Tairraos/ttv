@@ -2,7 +2,7 @@
 // **********************************
 // 储存数据的API，插入新记录或更新某条记录
 // **********************************
-// 插入：{ id: "99", value: "type|group|chinese|english }
+// 插入：{ id: "99", lesson:"", type:"", group:"", chinese:"", english:"", phonetic:""  }
 // 更新：{ id: "1,2,3", field: 'phonetic', value: '5.chinese.(920.33).mp4' }
 
 $field = $_REQUEST['field'] ?? '';
@@ -26,13 +26,19 @@ if ($field) { // 传入修改
     echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
 } else { // 插入
     $id = +$_REQUEST['id'];
-    $type = $_REQUEST['type'];
-    $group = $_REQUEST['group'];
-    $chinese = $_REQUEST['chinese'];
-    $english = $_REQUEST['english'];
-    $stmt = $db->prepare("INSERT INTO `material` (`id`, `type`, `group`, `chinese`, `english`) VALUES ($id, '$type', '$group', ?, ?)");
-    $stmt->bindParam(1, $chinese);
-    $stmt->bindParam(2, $english);
+    $lesson = $_REQUEST['lesson'] ?? 'Living Chinese';
+    $type = $_REQUEST['type'] ?? 'sentence';
+    $group = $_REQUEST['group'] ?? '';
+    $chinese = $_REQUEST['chinese'] ?? '';
+    $english = $_REQUEST['english'] ?? '';
+    $phonetic = $_REQUEST['phonetic'] ?? '';
+    $stmt = $db->prepare("INSERT INTO `material` (`id`, `lesson`, `type`, `group`, `chinese`, `english`, `phonetic`) VALUES ($id, ?, ?, ?, ?, ?, ?)");
+    $stmt->bindParam(1, $lesson);
+    $stmt->bindParam(2, $type);
+    $stmt->bindParam(3, $group);
+    $stmt->bindParam(4, $chinese);
+    $stmt->bindParam(5, $english);
+    $stmt->bindParam(6, $phonetic);
     $stmt->execute();
 
     $results = $db->query("SELECT * FROM `material` WHERE id = $id");
