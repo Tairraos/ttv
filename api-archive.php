@@ -5,14 +5,21 @@
 // projectid关联到project表
 
 $projectid = $_REQUEST['projectid'];
+$lesson = $_REQUEST['lesson'];
+$theme = implode("", array_map(fn($c) => strtoupper($c[0]), explode(" ", $lesson))) . str_pad($projectid, 4, '0', STR_PAD_LEFT);
+$stamp = date('Y-m-d H:i:s');
 
-rename('media/images/' . $projectid . '.png', 'media/archive/' . $projectid . '.png');
+rename('media/images/' . $theme . '.png', 'media/archive/' . $theme . '.png');
 
 $db = new PDO('sqlite:ttv-data.db');
 
 // 插入数据到archive表
-$stmt = $db->prepare("INSERT INTO archive (`id`, `lesson`, `type`, `group`, `chinese`, `english`, `phonetic`, `projectid`) SELECT `id`, `lesson`, `type`, `group`, `chinese`, `english`, `phonetic`, :projectid AS projectid FROM material");
-$stmt->bindParam(':projectid', $projectid);
+$stmt = $db->prepare("INSERT INTO archive (`id`, `lesson`, `type`, `group`, `chinese`, `english`, `phonetic`, `projectid`) SELECT `id`, `lesson`, `type`, `group`, `chinese`, `english`, `phonetic`, '$projectid' AS projectid FROM material");
+$stmt->execute();
+
+
+// 更新project表
+$stmt = $db->prepare("UPDATE `project` SET `archived` = 'yes', `stamp` = '$stamp' WHERE projectid = $projectid AND lesson = '$lesson'");
 $stmt->execute();
 
 // 删除material表中的数据
