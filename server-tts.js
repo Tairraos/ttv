@@ -15,7 +15,9 @@
 
 exports.textToSpeech = async function (args) {
     let fs = require("fs"),
+        path = require("path"),
         thread = require("child_process"),
+        basePath = process.cwd(),
         ssml = [
             `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US">`,
             `<voice name="${args.voice}">`,
@@ -26,6 +28,15 @@ exports.textToSpeech = async function (args) {
             `</speak>`
         ].join(""),
         progress;
+
+    let saveLog = async function (text) {
+        await fs.appendFileSync(path.join(basePath, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
+    };
+
+    let execCommand = async function (command) {
+        await saveLog(command);
+        return await thread.execSync(command);
+    };
 
     console.log(`TTS参数: ${JSON.stringify(args)}`);
 
@@ -39,6 +50,7 @@ exports.textToSpeech = async function (args) {
         let speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig, audio_config);
 
         progress = `通过API生成语音：${args.text}`;
+        saveLog(`azure tts api: ${args.voice} => ${args.text}`);
         let result = await new Promise((resolve, reject) => {
             speechSynthesizer.speakSsmlAsync(
                 ssml,
@@ -56,14 +68,41 @@ exports.textToSpeech = async function (args) {
         });
 
         progress = `保存MP3文件：${args.filename}`;
+        process.chdir("media/material/audio");
 
-        await fs.writeFileSync(`_temp_${args.filename}`, result);
-        // 删除头尾空白
-        await thread.execSync(
-            `ffmpeg -i "_temp_${args.filename}" -filter_complex "silenceremove=start_periods=1:start_duration=0:start_threshold=-60dB:start_silence=0.4:detection=peak,areverse,silenceremove=start_periods=1:start_duration=0:start_threshold=-60dB:start_silence=0.4:detection=peak,areverse" -ar 44100 -ac 2 -v quiet -y "media/material/${args.filename}"`
+        await fs.writeFileSync(`_temp_${args.filename}`, result); // 写临时文件
+        saveLog(`writeFileSync: _temp_${args.filename}`);
+
+        // 删除临时文件头尾空白，存成目标文件名
+        await execCommand(
+            [
+                `ffmpeg -i "_temp_${args.filename}"`,
+                `-filter_complex`,
+                [
+                    `"`,
+                    `silenceremove=`, // 删除静音
+                    `start_periods=1:`,
+                    `start_duration=0:`,
+                    `start_threshold=-60dB:`, // 小于最大音量-60dB的才算静音
+                    `start_silence=0.5:`, // 头上保留0.5秒静音
+                    `detection=peak,`,
+                    `areverse,`, // 反过来，因为从后面剪音频有问题
+                    `silenceremove=`, // 删除静音
+                    `start_periods=1:`,
+                    `start_duration=0:`,
+                    `start_threshold=-60dB:`,
+                    `start_silence=0.5:`,
+                    `detection=peak,`,
+                    `areverse`, // 反回来
+                    `"`
+                ].join(""),
+                `-v quiet -y "${args.filename}"`
+            ].join(" ")
         );
         await fs.unlinkSync(`_temp_${args.filename}`);
+        saveLog(`unlinkSync: _temp_${args.filename}`);
 
+        process.chdir(basePath);
         return { result: "success", filename: args.filename };
     } catch (error) {
         return { result: "failed", progress: progress, data: error };
