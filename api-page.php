@@ -18,17 +18,16 @@
     <div class="container">
         <div class="subcontainer">
             <?php
-            if (!isset($_REQUEST['lesson'])) {
-                echo '缺少参数 lesson';
-            } else if (!($_REQUEST['id'] ?? 0)) {
-                mt_srand(round(microtime(true) * 1000000));
+            if (isset($_REQUEST['type'])) {
                 ?>
                     <div class="listen-container">
-                        <object type="image/svg+xml" data="lib/listen<?= rand(1, 100) % 4 + 1; ?>.svg"
+                        <object type="image/svg+xml" data="lib/listen<?=$_REQUEST['id']?>.svg"
                             class="listen-svg"></object>
                         <object type="image/svg+xml" data="lib/listen-text.svg" class="listen-svg"></object>
                     </div>
                 <?php
+            } else if (!isset($_REQUEST['lesson'])) {
+                echo '缺少参数 lesson';
             } else {
                 require("api-data.php");
                 $lesson = $_REQUEST['lesson'];
@@ -69,7 +68,6 @@
             ?>
         </div>
         <?php
-        /*<div class="channel-name">Moore's Language</div>*/
         ?>
     </div>
 </body>
