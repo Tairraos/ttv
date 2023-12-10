@@ -6,7 +6,7 @@
 
 $projectid = $_REQUEST['projectid'];
 $lesson = $_REQUEST['lesson'];
-$theme = implode("", array_map(fn($c) => strtoupper($c[0]), explode(" ", $lesson))) . str_pad($projectid, 4, '0', STR_PAD_LEFT);
+$theme = $_REQUEST['theme'];
 $stamp = date('Y-m-d H:i:s');
 
 rename('media/images/' . $theme . '.png', 'media/archive/' . $theme . '.png');

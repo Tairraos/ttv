@@ -12,6 +12,7 @@ header('Content-Type: application/json');
 $projectid = $_REQUEST['projectid'] ?? '';
 $lesson = $_REQUEST['lesson'] ?? 'Living Chinese';
 $duration = $_REQUEST['duration'] ?? 0;
+$theme = $_REQUEST['theme'] ?? "default";
 $stamp = date('Y-m-d H:i:s');
 
 if (!$projectid) {
@@ -21,9 +22,8 @@ if (!$projectid) {
 $db = new PDO('sqlite:ttv-data.db');
 function create_project($lesson)
 {
-    global $db, $duration, $stamp;
+    global $db, $duration, $theme, $stamp;
     $projectid = getNewProjectid($lesson);
-    $theme = implode("", array_map(fn($c) => strtoupper($c[0]), explode(" ", $lesson))) . str_pad($projectid, 4, '0', STR_PAD_LEFT);
     $stmt = $db->prepare("INSERT INTO `project` (`projectid`, `lesson`, `theme`, `duration`, `stamp`) VALUES ('$projectid', '$lesson', '$theme', 0, '$stamp')");
     $stmt->execute();
     prepareBgImg($theme);
