@@ -4,6 +4,7 @@
         <meta charset="UTF-8" />
         <title>Text to video tool</title>
         <link rel="stylesheet" href="lib/style.css" />
+        <link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico">
     </head>
 
     <body>
@@ -32,7 +33,7 @@
                             <input type="text" id="projectid" /><button id="createProject">确认</button>
                         </li>
                         <li class="menu"><img id="preview" src="lib/notheme.png" /></li>
-                        <li class="menu"><div id="basket">拖放导入数据<a id="downloadTemplate" download = "template.xlsx">下载模板</a></div></li>
+                        <li class="menu"><div id="basket">拖放导入数据<a id="downloadTemplate">下载模板</a></div></li>
                         <li class="menu"><button id="popAdmin">数据库管理</button></li>
                     </ul>
                 </div>
@@ -45,7 +46,7 @@
                         <li class="menu"><button id="doCaptureSlide">4.生成slide</button></li>
                         <li class="menu"><button id="doPrepare">5.准备任务</button></li>
                         <li class="menu"><button id="doGenVideo" disabled>6.生成视频</button></li>
-                        <li class="menu"><button id="doGenNotes">7.复制课件</button></li>
+                        <li class="menu"><button id="doGenNotes"><a id="downloadContent">7.复制课件</a></button></li>
                         <li class="menu"><button id="doArchive">8.清理数据</button></li>
                     </ul>
                 </div>
