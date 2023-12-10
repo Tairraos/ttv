@@ -107,8 +107,12 @@ body {
     font: 16px/16px bold;
     padding: 5px 10px;
     margin: 5px 0;
+    cursor: pointer;
 }
-
+.menu button a{
+    text-decoration: none;
+    color: #000;
+}
 .menu input[type="radio"] {
     width: 12px;
     height: 12px;
