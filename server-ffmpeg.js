@@ -1,8 +1,4 @@
 /**
- * 完成所有的准备
- * 1 ui.js 会生成 slide 到 temp 目录
- * 2 把准备好的 mp3 从 audio 目录移到 temp 目录
- * 3 生成空白
  * 封装服务，把mp3和png文件封装成视频
  * @param {*} args
  * @param {string} args.action      <slide | mp4 | duration> slide 转 mp4 | mp4 合并 | media 时长
@@ -20,34 +16,78 @@
 
 exports.mp4Generator = async function (args) {
     let fs = require("fs"),
+        path = require("path"),
         thread = require("child_process"),
         basePath = process.cwd();
 
+    let saveLog = async function (text) {
+        await fs.appendFileSync(path.join(basePath, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
+    };
+
+    let execCommand = async function (command) {
+        await saveLog(command);
+        return await thread.execSync(command);
+    };
+
     console.log(`视频生成参数: ${JSON.stringify(args)}`);
-    if (args.action === "slide") {
+
+    if (args.action === "piece") {
+        /********************************/
+        // 为每一组slide和mp3生成一个mp4片段
+        /********************************/
+
+        let slidename = `slide/${args.slidename}`,
+            mp3name = args.mp3name === "DING" ? "../common/ding.mp3" : `audio/${args.mp3name}`;
+
         process.chdir("media/material");
-        await thread.execSync(
-            `ffmpeg -loop 1 -i "${args.slidename}" -i "${args.mp3name}" -c:a copy -c:v libx264 -shortest -v quiet -y "../video/${args.target}"`
+
+        await execCommand(
+            [
+                `ffmpeg -loop 1 -i "${slidename}" -i "${mp3name}"`,
+                `-c:v libx264 -tune stillimage -pix_fmt yuv420p`, // 视频用x264编码，stillimage优化静态图像，象素格式yuv420p
+                `-c:a aac -b:a 128k -ac 2`, // 音频用aac编码，128k码率，2声道
+                `-shortest -v quiet -y "video/${args.target}` // 视频长度和mp3一致，静默执行，覆盖目标文件
+            ].join(" ")
         );
+
         process.chdir(basePath);
+
         return { result: "success", action: args.action, filename: args.target };
     } else if (args.action === "mp4") {
+        /********************************/
+        // 把所有的mp4片段合并成一个大的mp4
+        /********************************/
+
         let mp4list = args.mp4list.split("|");
-        process.chdir("media/video");
-        await fs.writeFileSync("filelist.txt", mp4list.map((line) => `file '${line}'`).join("\n"));
-        await thread.execSync(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "_tmp.mp4"`);
-        await thread.execSync(`ffmpeg -i "_tmp.mp4" -v quiet -y "../dist/${args.target}"`);
-        let result = await thread.execSync(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "../dist/${args.target}"`);
+
+        process.chdir("media/material");
+
+        await fs.writeFileSync("filelist.txt", mp4list.map((line) => `file 'video/${line}'`).join("\n")); // 生成文件列表
+        saveLog(`writeFileSync: filelist.txt`);
+        // command = `ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "_tmp.mp4"`;
+        await execCommand(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "../dist/${args.target}"`); // 合并
+        let result = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "../dist/${args.target}"`);
+
         process.chdir(basePath);
+
         return { result: "success", action: args.action, filename: args.target, duration: +(+result).toFixed(3) };
     } else if (args.action === "duration") {
+        /********************************/
+        // 计算列表里mp3的时间总长度
+        /********************************/
+
         let totalDuration = 0;
-        process.chdir("media/material");
-        for (const mp3 of args.mp3list.split("|")) {
-            let result = await thread.execSync(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${mp3}`);
+
+        process.chdir("media/material/audio");
+
+        for (let mp3 of args.mp3list.split("|")) {
+            let mp3name = mp3 === "DING" ? "../../common/ding.mp3" : mp3,
+                result = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${mp3name}`);
             totalDuration += +result;
         }
+
         process.chdir(basePath);
+
         return { result: "success", duration: +totalDuration.toFixed(3) };
     } else {
         return { result: "failed", action: args.action, reason: "unknown action" };
