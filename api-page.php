@@ -3,12 +3,20 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Moore's Language School</title>
+    <title>Moore's Language</title>
     <link rel="stylesheet" href="lib/page.css">
     <style>
         .backimg {
             background-image: url('media/images/<?= $_REQUEST['theme'] ?? 'default' ?>.png');
             background-size: 100% 100%;
+        }
+
+        #watermark {
+            position: absolute;
+            height: 32px;
+            opacity: 0.4;
+            <?= in_array($_REQUEST['watermark'] ?? 0, [0, 1]) ? "top: 40px;" : "bottom: 40px;" ?>
+            <?= in_array($_REQUEST['watermark'] ?? 0, [0, 2]) ? "left: 30px;" : "right: 30px;" ?>
         }
     </style>
 </head>
@@ -18,13 +26,13 @@
     <div class="container">
         <div class="subcontainer">
             <?php
-            if (isset($_REQUEST['type'])) {
+            if ($_REQUEST['type'] ?? "text" == "slide") {
                 ?>
-                    <div class="listen-container">
-                        <object type="image/svg+xml" data="lib/listen<?=$_REQUEST['id']?>.svg"
-                            class="listen-svg"></object>
-                        <object type="image/svg+xml" data="lib/listen-text.svg" class="listen-svg"></object>
-                    </div>
+                <div class="listen-container">
+                    <object type="image/svg+xml" data="lib/listen<?= $_REQUEST['svg'] ?? 0 ?>.svg"
+                        class="listen-svg"></object>
+                    <object type="image/svg+xml" data="lib/listen-text.svg" class="listen-svg"></object>
+                </div>
                 <?php
             } else if (!isset($_REQUEST['lesson'])) {
                 echo '缺少参数 lesson';
@@ -70,6 +78,8 @@
         <?php
         ?>
     </div>
+    <img src="lib/watermark-<?= preg_match("/chinese/i", $_REQUEST['lesson']) ? 'chinese' : 'english' ?>.svg"
+        id="watermark" />
 </body>
 
 </html>

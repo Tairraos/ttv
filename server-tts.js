@@ -62,7 +62,7 @@ exports.textToSpeech = async function (args) {
                 },
                 (error) => {
                     speechSynthesizer.close();
-                    reject({ error: error });
+                    reject({ error });
                 }
             );
         });
@@ -108,6 +108,6 @@ exports.textToSpeech = async function (args) {
         process.chdir(basePath);
         return { result: "success", filename: args.filename };
     } catch (error) {
-        return { result: "failed", progress: progress, data: error };
+        return { result: "failed", progress, data: error };
     }
 };
