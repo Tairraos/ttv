@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <title>Text to video tool</title>
         <link rel="stylesheet" href="lib/style.css" />
-        <link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico">
+        <link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico" />
     </head>
 
     <body>
@@ -16,13 +16,12 @@
                     <ul id="bigbasket">
                         <li class="menu">
                             <select id="lesson"></select>
-
                         </li>
-                        <li class="menu">
-                            <input type="text" id="projectid" /><button id="createProject">确认</button>
-                        </li>
+                        <li class="menu"><input type="text" id="projectid" /><button id="createProject">确认</button></li>
                         <li class="menu"><img id="preview" src="lib/notheme.png" /></li>
-                        <li class="menu"><div id="basket">拖放导入数据<a id="downloadTemplate">下载模板</a></div></li>
+                        <li class="menu">
+                            <div id="basket">拖放导入数据<a id="downloadTemplate">下载模板</a></div>
+                        </li>
                         <li class="menu"><button id="popAdmin">数据库管理</button></li>
                     </ul>
                 </div>
@@ -35,8 +34,10 @@
                         <li class="menu"><button id="doCaptureSlide">4.生成slide</button></li>
                         <li class="menu"><button id="doPrepare">5.准备任务</button></li>
                         <li class="menu"><button id="doGenVideo" disabled>6.生成视频</button></li>
-                        <li class="menu"><button id="doGenNotes"><a id="downloadContent">7.下载课件</a></button></li>
-                        <li class="menu"><button id="doArchive">8.清理数据</button></li>
+                        <li class="menu"><button id="doArchive">7.清理数据</button></li>
+                        <li class="menu">
+                            <button id="doExport"><a id="downloadContent">x.导出素材</a></button>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -45,26 +46,12 @@
             </div>
         </nav>
         <div id="content">
-            <table id="material">
-                <tr>
-                    <th>id</th>
-                    <th>type</th>
-                    <th>group</th>
-                    <th>chinese</th>
-                    <th>english</th>
-                    <th>phonetic</th>
-                    <th>cn_male</th>
-                    <th>cn_female</th>
-                    <th>en_male</th>
-                    <th>en_female</th>
-                    <th>slide</th>
-                    <th>isready</th>
-                </tr>
-            </table>
+            <table id="material"></table>
         </div>
     </body>
     <script src="lib/pinyin.js"></script>
     <script src="lib/xlsx.bundle.js"></script>
+    <script src="lib/tool-conf.js"></script>
     <script src="lib/tool-util.js"></script>
     <script src="lib/tool-action.js"></script>
     <script src="lib/tool-ui.js"></script>

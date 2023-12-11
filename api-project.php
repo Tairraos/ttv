@@ -54,7 +54,11 @@ function echoProject($projectid, $lesson)
 {
     global $db;
 
-    $stmt = $db->query("SELECT MAX(`maxid`) as `maxid` FROM ( SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `archive` WHERE `lesson` = '$lesson' UNION ALL SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `material` WHERE `lesson` = '$lesson')");
+    $stmt = $db->query("SELECT MAX(`maxid`) as `maxid` FROM ( " .
+        "SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `archive` WHERE `lesson` = '$lesson' " .
+        "UNION ALL " .
+        "SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `material` WHERE `lesson` = '$lesson'" .
+        ")");
     $maxid = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $stmt = $db->query("SELECT * FROM `project` WHERE projectid = '$projectid' AND lesson = '$lesson'");

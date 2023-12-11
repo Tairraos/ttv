@@ -37,8 +37,8 @@
             } else if (!isset($_REQUEST['lesson'])) {
                 echo '缺少参数 lesson';
             } else {
-                require("api-data.php");
                 $lesson = $_REQUEST['lesson'];
+                require("api-data.php");
                 //$rows的长度
                 $vol = count($rows);
                 foreach ($rows as $index => $row) {

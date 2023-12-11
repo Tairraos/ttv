@@ -29,16 +29,18 @@ if ($field) { // 传入修改
     $lesson = $_REQUEST['lesson'] ?? 'Living Chinese';
     $type = $_REQUEST['type'] ?? 'sentence';
     $group = $_REQUEST['group'] ?? '';
+    $voice = $_REQUEST['voice'] ?? '';
     $chinese = $_REQUEST['chinese'] ?? '';
     $english = $_REQUEST['english'] ?? '';
     $phonetic = $_REQUEST['phonetic'] ?? '';
-    $stmt = $db->prepare("INSERT INTO `material` (`id`, `lesson`, `type`, `group`, `chinese`, `english`, `phonetic`) VALUES ($id, ?, ?, ?, ?, ?, ?)");
+    $stmt = $db->prepare("INSERT INTO `material` (`id`, `lesson`, `type`, `group`, `voice`,`chinese`, `english`, `phonetic`) VALUES ($id, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bindParam(1, $lesson);
     $stmt->bindParam(2, $type);
     $stmt->bindParam(3, $group);
-    $stmt->bindParam(4, $chinese);
-    $stmt->bindParam(5, $english);
-    $stmt->bindParam(6, $phonetic);
+    $stmt->bindParam(4, $voice);
+    $stmt->bindParam(5, $chinese);
+    $stmt->bindParam(6, $english);
+    $stmt->bindParam(7, $phonetic);
     $stmt->execute();
 
     $results = $db->query("SELECT * FROM `material` WHERE id = $id");
