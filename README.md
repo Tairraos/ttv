@@ -34,10 +34,10 @@ CREATE TABLE 'material' (
     'chinese'       TEXT NOT NULL DEFAULT '',
     'english'       TEXT NOT NULL DEFAULT '', 
     'phonetic'      TEXT NOT NULL DEFAULT '', 
-    'cn_male'       TEXT NOT NULL DEFAULT '', 
-    'cn_female'     TEXT NOT NULL DEFAULT '', 
-    'en_male'       TEXT NOT NULL DEFAULT '', 
-    'en_female'     TEXT NOT NULL DEFAULT '', 
+    'media_cn1'     TEXT NOT NULL DEFAULT '', 
+    'media_cn2'     TEXT NOT NULL DEFAULT '', 
+    'media_en1'     TEXT NOT NULL DEFAULT '', 
+    'media_en2'     TEXT NOT NULL DEFAULT '', 
     'slide'         TEXT NOT NULL DEFAULT '', 
     'isready'       TEXT NOT NULL DEFAULT '',
     PRIMARY KEY ('id', 'lesson')
@@ -65,7 +65,9 @@ CREATE TABLE 'archive' (
 - duration = 0 或者 archived = '' 视为进行中的工程
 - video 在生成之后，duration 字段会被填上 video 长度
 - 如果记录被存档，project 的 archived 字段会成为 yes
-- 存档的数据 id 视作占用，如果语料未存档，新导入语料会重用 id
+- 如果导入的语料没有被制作视频，可以导出素材，然后存档
+- 只要id在存档里就不会被新导入的内容占用
+- 导入素材时，选择使用素材自带的id就可以把重用那些保留在存档表里的 id
 - 从存档中生成课件的功能待制作
 - 生成的video为裸视频，需自己添加视频头尾
 - theme 为 背景图片，lesson 的缩写 + projectid = theme name
@@ -79,9 +81,9 @@ CREATE TABLE 'archive' (
 - `type`字段留空表示`sentence`
 - `voice`字段留空或填写`child`, `man`, `woman`, `man2`, `woman2`, `man3`, `woman3`, `elder`
 - `voice`有值的话，只会生成相应性别的语音
-- `voice`字段留空表示`male`和`female`使用`man`和`woman`都生成音频
+- `voice`字段留空表示使用`man`和`woman`都生成音频
 - 导入语料的工程如果要更改`lesson`只能清空material表然后重来
-- 素材xlsx至少有1sheet，`语料`
+- 素材xlsx至少有1个sheet，`语料`
 - 导出的素材文件会自动生成`语料`和`课件`sheet，可以用来导入
 
 
