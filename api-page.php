@@ -26,7 +26,7 @@
     <div class="container">
         <div class="subcontainer">
             <?php
-            if ($_REQUEST['type'] ?? "text" == "slide") {
+            if (($_REQUEST['type'] ?? "") == "slide") {
                 ?>
                 <div class="listen-container">
                     <object type="image/svg+xml" data="lib/listen<?= $_REQUEST['svg'] ?? 0 ?>.svg"
@@ -34,10 +34,10 @@
                     <object type="image/svg+xml" data="lib/listen-text.svg" class="listen-svg"></object>
                 </div>
                 <?php
-            } else if (!isset($_REQUEST['lesson'])) {
-                echo '缺少参数 lesson';
+            } else if (!isset($_REQUEST['language'])) {
+                echo '缺少参数 language';
             } else {
-                $lesson = $_REQUEST['lesson'];
+                $language = $_REQUEST['language'];
                 require("api-data.php");
                 //$rows的长度
                 $vol = count($rows);
@@ -54,8 +54,8 @@
                     echo '<div class="subtitle-id">';
                     echo $id;
                     echo '</div>';
-                    echo '<div class="text lesson-' . $lesson . ' type-' . $type . '">';
-                    if ($lesson == "chinese") {
+                    echo '<div class="text lesson-' . $language . ' type-' . $type . '">';
+                    if ($language == "chinese") {
                         echo '<div class="combined">';
                         foreach ($cnarr as $key => $value) {
                             echo '<span class="char"><ruby><rb class="cn">' . $value . '</rb><rt class="py">' . $pyarr[$key] . '</rt></ruby></span>';
@@ -78,7 +78,7 @@
         <?php
         ?>
     </div>
-    <img src="lib/watermark-<?= preg_match("/chinese/i", $_REQUEST['lesson']) ? 'chinese' : 'english' ?>.svg"
+    <img src="lib/watermark-<?= preg_match("/chinese/i", $_REQUEST['language']) ? 'chinese' : 'english' ?>.svg"
         id="watermark" />
 </body>
 
