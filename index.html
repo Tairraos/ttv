@@ -30,7 +30,7 @@
                     <ul>
                         <li class="menu"><button id="doTranslate">1.素材翻译</button></li>
                         <li class="menu"><button id="doGenPhonetic">2.拼音音标</button></li>
-                        <li class="menu"><button id="doGenAudio">3.语音MP3</button></li>
+                        <li class="menu"><button id="doGenAudio">3.生成语音</button></li>
                         <li class="menu"><button id="doCaptureSlide">4.生成slide</button></li>
                         <li class="menu"><button id="doPrepare">5.准备任务</button></li>
                         <li class="menu"><button id="doGenVideo" disabled>6.生成视频</button></li>
@@ -47,6 +47,12 @@
         </nav>
         <div id="content">
             <table id="material"></table>
+        </div>
+        <div id="edittool">
+            <button id="doEditCell">Edit</button>
+            <button id="doGenAudioPiece">Audio</button>
+            <button id="doEditDone">Done</button>
+            <button id="doEditRestore">Restore</button>
         </div>
     </body>
     <script src="lib/pinyin.js"></script>

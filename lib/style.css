@@ -57,17 +57,23 @@ body {
     background: #fff;
 }
 
-#material tr.ready:nth-child(odd) {
+#material tr.ready:nth-child(odd),
+#material tr:nth-child(odd) .ready {
     background: #ded;
 }
 
-#material tr.ready:nth-child(even) {
+#material tr.ready:nth-child(even),
+#material tr:nth-child(even) .ready {
     background: #efe;
 }
 
 #material th {
     background: #666;
     color: #fff;
+}
+
+#material td:hover {
+    box-shadow: inset 0px 0px 3px #3250f0;
 }
 
 #basket {
@@ -198,4 +204,29 @@ body {
     font-size: 12px;
 }
 
-#ignoreConfMaxid{ vertical-align: middle;}
+#ignoreConfMaxid {
+    vertical-align: middle;
+}
+
+#edittool {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    flex-direction: row;
+    box-shadow: inset 0px 0px 6px #3250f0;
+    padding: 4px 2px 0 2px;
+    border-radius: 5px 5px 0 0;
+}
+
+#edittool button {
+    font-size: 9px;
+    margin: 0 3px;
+    cursor: pointer;
+    width: 42px;
+    padding: 1px 0;
+}
+
+#doEditDone,
+#doEditRestore {
+    display: none;
+}
