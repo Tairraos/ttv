@@ -34,12 +34,6 @@ CREATE TABLE 'material' (
     'chinese'       TEXT NOT NULL DEFAULT '',
     'english'       TEXT NOT NULL DEFAULT '', 
     'phonetic'      TEXT NOT NULL DEFAULT '', 
-    'media_cn1'     TEXT NOT NULL DEFAULT '', 
-    'media_cn2'     TEXT NOT NULL DEFAULT '', 
-    'media_en1'     TEXT NOT NULL DEFAULT '', 
-    'media_en2'     TEXT NOT NULL DEFAULT '', 
-    'slide'         TEXT NOT NULL DEFAULT '', 
-    'isready'       TEXT NOT NULL DEFAULT '',
     PRIMARY KEY ('id', 'lesson')
 );
 

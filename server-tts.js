@@ -50,7 +50,7 @@ exports.textToSpeech = async function (args) {
         let speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig, audio_config);
 
         progress = `通过API生成语音：${args.text}`;
-        saveLog(`azure tts api: ${args.model} => ${args.text}`);
+        saveLog(`通过API生成语音：${args.model} => ${args.text}`);
         let result = await new Promise((resolve, reject) => {
             speechSynthesizer.speakSsmlAsync(
                 ssml,
@@ -71,7 +71,7 @@ exports.textToSpeech = async function (args) {
 
         progress = `保存文件：${args.basename}.mp3`;
         await fs.writeFileSync(`${args.basename}.mp3`, result); // 写临时文件
-        saveLog(`writeFileSync: ${args.basename}.mp3`);
+        saveLog(`保存文件：${args.basename}.mp3`);
 
         progress = `修正静音，输出成：${args.basename}.m4a`;
         await execCommand(
@@ -103,7 +103,7 @@ exports.textToSpeech = async function (args) {
 
         progress = `删除mp3源文件：${args.basename}.mp3`;
         await fs.unlinkSync(`${args.basename}.mp3`);
-        saveLog(`unlinkSync: ${args.basename}.mp3`);
+        saveLog(`删除mp3源文件：${args.basename}.mp3`);
 
         process.chdir(basePath);
         return { result: "success", filename: `${args.basename}.m4a` };
