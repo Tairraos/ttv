@@ -1,0 +1,65 @@
+#slide {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+#title {
+    text-align: center;
+    font-size: 20px;
+}
+
+#slide .content {
+    width: 32%;
+    margin: 1%;
+}
+#slide .content img {
+    width: 100%;
+}
+
+.phonetic {
+    font-family: "Mulish";
+    font-weight: 700;
+}
+
+#material {
+    border-collapse: collapse;
+    margin: 0 auto;
+    font-size: 13px;
+    line-height: 20px;
+    width: 1600px;
+}
+
+#material td,
+#material th {
+    border: 1px solid #cad9ea;
+    padding: 4px 6px;
+    text-align: center;
+    cursor: pointer;
+}
+
+#material tr:nth-child(odd) {
+    background: #eee;
+}
+
+#material tr:nth-child(even) {
+    background: #fff;
+}
+
+#material th {
+    background: #666;
+    color: #fff;
+}
+
+audio {
+    height: 30px;
+    width: 320px;
+}
+
+video {
+    width: 320px;
+}
+
+.error {
+    color: red;
+}
