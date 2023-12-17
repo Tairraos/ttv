@@ -1,7 +1,7 @@
 /**
  * 封装服务，把audio和png文件封装成视频
  * @param {*} args
- * @param {string} args.action      <slide | video | duration> slide 转 video | video 合并 | media 时长
+ * @param {string} args.action      <piece | video | duration> slide 转 video | video 合并 | media 时长
  * @param {string} args.filename    保存的文件名
  * @param {string} args.slidename   slide 素材
  * @param {string} args.audioname   audio 素材
