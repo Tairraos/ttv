@@ -31,6 +31,7 @@ exports.textToSpeech = async function (args) {
 
     let saveLog = async function (text) {
         await fs.appendFileSync(path.join(basePath, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
+        return text;
     };
 
     let execCommand = async function (command) {
@@ -49,8 +50,7 @@ exports.textToSpeech = async function (args) {
         speechConfig.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio48Khz192KBitRateMonoMp3;
         let speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig, audio_config);
 
-        progress = `通过API生成语音：${args.text}`;
-        saveLog(`通过API生成语音：${args.model} => ${args.text}`);
+        progress = saveLog(`通过api生成语音：${args.model} => ${args.text}`);
         let result = await new Promise((resolve, reject) => {
             speechSynthesizer.speakSsmlAsync(
                 ssml,
@@ -69,11 +69,10 @@ exports.textToSpeech = async function (args) {
 
         process.chdir("media/material/audio");
 
-        progress = `保存文件：${args.basename}.mp3`;
+        progress = saveLog(`保存文件：${args.basename}.mp3`);
         await fs.writeFileSync(`${args.basename}.mp3`, result); // 写临时文件
-        saveLog(`保存文件：${args.basename}.mp3`);
-
-        progress = `修正静音，输出成：${args.basename}.m4a`;
+        
+        progress = saveLog(`修正静音，输出成：${args.basename}.m4a`);
         await execCommand(
             [
                 `ffmpeg -i "${args.basename}.mp3"`,
@@ -101,9 +100,8 @@ exports.textToSpeech = async function (args) {
             ].join(" ")
         );
 
-        progress = `删除mp3源文件：${args.basename}.mp3`;
+        progress = saveLog(`删除mp3源文件：${args.basename}.mp3`);
         await fs.unlinkSync(`${args.basename}.mp3`);
-        saveLog(`删除mp3源文件：${args.basename}.mp3`);
 
         process.chdir(basePath);
         return { result: "success", filename: `${args.basename}.m4a` };

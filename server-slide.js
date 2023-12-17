@@ -30,7 +30,7 @@ exports.captureSlide = async function (args) {
         await page.screenshot({ path: `media/material/slide/${args.filename}` });
         await browser.close();
 
-        saveLog(`screenshot: https://ttv.localweb.com/api-page.php?${query} => media/material/slide/${args.filename}`);
+        saveLog(`生成slide: https://ttv.localweb.com/api-page.php?${query} => media/material/slide/${args.filename}`);
         return { result: "success", filename: args.filename, id: args.id };
     } catch (error) {
         return { result: "failed", reason: "遇到错误" };
