@@ -26,7 +26,7 @@
     <div class="container">
         <div class="subcontainer">
             <?php
-            if (($_REQUEST['type'] ?? "") == "ding") {
+            if (($_REQUEST['type'] ?? "") == "listen") {
                 ?>
                 <div class="listen-container">
                     <object type="image/svg+xml" data="lib/listen<?= $_REQUEST['svg'] ?? 0 ?>.svg"
