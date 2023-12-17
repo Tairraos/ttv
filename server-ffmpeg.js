@@ -2,7 +2,7 @@
  * 封装服务，把audio和png文件封装成视频
  * @param {*} args
  * @param {string} args.action      <slide | video | duration> slide 转 video | video 合并 | media 时长
- * @param {string} args.target      保存的文件名
+ * @param {string} args.filename    保存的文件名
  * @param {string} args.slidename   slide 素材
  * @param {string} args.audioname   audio 素材
  * @param {string} args.videolist   要合并的 video 列表
@@ -45,13 +45,13 @@ exports.videoGenerator = async function (args) {
                 `ffmpeg -loop 1 -i "${slidename}" -i "${audioname}"`,
                 `-c:v libx264 -tune stillimage -pix_fmt yuv420p`, // 视频用x264编码，stillimage优化静态图像，象素格式yuv420p
                 `-c:a copy`, // 音频直接复制，否则会有bug
-                `-shortest -v quiet -y "video/${args.target}` // 视频长度和audio一致，静默执行，覆盖目标文件
+                `-shortest -v quiet -y "video/${args.filename}` // 视频长度和audio一致，静默执行，覆盖目标文件
             ].join(" ")
         );
 
         process.chdir(basePath);
 
-        return { result: "success", action: args.action, filename: args.target };
+        return { result: "success", action: args.action, filename: args.filename };
     } else if (args.action === "video") {
         /********************************/
         // 把所有的video片段合并成一个大的video
@@ -64,12 +64,12 @@ exports.videoGenerator = async function (args) {
         await fs.writeFileSync("filelist.txt", videolist.map((line) => `file 'video/${line}'`).join("\n")); // 生成文件列表
         saveLog(`writeFileSync: filelist.txt`);
         // command = `ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "_tmp.mp4"`;
-        await execCommand(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "../dist/${args.target}"`); // 合并
-        let result = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "../dist/${args.target}"`);
+        await execCommand(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "../dist/${args.filename}"`); // 合并
+        let result = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "../dist/${args.filename}"`);
 
         process.chdir(basePath);
 
-        return { result: "success", action: args.action, filename: args.target, duration: +(+result).toFixed(3) };
+        return { result: "success", action: args.action, filename: args.filename, duration: +(+result).toFixed(3) };
     } else if (args.action === "duration") {
         /********************************/
         // 计算列表里audio的时间总长度
