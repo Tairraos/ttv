@@ -17,7 +17,13 @@
                         <li class="menu"><select id="lesson"></select></li>
                         <li class="menu"><input type="text" id="projectid" /><button id="createProject">确认</button></li>
                         <li class="menu"><img id="preview" src="lib/notheme.png" /></li>
-                        <li class="menu"><div id="basket">拖放导入数据<a id="downloadTemplate">下载模板</a></div></li>
+                        <li class="menu">
+                            <div id="basket">
+                                <div>拖放导入数据</div>
+                                <div><a id="downloadTemplate">下载模板</a></div>
+                                <div><a id="downloadContent">导出数据</a></div>
+                            </div>
+                        </li>
                         <li class="menu useImportId"><input type="checkbox" id="ignoreConfMaxid" />使用素材自带的id</li>
                     </ul>
                 </div>
@@ -27,11 +33,11 @@
                         <li class="menu"><button id="doTranslate">1.素材翻译</button></li>
                         <li class="menu"><button id="doGenPhonetic">2.拼音音标</button></li>
                         <li class="menu"><button id="doGenAudio">3.音频素材</button></li>
-                        <li class="menu"><button id="doCaptureSlide">4.字幕素材</button></li>
-                        <li class="menu"><button id="doPrepare">5.视频素材</button></li>
-                        <li class="menu"><button id="doGenVideo" disabled>6.成品视频</button></li>
-                        <li class="menu"><button id="doArchive">7.存档数据</button></li>
-                        <li class="menu"><button id="doExport"><a id="downloadContent">x.导出素材</a></button></li>
+                        <li class="menu"><button id="doGenSlide">4.字幕素材</button></li>
+                        <li class="menu"><button id="doGenVideo">5.视频素材</button></li>
+                        <li class="menu"><button id="doEstimate">6.工程估算</button></li>
+                        <li class="menu"><button id="doBuild">7.生成作品</button></li>
+                        <li class="menu"><button id="doArchive">8.存档数据</button></li>
                     </ul>
                 </div>
             </div>
@@ -51,5 +57,7 @@
     <script src="lib/tool-util.js"></script>
     <script src="lib/tool-action.js"></script>
     <script src="lib/tool-ui.js"></script>
-    <script> util.initMaterial(); </script>
+    <script>
+        util.initMaterial();
+    </script>
 </html>
