@@ -68,21 +68,21 @@
         </tr>
         <?php
         foreach ($rows as $row) {
-            echo '<tr><td colspan="4">id: ' . $row['id'] . ', 类型: 语音</td></tr><tr>';
+            echo '<tr><td colspan="4" class="label">id: ' . $row['id'] . ', 类型: 语音</td></tr><tr>';
             echo getAudioDom('media/material/audio/' . $row['id'] . '.cn1.m4a');
             echo ($row['voice'] == '') ? getAudioDom('media/material/audio/' . $row['id'] . '.cn2.m4a') : '<td><span class="pass">不需要</span></td>';
             echo getAudioDom('media/material/audio/' . $row['id'] . '.en1.m4a');
             echo ($row['voice'] == '') ? getAudioDom('media/material/audio/' . $row['id'] . '.en2.m4a') : '<td><span class="pass">不需要</span></td>';
             echo '</tr>';
 
-            echo '<tr><td colspan="4">id: ' . $row['id'] . ', 类型: 字幕视频</td></tr><tr>';
+            echo '<tr><td colspan="4" class="label">id: ' . $row['id'] . ', 类型: 字幕视频</td></tr><tr>';
             echo getVideoDom('media/material/video/' . $row['id'] . '.cn1.text.mp4');
             echo ($row['voice'] == '') ? getAudioDom('media/material/video/' . $row['id'] . '.cn2.text.mp4') : '<td><span class="pass">不需要</span></td>';
             echo getVideoDom('media/material/video/' . $row['id'] . '.en1.text.mp4');
             echo ($row['voice'] == '') ? getAudioDom('media/material/video/' . $row['id'] . '.en2.text.mp4') : '<td><span class="pass">不需要</span></td>';
             echo '</tr>';
 
-            echo '<tr><td colspan="4">id: ' . $row['id'] . ', 类型: 听力视频</td></tr><tr>';
+            echo '<tr><td colspan="4" class="label">id: ' . $row['id'] . ', 类型: 听力视频</td></tr><tr>';
             echo getVideoDom('media/material/video/' . $row['id'] . '.cn1.listen.mp4');
             echo ($row['voice'] == '') ? getAudioDom('media/material/video/' . $row['id'] . '.cn2.listen.mp4') : '<td><span class="pass">不需要</span></td>';
             echo getVideoDom('media/material/video/' . $row['id'] . '.en1.listen.mp4');
@@ -94,7 +94,7 @@
     </table>
     <table id="material">
         <tr>
-            <th>theme</th>
+            <th>背景图片</th>
             <th>字幕图片</th>
             <th>听力图片</th>
             <th>ding视频</th>

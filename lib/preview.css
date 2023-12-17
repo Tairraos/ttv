@@ -22,7 +22,7 @@
     padding: 4px 6px;
     text-align: center;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 #material tr:nth-child(odd) {
@@ -44,11 +44,11 @@
 
 audio {
     height: 30px;
-    width: 320px;
+    width: 100%;
 }
 
 video {
-    width: 320px;
+    width: 100%;
 }
 
 img {
@@ -63,4 +63,22 @@ img {
     text-align: center;
     font-size: 14px;
     font-weight: 900;
+}
+
+#material td.label {
+    text-align: left;
+    font-size: 14px;
+    line-height: 14px;
+}
+
+#material td .pass {
+    font-size: 14px;
+    color: #888;
+    font-weight: normal;
+}
+
+#material td {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: bold;
 }
