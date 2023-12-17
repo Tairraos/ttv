@@ -12,56 +12,100 @@
     $id = $_REQUEST['id'] ?? 0;
     $theme = $_REQUEST['theme'] ?? '';
     require("api-data.php");
-    ?>
-    <div id="title">Materials Preview</div>
-    <table id="material">
-    <tr><th>id</th><th>lesson</th><th>type</th><th>voice</th><th>chinese</th><th>english</th><th>phonetic</th></tr>
-    <?php
-    foreach ($rows as $row) {
-        echo '<tr><td>' . $row['id'] . '</td><td>'.$row['lesson'].'</td><td>'.$row['type'].'</td><td>'.$row['voice'].'</td><td>'.$row['chinese'].'</td><td>'.$row['english'].'</td><td class="phonetic">'.$row['phonetic'].'</td></tr>';
+
+    function getAudioDom($filename)
+    {
+        return implode('', [
+            '<td class="media">',
+            file_exists($filename) ? '<audio controls src="' . $filename . '"></audio>' : '<span class="error">素材未生成</span>',
+            '<div class="filename">' . $filename . '</div>',
+            '</td>'
+        ]);
+    }
+    function getVideoDom($filename)
+    {
+        return implode('', [
+            '<td class="media">',
+            file_exists($filename) ? '<video controls src="' . $filename . '" /></video>' : '<span class="error">素材未生成</span>',
+            '<div class="filename">' . $filename . '</div>',
+            '</td>'
+        ]);
+    }
+    function getImageDom($filename)
+    {
+        return implode('', [
+            '<td class="media">',
+            file_exists($filename) ? '<img src="' . $filename . '" />' : '<span class="error">素材未生成</span>',
+            '<div class="filename">' . $filename . '</div>',
+            '</td>'
+        ]);
+
     }
     ?>
+    <div id="title">素材预览</div>
+    <table id="material">
+        <tr>
+            <th>id</th>
+            <th>课程</th>
+            <th>类型</th>
+            <th>音色</th>
+            <th>中文</th>
+            <th>英文</th>
+            <th>音标或拼音</th>
+        </tr>
+        <?php
+        foreach ($rows as $row) {
+            echo '<tr><td>' . $row['id'] . '</td><td>' . $row['lesson'] . '</td><td>' . $row['type'] . '</td><td>' . $row['voice'] . '</td><td>' . $row['chinese'] . '</td><td>' . $row['english'] . '</td><td class="phonetic">' . $row['phonetic'] . '</td></tr>';
+        }
+        ?>
     </table>
     <table id="material">
-    <tr><th>id</th><th>type</th><th>media_cn1</th><th>media_cn2</th><th>media_en1</th><th>media_en2</th></tr>
-    <?php
-    foreach ($rows as $row) {
-        echo '<tr><td>' . $row['id'] . '</td><td>audio</td>';
-        echo '<td>'.(file_exists('media/material/audio/' . $row['id'] . '.media_cn1.m4a')?'<audio controls src="media/material/audio/' . $row['id'] . '.media_cn1.m4a">':'<span class="error">'.$row['id'].'.media_cn1.m4a 未生成').'</td>';
-        if ($row['voice'] == '') {
-            echo '<td>'.(file_exists('media/material/audio/' . $row['id'] . '.media_cn2.m4a')?'<audio controls src="media/material/audio/' . $row['id'] . '.media_cn2.m4a">':'<span class="error">'.$row['id'].'.media_cn2.m4a 未生成').'</td>';
-        } else {
-            echo '<td><span class="pass">不需要</span></td>';
+        <tr>
+            <th>中文素材1</th>
+            <th>中文素材2</th>
+            <th>英文素材1</th>
+            <th>英文素材2</th>
+        </tr>
+        <?php
+        foreach ($rows as $row) {
+            echo '<tr><td colspan="4">id: ' . $row['id'] . ', 类型: 语音</td></tr><tr>';
+            echo getAudioDom('media/material/audio/' . $row['id'] . '.cn1.m4a');
+            echo ($row['voice'] == '') ? getAudioDom('media/material/audio/' . $row['id'] . '.cn2.m4a') : '<td><span class="pass">不需要</span></td>';
+            echo getAudioDom('media/material/audio/' . $row['id'] . '.en1.m4a');
+            echo ($row['voice'] == '') ? getAudioDom('media/material/audio/' . $row['id'] . '.en2.m4a') : '<td><span class="pass">不需要</span></td>';
+            echo '</tr>';
+
+            echo '<tr><td colspan="4">id: ' . $row['id'] . ', 类型: 字幕视频</td></tr><tr>';
+            echo getVideoDom('media/material/video/' . $row['id'] . '.cn1.text.mp4');
+            echo ($row['voice'] == '') ? getAudioDom('media/material/video/' . $row['id'] . '.cn2.text.mp4') : '<td><span class="pass">不需要</span></td>';
+            echo getVideoDom('media/material/video/' . $row['id'] . '.en1.text.mp4');
+            echo ($row['voice'] == '') ? getAudioDom('media/material/video/' . $row['id'] . '.en2.text.mp4') : '<td><span class="pass">不需要</span></td>';
+            echo '</tr>';
+
+            echo '<tr><td colspan="4">id: ' . $row['id'] . ', 类型: 听力视频</td></tr><tr>';
+            echo getVideoDom('media/material/video/' . $row['id'] . '.cn1.listen.mp4');
+            echo ($row['voice'] == '') ? getAudioDom('media/material/video/' . $row['id'] . '.cn2.listen.mp4') : '<td><span class="pass">不需要</span></td>';
+            echo getVideoDom('media/material/video/' . $row['id'] . '.en1.listen.mp4');
+            echo ($row['voice'] == '') ? getAudioDom('media/material/video/' . $row['id'] . '.en2.listen.mp4') : '<td><span class="pass">不需要</span></td>';
+            echo '</tr>';
+
         }
-        echo '<td>'.(file_exists('media/material/audio/' . $row['id'] . '.media_en1.m4a')?'<audio controls src="media/material/audio/' . $row['id'] . '.media_en1.m4a">':'<span class="error">'.$row['id'].'.media_en1.m4a 未生成').'</td>';
-        if ($row['voice'] == '') {
-            echo '<td>'.(file_exists('media/material/audio/' . $row['id'] . '.media_en2.m4a')?'<audio controls src="media/material/audio/' . $row['id'] . '.media_en2.m4a">':'<span class="error">'.$row['id'].'.media_en2.m4a 未生成').'</td>';
-        } else {
-            echo '<td><span class="pass">不需要</span></td>';
-        }
-        echo '</tr>';
-        echo '<tr><td>' . $row['id'] . '</td><td>video</td>';
-        echo '<td>'.(file_exists('media/material/video/' . $row['id'] . '.media_cn1.mp4')?'<video controls src="media/material/video/' . $row['id'] . '.media_cn1.mp4">':'<span class="error">'.$row['id'].'.media_cn1.mp4 未生成').'</td>';
-        if ($row['voice'] == '') {
-            echo '<td>'.(file_exists('media/material/video/' . $row['id'] . '.media_cn2.mp4')?'<video controls src="media/material/video/' . $row['id'] . '.media_cn2.mp4">':'<span class="error">'.$row['id'].'.media_cn2.mp4 未生成').'</td>';
-        } else {
-            echo '<td><span class="pass">不需要</span></td>';
-        }
-        echo '<td>'.(file_exists('media/material/video/' . $row['id'] . '.media_en1.mp4')?'<video controls src="media/material/video/' . $row['id'] . '.media_en1.mp4">':'<span class="error">'.$row['id'].'.media_en1.mp4 未生成').'</td>';
-        if ($row['voice'] == '') {
-            echo '<td>'.(file_exists('media/material/video/' . $row['id'] . '.media_en2.mp4')?'<video controls src="media/material/video/' . $row['id'] . '.media_en2.mp4">':'<span class="error">'.$row['id'].'.media_en2.mp4 未生成').'</td>';
-        } else {
-            echo '<td><span class="pass">不需要</span></td>';
-        }
-        echo '</tr>';
-    }
-    ?>
+        ?>
     </table>
-    <div id="slide">
-        <div class="content"><?= file_exists('media/images/' . $theme . '.png') ? '<img src="media/images/' . $theme . '.png">' : '<span class="error">' . $theme . '.png 不存在</span>' ?></div>
-        <div class="content"><?= file_exists('media/material/slide/' . $id . '.ding.png') ? '<img src="media/material/slide/' . $id . '.ding.png">' : '<span class="error">' . $id . '.ding.png 未生成</span>' ?></div>
-        <div class="content"><?= file_exists('media/material/slide/' . $id . '.text.png') ? '<img src="media/material/slide/' . $id . '.text.png">' : '<span class="error">' . $id . '.text.png 未生成</span>' ?></div>
-    </div>
+    <table id="material">
+        <tr>
+            <th>theme</th>
+            <th>字幕图片</th>
+            <th>听力图片</th>
+            <th>ding视频</th>
+        </tr>
+        <tr>
+            <?= getImageDom('media/images/' . $theme . '.png') ?>
+            <?= getImageDom('media/material/slide/' . $id . '.text.png') ?>
+            <?= getImageDom('media/material/slide/' . $id . '.listen.png') ?>
+            <?= getVideoDom('media/material/video/' . $row['id'] . '.ding.mp4'); ?>
+        </tr>
+    </table>
 
 </body>
 
