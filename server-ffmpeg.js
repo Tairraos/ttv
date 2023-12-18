@@ -18,10 +18,12 @@ exports.videoGenerator = async function (args) {
     let fs = require("fs"),
         path = require("path"),
         thread = require("child_process"),
-        basePath = process.cwd();
+        base_path = process.cwd(),
+        action = args.action,
+        filename = args.filename;
 
     let saveLog = async function (text) {
-        await fs.appendFileSync(path.join(basePath, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
+        await fs.appendFileSync(path.join(base_path, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
     };
 
     let execCommand = async function (command) {
@@ -31,7 +33,7 @@ exports.videoGenerator = async function (args) {
 
     console.log(`视频生成参数: ${JSON.stringify(args)}`);
 
-    if (args.action === "piece") {
+    if (action === "piece") {
         /********************************/
         // 为每一组slide和audio生成一个video片段
         /********************************/
@@ -45,14 +47,16 @@ exports.videoGenerator = async function (args) {
                 `ffmpeg -loop 1 -i "${slidename}" -i "${audioname}"`,
                 `-c:v libx264 -tune stillimage -pix_fmt yuv420p`, // 视频用x264编码，stillimage优化静态图像，象素格式yuv420p
                 `-c:a copy`, // 音频直接复制，否则会有bug
-                `-shortest -v quiet -y "video/${args.filename}` // 视频长度和audio一致，静默执行，覆盖目标文件
+                `-shortest -v quiet -y "video/${filename}` // 视频长度和audio一致，静默执行，覆盖目标文件
             ].join(" ")
         );
 
-        process.chdir(basePath);
+        let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${audioname}`);
 
-        return { result: "success", action: args.action, filename: args.filename };
-    } else if (args.action === "video") {
+        process.chdir(base_path);
+
+        return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
+    } else if (action === "video") {
         /********************************/
         // 把所有的video片段合并成一个大的video
         /********************************/
@@ -64,31 +68,31 @@ exports.videoGenerator = async function (args) {
         await fs.writeFileSync("filelist.txt", videolist.map((line) => `file 'video/${line}'`).join("\n")); // 生成文件列表
         saveLog(`writeFileSync: filelist.txt`);
         // command = `ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "_tmp.mp4"`;
-        await execCommand(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "../dist/${args.filename}"`); // 合并
-        let result = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "../dist/${args.filename}"`);
+        await execCommand(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "../dist/${filename}"`); // 合并
+        let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "../dist/${filename}"`);
 
-        process.chdir(basePath);
+        process.chdir(base_path);
 
-        return { result: "success", action: args.action, filename: args.filename, duration: +(+result).toFixed(3) };
-    } else if (args.action === "duration") {
+        return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
+    } else if (action === "duration") {
         /********************************/
         // 计算列表里audio的时间总长度
         /********************************/
 
-        let totalDuration = 0;
+        let duration_counter = 0;
 
         process.chdir("media/material/audio");
 
         for (let audio of args.audiolist.split("|")) {
             let audioname = audio === "DING" ? "../../common/ding.m4a" : audio,
-                result = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${audioname}`);
-            totalDuration += +result;
+                duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${audioname}`);
+            duration_counter += +duration;
         }
 
-        process.chdir(basePath);
+        process.chdir(base_path);
 
-        return { result: "success", duration: +totalDuration.toFixed(3) };
+        return { result: "success", duration: +duration_counter.toFixed(3) };
     } else {
-        return { result: "failed", action: args.action, reason: "unknown action" };
+        return { result: "failed", action, reason: "unknown action" };
     }
 };

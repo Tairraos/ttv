@@ -17,7 +17,7 @@ exports.textToSpeech = async function (args) {
     let fs = require("fs"),
         path = require("path"),
         thread = require("child_process"),
-        basePath = process.cwd(),
+        base_path = process.cwd(),
         ssml = [
             `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US">`,
             `<voice name="${args.model}">`,
@@ -30,7 +30,7 @@ exports.textToSpeech = async function (args) {
         progress;
 
     let saveLog = async function (text) {
-        await fs.appendFileSync(path.join(basePath, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
+        await fs.appendFileSync(path.join(base_path, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
         return text;
     };
 
@@ -42,26 +42,26 @@ exports.textToSpeech = async function (args) {
     console.log(`TTS参数: ${JSON.stringify(args)}`);
 
     let sdk = require("microsoft-cognitiveservices-speech-sdk"),
-        speechConfig = sdk.SpeechConfig.fromSubscription(process.env.AZURE_SPEECH_KEY, process.env.AZURE_SPEECH_REGION),
+        speech_config = sdk.SpeechConfig.fromSubscription(process.env.AZURE_SPEECH_KEY, process.env.AZURE_SPEECH_REGION),
         audio_config = sdk.AudioConfig.fromDefaultSpeakerOutput();
 
     try {
-        speechConfig.setProperty(sdk.PropertyId.SpeechServiceResponse_RequestSentenceBoundary, "true");
-        speechConfig.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio48Khz192KBitRateMonoMp3;
-        let speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig, audio_config);
+        speech_config.setProperty(sdk.PropertyId.SpeechServiceResponse_RequestSentenceBoundary, "true");
+        speech_config.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio48Khz192KBitRateMonoMp3;
+        let speech_synthesizer = new sdk.SpeechSynthesizer(speech_config, audio_config);
 
         progress = saveLog(`通过api生成语音：${args.model} => ${args.text}`);
         let result = await new Promise((resolve, reject) => {
-            speechSynthesizer.speakSsmlAsync(
+            speech_synthesizer.speakSsmlAsync(
                 ssml,
                 (result) => {
                     result.reason === sdk.ResultReason.SynthesizingAudioCompleted
                         ? resolve(Buffer.from(result.audioData))
                         : reject({ error: result.errorDetails });
-                    speechSynthesizer.close();
+                    speech_synthesizer.close();
                 },
                 (error) => {
-                    speechSynthesizer.close();
+                    speech_synthesizer.close();
                     reject({ error });
                 }
             );
@@ -103,7 +103,7 @@ exports.textToSpeech = async function (args) {
         progress = saveLog(`删除mp3源文件：${args.basename}.mp3`);
         await fs.unlinkSync(`${args.basename}.mp3`);
 
-        process.chdir(basePath);
+        process.chdir(base_path);
         return { result: "success", filename: `${args.basename}.m4a` };
     } catch (error) {
         return { result: "failed", progress, data: error };

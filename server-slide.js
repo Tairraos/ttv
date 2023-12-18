@@ -12,7 +12,7 @@ exports.captureSlide = async function (args) {
     let puppeteer = require("puppeteer"),
         fs = require("fs"),
         path = require("path"),
-        basePath = process.cwd(),
+        base_path = process.cwd(),
         browser = await puppeteer.launch({ headless: "new", args: ["--window-size=1920,1080"] }),
         page = await browser.newPage(),
         query = Object.keys(args)
@@ -20,7 +20,7 @@ exports.captureSlide = async function (args) {
             .join("&");
 
     let saveLog = async function (text) {
-        await fs.appendFileSync(path.join(basePath, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
+        await fs.appendFileSync(path.join(base_path, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
     };
 
     try {
