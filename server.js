@@ -1,4 +1,5 @@
 let plugins = {
+        "/ping": ()=>({ result: "success" }),
         "/tts": require("./server-tts.js").textToSpeech,
         "/slide": require("./server-slide.js").captureSlide,
         "/ffmpeg": require("./server-ffmpeg.js").videoGenerator
