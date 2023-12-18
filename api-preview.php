@@ -77,16 +77,16 @@
 
             echo '<tr><td colspan="4" class="label">id: ' . $row['id'] . ', 类型: 字幕视频</td></tr><tr>';
             echo getVideoDom('media/material/video/' . $row['id'] . '.cn1.text.mp4');
-            echo ($row['voice'] == '') ? getAudioDom('media/material/video/' . $row['id'] . '.cn2.text.mp4') : '<td><span class="pass">不需要</span></td>';
+            echo ($row['voice'] == '') ? getVideoDom('media/material/video/' . $row['id'] . '.cn2.text.mp4') : '<td><span class="pass">不需要</span></td>';
             echo getVideoDom('media/material/video/' . $row['id'] . '.en1.text.mp4');
-            echo ($row['voice'] == '') ? getAudioDom('media/material/video/' . $row['id'] . '.en2.text.mp4') : '<td><span class="pass">不需要</span></td>';
+            echo ($row['voice'] == '') ? getVideoDom('media/material/video/' . $row['id'] . '.en2.text.mp4') : '<td><span class="pass">不需要</span></td>';
             echo '</tr>';
 
             echo '<tr><td colspan="4" class="label">id: ' . $row['id'] . ', 类型: 听力视频</td></tr><tr>';
             echo getVideoDom('media/material/video/' . $row['id'] . '.cn1.listen.mp4');
-            echo ($row['voice'] == '') ? getAudioDom('media/material/video/' . $row['id'] . '.cn2.listen.mp4') : '<td><span class="pass">不需要</span></td>';
+            echo ($row['voice'] == '') ? getVideoDom('media/material/video/' . $row['id'] . '.cn2.listen.mp4') : '<td><span class="pass">不需要</span></td>';
             echo getVideoDom('media/material/video/' . $row['id'] . '.en1.listen.mp4');
-            echo ($row['voice'] == '') ? getAudioDom('media/material/video/' . $row['id'] . '.en2.listen.mp4') : '<td><span class="pass">不需要</span></td>';
+            echo ($row['voice'] == '') ? getVideoDom('media/material/video/' . $row['id'] . '.en2.listen.mp4') : '<td><span class="pass">不需要</span></td>';
             echo '</tr>';
 
         }
