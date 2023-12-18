@@ -6,7 +6,6 @@
  * @param {string} args.slidename   slide 素材
  * @param {string} args.audioname   audio 素材
  * @param {string} args.videolist   要合并的 video 列表
- * @param {string} args.audiolist   求长度的 audio 列表
  * @return {JSON}
  *
  * voice 参数可用值参考：https://learn.microsoft.com/zh-cn/azure/ai-services/speech-service/language-support?tabs=tts
@@ -37,7 +36,6 @@ exports.videoGenerator = async function (args) {
         /********************************/
         // 为每一组slide和audio生成一个video片段
         /********************************/
-
         let slidename = `slide/${args.slidename}`,
             audioname = args.audioname === "DING" ? "../common/ding.m4a" : `audio/${args.audioname}`;
 
@@ -52,46 +50,34 @@ exports.videoGenerator = async function (args) {
         );
 
         let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${audioname}`);
-
         process.chdir(base_path);
-
         return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
     } else if (action === "video") {
         /********************************/
         // 把所有的video片段合并成一个大的video
         /********************************/
-
         let videolist = args.videolist.split("|");
 
         process.chdir("media/material");
-
         await fs.writeFileSync("filelist.txt", videolist.map((line) => `file 'video/${line}'`).join("\n")); // 生成文件列表
         saveLog(`writeFileSync: filelist.txt`);
-        // command = `ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "_tmp.mp4"`;
+
         await execCommand(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "../dist/${filename}"`); // 合并
+
         let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "../dist/${filename}"`);
-
         process.chdir(base_path);
-
         return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
+
     } else if (action === "duration") {
         /********************************/
-        // 计算列表里audio的时间总长度
+        // 返回给定media文件的长度
         /********************************/
-
-        let duration_counter = 0;
-
-        process.chdir("media/material/audio");
-
-        for (let audio of args.audiolist.split("|")) {
-            let audioname = audio === "DING" ? "../../common/ding.m4a" : audio,
-                duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${audioname}`);
-            duration_counter += +duration;
-        }
-
+        process.chdir("media/material");
+        let media_path = filename.match(/.mp4$/) ? "video" : "audio",
+            duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${media_path}/${filename}"`);
         process.chdir(base_path);
+        return { result: "success", duration: +(+duration).toFixed(3) };
 
-        return { result: "success", duration: +duration_counter.toFixed(3) };
     } else {
         return { result: "failed", action, reason: "unknown action" };
     }
