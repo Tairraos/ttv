@@ -15,8 +15,8 @@
             position: absolute;
             height: 32px;
             opacity: 0.4;
-            <?= in_array($_REQUEST['watermark'] ?? 0, [0, 1]) ? "top: 40px;" : "bottom: 40px;" ?>
-            <?= in_array($_REQUEST['watermark'] ?? 0, [0, 2]) ? "left: 30px;" : "right: 30px;" ?>
+            <?= in_array($_REQUEST['watermark'] ?? 0, [0, 1]) ? "top: 50px;" : "bottom: 50px;" ?>
+            <?= in_array($_REQUEST['watermark'] ?? 0, [0, 2]) ? "left: 50px;" : "right: 50px;" ?>
         }
     </style>
 </head>

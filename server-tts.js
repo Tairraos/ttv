@@ -22,7 +22,12 @@ exports.textToSpeech = async function (args) {
             `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US">`,
             `<voice name="${args.model}">`,
             +args.rate ? `<prosody rate="${args.rate > 0 ? "+" : ""}${+args.rate}%">` : "",
-            `<break time="500ms" />${args.text}<break time="500ms" />`,
+            `<break time="500ms" />${args.text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;")}<break time="500ms" />`,
             +args.rate ? "</prosody>" : "",
             `</voice>`,
             `</speak>`
@@ -71,7 +76,7 @@ exports.textToSpeech = async function (args) {
 
         progress = saveLog(`保存文件：${args.basename}.mp3`);
         await fs.writeFileSync(`${args.basename}.mp3`, result); // 写临时文件
-        
+
         progress = saveLog(`修正静音，输出成：${args.basename}.m4a`);
         await execCommand(
             [
