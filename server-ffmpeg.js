@@ -62,7 +62,7 @@ exports.videoGenerator = async function (args) {
         await fs.writeFileSync("filelist.txt", videolist.map((line) => `file 'video/${line}'`).join("\n")); // 生成文件列表
         saveLog(`writeFileSync: filelist.txt`);
 
-        await execCommand(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -v quiet -y "../dist/${filename}"`); // 合并
+        await execCommand(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -async 1000 -v quiet -y "../dist/${filename}"`); // 合并
 
         let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "../dist/${filename}"`);
         process.chdir(base_path);
