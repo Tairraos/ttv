@@ -234,9 +234,9 @@ body {
     fill: #ddd;
 }
 
-#material .svg.video-text,
-#material .svg.slide-listen {
-    margin: 0 10px;
+#material .svg.video-listen,
+#material .svg.slide-text {
+    margin: 0 8px;
 }
 
 #material .media_cn1,
@@ -245,6 +245,7 @@ body {
 #material .media_en2,
 #material .slide {
     width: 110px;
+    padding: 6px 6px;
 }
 
 #material .check {
