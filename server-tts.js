@@ -18,17 +18,18 @@ exports.textToSpeech = async function (args) {
         path = require("path"),
         thread = require("child_process"),
         base_path = process.cwd(),
+        is_rate = args.rate && +args.rate !== 0,
         ssml = [
             `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US">`,
             `<voice name="${args.model}">`,
-            +args.rate ? `<prosody rate="${args.rate > 0 ? "+" : ""}${+args.rate}%">` : "",
-            `<break time="500ms" />${args.text
+            is_rate ? `<prosody rate="${args.rate > 0 ? "+" : ""}${+args.rate}%">` : "",
+            `<break time="800ms" />${args.text
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;")}<break time="500ms" />`,
-            +args.rate ? "</prosody>" : "",
+                .replace(/'/g, "&#039;")}<break time="800ms" />`,
+            is_rate ? "</prosody>" : "",
             `</voice>`,
             `</speak>`
         ].join(""),
@@ -87,15 +88,15 @@ exports.textToSpeech = async function (args) {
                     `silenceremove=`, // 删除静音
                     `start_periods=1:`,
                     `start_duration=0:`,
-                    `start_threshold=-60dB:`, // 小于最大音量-60dB的才算静音
-                    `start_silence=0.5:`, // 头上保留0.5秒静音
+                    `start_threshold=-80dB:`, // 小于最大音量-80dB的才算静音
+                    `start_silence=0.8:`, // 头上保留0.8秒静音
                     `detection=peak,`,
                     `areverse,`, // 反过来，因为从后面剪音频有问题
                     `silenceremove=`, // 删除静音
                     `start_periods=1:`,
                     `start_duration=0:`,
-                    `start_threshold=-60dB:`,
-                    `start_silence=0.5:`,
+                    `start_threshold=-80dB:`,
+                    `start_silence=0.8:`,
                     `detection=peak,`,
                     `areverse`, // 反回来
                     `"`
