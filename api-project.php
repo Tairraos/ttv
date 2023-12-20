@@ -3,7 +3,7 @@
 // 工程表API
 // ************
 // 查询/新建/更新 工程记录：{projectid: "0001", lesson: "Living Chinese", duration: "300"}
-// 如果archived为空，则删除所有同样前缀未完成的记录，并在数据表插入一条新记录，projectid顺延
+// 如果duration为0，则删除所有同样前缀未完成的记录，并在数据表插入一条新记录，projectid顺延
 // 否则更新duration
 // 无论如何，stamp都会被更新成当前时间，精确到秒
 
@@ -35,7 +35,7 @@ function getNewProjectid($lesson)
 {
     global $db;
     // 删除同样前缀的未完成记录
-    $db->query("DELETE FROM `project` WHERE lesson = '$lesson' AND archived = '' AND duration = 0");
+    $db->query("DELETE FROM `project` WHERE lesson = '$lesson' AND duration = 0");
     // 找到合适的projectid
     $stmt = $db->query("SELECT IFNULL(MAX(projectid),0) AS maxid FROM project WHERE lesson = '$lesson'");
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);

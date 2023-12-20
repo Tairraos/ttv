@@ -2,23 +2,15 @@
 // ************
 // 数据库存档
 // ************
-// projectid关联到project表
 
-$projectid = $_REQUEST['projectid'];
-$lesson = $_REQUEST['lesson'];
 $theme = $_REQUEST['theme'];
 $stamp = date('Y-m-d H:i:s');
 
 $db = new PDO('sqlite:ttv-data.db');
 
 // 插入数据到archive表
-$stmt = $db->prepare("INSERT INTO archive (`id`, `lesson`, `type`, `group`, `voice`, `chinese`, `english`, `phonetic`, `projectid`) " .
-    " SELECT `id`, `lesson`, `type`, `group`, `voice`, `chinese`, `english`, `phonetic`, '$projectid' AS projectid FROM material");
-$stmt->execute();
-
-
-// 更新project表
-$stmt = $db->prepare("UPDATE `project` SET `archived` = 'yes', `stamp` = '$stamp' WHERE projectid = $projectid AND lesson = '$lesson'");
+$stmt = $db->prepare("INSERT INTO archive (`id`, `lesson`, `type`, `group`, `voice`, `chinese`, `english`, `phonetic`) " .
+    " SELECT `id`, `lesson`, `type`, `group`, `voice`, `chinese`, `english`, `phonetic` FROM material");
 $stmt->execute();
 
 // 删除material表中的数据

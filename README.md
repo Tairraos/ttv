@@ -19,7 +19,9 @@ CREATE TABLE 'project' (
     'lesson'        TEXT NOT NULL DEFAULT '',
     'theme'         TEXT NOT NULL DEFAULT '',
     'duration'      REAL NOT NULL DEFAULT 0,
-    'archived'      TEXT NOT NULL DEFAULT '',
+    'style'         TEXT NOT NULL DEFAULT '',
+    'startid'       INTEGER NOT NULL DEFAULT 0, 
+    'endid'         INTEGER NOT NULL DEFAULT 0, 
     'stamp'         TEXT NOT NULL DEFAULT '',
     PRIMARY KEY ('projectid', 'lesson')
 );
@@ -47,21 +49,18 @@ CREATE TABLE 'archive' (
     'chinese'       TEXT NOT NULL DEFAULT '',
     'english'       TEXT NOT NULL DEFAULT '', 
     'phonetic'      TEXT NOT NULL DEFAULT '', 
-    'projectid'     TEXT NOT NULL DEFAULT '',
     PRIMARY KEY ('id', 'lesson')
 );
 ```
 
 ## project设计
-- 一条project记录，对应一次语料处理
+- 一条project记录，对应一个视频
 - 同一种类型的 lesson 仅允许有一条 **进行中** 的工程记录
-- 如果已导入语料暂时不想生成视频，可以使用步骤`x.导出素材`备份，需要的时候再导入制作
-- duration = 0 或者 archived = '' 视为进行中的工程
+- 如果已导入语料暂时不想生成视频，可以`存档数据`，开始其它素材。
+- 也可以使用`导出数据`备份，需要的时候再导入制作
+- duration = 0 视为进行中的工程
 - video 在生成之后，duration 字段会被填上 video 长度
-- 如果记录被存档，project 的 archived 字段会成为 yes
-- 如果导入的语料没有被制作视频，可以导出素材，然后存档
 - 只要id在存档里就不会被新导入的内容占用
-- 导入素材时，选择使用素材自带的id就可以把重用那些保留在存档表里的 id
 - 从存档中生成课件的功能待制作
 - 生成的video为裸视频，需自己添加视频头尾
 - theme 为 背景图片，lesson 的缩写 + projectid = theme name

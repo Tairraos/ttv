@@ -86,23 +86,32 @@ body {
     border-style: dotted;
 }
 
-#lesson {
+.menu select {
     width: 140px;
     text-align: center;
-    margin: 5px 0;
-    height: 30px;
+    margin: 5px 0 2px;
+    padding: 4px 0;
+    /* height: 27px; */
+    line-height: 25px;
 }
 
+.menu select option {
+    font-size: 14px;
+}
 #projectid {
     width: 50px;
     text-align: center;
-    padding: 5px 10px;
+    padding: 3px 10px;
     margin: 5px 10px 0 0;
     vertical-align: top;
 }
 
 #createProject {
-    vertical-align: top;
+    line-height: 0;
+    padding: 0 10px;
+    height: 26px;
+    margin: 5px 0 5px 2px;
+    font-size: 14px;
 }
 
 .menu button {
@@ -192,18 +201,10 @@ body {
     text-decoration: none;
 }
 
-.useImportId {
-    font-size: 12px;
-}
-
-#ignoreConfMaxid {
-    vertical-align: middle;
-}
-
 #edittool {
     display: none;
     flex-direction: column;
-    position: absolute;
+    position: fixed;
     flex-direction: row;
     box-shadow: inset 0px 0px 6px #3250f0;
     padding: 4px 2px 0 2px;
@@ -266,6 +267,10 @@ body {
     fill: #f6f6f6;
 }
 
+#material .skip {
+    opacity: 0.25;
+}
+
 #server.ok::after {
     content: "正在服务";
     padding: 4px 10px;
@@ -302,4 +307,25 @@ body {
     100% {
         background-color: #5a0000;
     }
+}
+
+#startid,
+#endid {
+    width: 40px;
+    text-align: center;
+    padding: 3px 2px;
+    margin: 5px 0;
+}
+
+.rangeconfig {
+    font-size: 14px;
+    border: 2px dashed #333;
+    margin: 5px auto;
+    width: 280px;
+    border-radius: 10px;
+}
+
+#confirmRange {
+    height: 25px;
+    line-height: 0;
 }
