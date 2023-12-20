@@ -27,6 +27,7 @@ function create_project($lesson)
     $stmt = $db->prepare("INSERT INTO `project` (`projectid`, `lesson`, `theme`, `duration`, `stamp`) VALUES ('$projectid', '$lesson', '$theme', 0, '$stamp')");
     $stmt->execute();
     prepareBgImg($theme);
+    prepareFolder();
     echoProject($projectid, $lesson);
 }
 
@@ -73,6 +74,20 @@ function prepareBgImg($theme)
         if ($files) {
             rename($files[0], "media/images/$theme.png");
         }
+    }
+}
+
+function prepareFolder()
+{
+    //检查目录 media/material/audio 是否存在，不存在则创建
+    if (!file_exists("media/material/audio")) {
+        mkdir("media/material/audio");
+    }
+    if (!file_exists("media/material/video")) {
+        mkdir("media/material/video");
+    }
+    if (!file_exists("media/material/slide")) {
+        mkdir("media/material/slide");
     }
 }
 
