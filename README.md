@@ -17,11 +17,12 @@ DROP TABLE IF EXISTS 'project';
 CREATE TABLE 'project' (
     'projectid'     INTEGER NOT NULL DEFAULT 0,
     'lesson'        TEXT NOT NULL DEFAULT '',
-    'theme'         TEXT NOT NULL DEFAULT '',
-    'duration'      REAL NOT NULL DEFAULT 0,
-    'style'         TEXT NOT NULL DEFAULT '',
+    'lesson_cn'     TEXT NOT NULL DEFAULT '',
+    'program'       TEXT NOT NULL DEFAULT '',
     'startid'       INTEGER NOT NULL DEFAULT 0, 
     'endid'         INTEGER NOT NULL DEFAULT 0, 
+    'duration'      REAL NOT NULL DEFAULT 0,
+    'theme'         TEXT NOT NULL DEFAULT '',
     'stamp'         TEXT NOT NULL DEFAULT '',
     PRIMARY KEY ('projectid', 'lesson')
 );

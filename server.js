@@ -6,6 +6,7 @@ let plugins = {
     },
     entries = Object.keys(plugins);
 
+
 let server = require("http").createServer(async (req, res) => {
     let postBody = "";
     res.statusCode = 200;
@@ -24,6 +25,10 @@ let server = require("http").createServer(async (req, res) => {
         res.end(JSON.stringify(await plugins[req.url](params)));
     });
 });
+
+
+console.log(`摩耳视频生成助手即将启动，如果端口绑定出错，用管理员cmd执行下面的命令：`);
+console.log(`net stop winnat && net start winnat`);
 
 server.listen(3000, "ttv.localweb.com", () => {
     console.log(`摩耳视频生成助手已启动，合法POST入口: ${JSON.stringify(entries)}`);
