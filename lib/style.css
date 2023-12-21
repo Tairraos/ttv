@@ -68,17 +68,14 @@ body {
 
 #basket {
     width: 144px;
-    height: 110px;
-    display: flex;
+    padding: 17px 0;
     transition: background-color 1s, height 0s;
     border: 2px dashed #333;
     border-radius: 10px;
-    font-size: 20px;
+    font-size: 19px;
     text-align: center;
     color: #68c;
     margin: 5px 0 4px;
-    flex-direction: column;
-    justify-content: center;
 }
 
 #basket.dragover {
@@ -91,13 +88,13 @@ body {
     text-align: center;
     margin: 5px 0 2px;
     padding: 4px 0;
-    /* height: 27px; */
     line-height: 25px;
 }
 
 .menu select option {
     font-size: 14px;
 }
+
 #projectid {
     width: 50px;
     text-align: center;
@@ -311,7 +308,7 @@ body {
 
 #startid,
 #endid {
-    width: 40px;
+    width: 30px;
     text-align: center;
     padding: 3px 2px;
     margin: 5px 0;
@@ -325,7 +322,32 @@ body {
     border-radius: 10px;
 }
 
+#confirmRange,
+#resetRange {
+    height: 24px;
+    width: 24px;
+    vertical-align: middle;
+    fill: #333;
+    cursor: pointer;
+}
+
 #confirmRange {
-    height: 25px;
-    line-height: 0;
+    margin-left: 10px;
+}
+
+#confirmRange:hover {
+    fill: #2a2;
+}
+
+#resetRange:hover {
+    fill: #a22;
+}
+
+.unselectable {
+    user-select: none;
+}
+
+.selecting {
+    background: #c9c9c9 !important;
+    opacity: 1 !important;
 }
