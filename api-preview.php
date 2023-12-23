@@ -17,7 +17,6 @@
     {
         global $files;
         if (file_exists($path . $filename)) {
-            // push $filename into $files
             $files[] = $filename;
         }
     }
