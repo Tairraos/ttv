@@ -1,17 +1,6 @@
 ## 环境配置
-- 第一次使用需确认环境配置如下
-- PHP.ini里，有可能被设置成production模式，确保 variables_order = "EGPCS", 否则不能读取环境变量
-- cmd用管理员启动，然后执行下面的命令存入 API KEY
-- `setx /m AZURE_SPEECH_KEY xxxxxx`
-- `setx /m AZURE_SPEECH_REGION xxxxxx`
-- `setx /m BAIDU_APP_ID xxxxxx`
-- `setx /m BAIDU_SEC_KEY xxxxxx`
-- azure API 用来生成 tts 语音，baidu api 用来翻译中英文
-- 执行 work 目录下的`初始化目录.bat`
-- `npm run server` 把工具助手运行起来
-- 照下列结构创建 `sqlite` 数据库 `ttv-data.db`
-
-## 数据表结构
+### 1 数据表结构
+照下列结构创建 `sqlite` 数据库 `ttv-data.db`
 ```
 DROP TABLE IF EXISTS 'project';
 CREATE TABLE 'project' (
@@ -54,41 +43,69 @@ CREATE TABLE 'archive' (
 );
 ```
 
-## project设计
+### 2 虚拟机配置
+vhost文件里添加有ProxyPassMatch，完整的虚拟主机配置为：
+```
+<VirtualHost *:80>
+    ServerAdmin webmaster@localweb.com
+    DocumentRoot "D:/Workspace/ttv"
+    ServerName ttv.localweb.com
+    ErrorLog "D:/Apps/Xampp/apache/logs/ttv-error.log"
+    CustomLog "D:/Apps/Xampp/apache/logs/ttv-access.log" common
+</VirtualHost>
+<VirtualHost *:443>
+    DocumentRoot "D:/Workspace/ttv"
+    ServerName ttv.localweb.com:443
+    ServerAdmin webmaster@localweb.com
+    ProxyPassMatch ^/api/(.*)$ http://ttv.localweb.com:3000/$1
+    SSLEngine on
+    SSLCertificateFile "D:/Apps/Xampp/apache/conf/server.crt"
+    SSLCertificateKeyFile "D:/Apps/Xampp/apache/conf/server.key"
+    ErrorLog "D:/Apps/Xampp/apache/logs/ttv-error.ssl.log"
+    CustomLog "D:/Apps/Xampp/apache/logs/ttv-access.ssl.log" common
+</VirtualHost>                       
+<Directory "D:/Workspace/ttv">
+    Options FollowSymLinks Multiviews Indexes
+    MultiviewsMatch Any
+    AllowOverride All
+    Require all granted
+</Directory>
+```
+确认`httpd.conf`文件里`proxy`模块的loader前面没有被注释
+
+### 3 环境变量
+- cmd用管理员启动，然后执行下面的命令存入 API KEY
+- `setx /m AZURE_SPEECH_KEY xxxxxx`
+- `setx /m AZURE_SPEECH_REGION xxxxxx`
+- `setx /m BAIDU_APP_ID xxxxxx`
+- `setx /m BAIDU_SEC_KEY xxxxxx`
+- azure API 用来生成 tts 语音，baidu api 用来翻译中英文
+
+### 4 php配置
+- PHP.ini里，有可能被设置成`production`模式，确保 `variables_order = "EGPCS"`, 否则不能读取环境变量
+
+### 5 准备目录
+- 执行 `https://ttv.localweb.com/setup.php` 初始化目录
+
+### 6 启动助手
+- `npm run server` 把工具助手运行起来
+
+### 7 使用~~~
+- `https://ttv.localweb.com`
+
+## 系统设计
 - 一条project记录，对应一个视频
-- 同一种类型的 lesson 仅允许有一条 **进行中** 的工程记录
-- 如果已导入语料暂时不想生成视频，可以`存档数据`，开始其它素材。
-- 也可以使用`导出数据`备份，需要的时候再导入制作
-- duration = 0 视为进行中的工程
-- video 在生成之后，duration 字段会被填上 video 长度
-- 只要id在存档里就不会被新导入的内容占用
-- 从存档中生成课件的功能待制作
+- 视频生成后才会记录project内容
+- 每种不同的类型的 lesson 语料，会使用从1开始的id编号
+- 可以一次性导入一本书的素材，分批生成多个视频
+- `导出数据`功能会将使用当前显示的所有的语料生成excel和课件
 - 生成的video为裸视频，需自己添加视频头尾
 - theme 为 背景图片，lesson 的缩写 + projectid = theme name
 - lesson 在 lib/tool-util.js里增删改
-
-## 导入用素材xlsx说明
-- 使用excel制作导入文件
-- 每个文件里的语料会被处理成一个视频
-- 通过工具下载空模板，然后填充内容生成xlsx文件
-- `type`字段留空或填写`story`, `sentence`或`word`，也可以使用中文`故事`, `句子`，`单词`，`词汇`，`词组`
-- `type`字段留空表示`sentence`
+- 使用excel制作导入文件，通过工具下载空模板，然后填充内容生成xlsx文件
+- `type`字段留空或填写`title`, `story`, `sentence`或`word`，也可以使用中文`故事`, `句子`，`单词`，`词汇`，`词组`
 - `voice`字段留空或填写`child`, `man`, `woman`, `man2`, `woman2`, `man3`, `woman3`, `elder`
-- `voice`有值的话，只会生成相应性别的语音
-- `voice`字段留空表示使用`man`和`woman`都生成音频
+- `voice`有值的话，只会生成相应性别的语音, `voice`字段留空表示使用`woman`和`man`各生成一份语音
 - 导入语料的工程如果要更改`lesson`只能清空material表然后重来
-- 素材xlsx至少有1个sheet，`语料`
-- 导出的素材文件会自动生成`语料`和`课件`sheet，可以用来导入
-
-
-## material设计
-- material表记录了视频制作的过程，语料导入该表进行处理
-- 如果过程被打断，工具会从material表恢复出已经完成的步骤
-- 每次导入语料，id会使用material和archive中，最大的id+1开始
-- 视频制作完成后，使用存档功能，背景图片移入archive文件夹存档
-- chinese lesson下，phonetic 为 chinese 字段的拼音
-- english lesson 的句子类型, phonetic为空
-- english lesson 的单词类型, phonetic为词汇的音标
-- english lesson 的单词类型, chinese为词典翻译（非api）
-- english lesson 的单词类型不会有中文语音
-
+- 点击`type`会预览当前数据行的原始`slide`，可以用于调试
+- 点击`check`会显示`preview.php`,显示该行或该`group`所有的必要语料，用于调试
