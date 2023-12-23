@@ -12,38 +12,36 @@
     $id = $_REQUEST['id'] ?? 0;
     $theme = $_REQUEST['theme'] ?? '';
     require("api-data.php");
-
-    function getAudioDom($filename)
+    $files = [];
+    function checkFile($path, $filename)
     {
-        return implode('', [
-            '<td class="media">',
-            file_exists($filename) ? '<audio controls src="' . $filename . '"></audio>' : '<span class="error">素材未生成</span>',
-            '<div class="filename">' . $filename . '</div>',
-            '</td>'
-        ]);
+        global $files;
+        if (file_exists($path . $filename)) {
+            // push $filename into $files
+            $files[] = $filename;
+        }
     }
-    function getVideoDom($filename)
-    {
-        return implode('', [
-            '<td class="media">',
-            file_exists($filename) ? '<video controls src="' . $filename . '" /></video>' : '<span class="error">素材未生成</span>',
-            '<div class="filename">' . $filename . '</div>',
-            '</td>'
-        ]);
-    }
-    function getImageDom($filename)
-    {
-        return implode('', [
-            '<td class="media">',
-            file_exists($filename) ? '<img src="' . $filename . '" />' : '<span class="error">素材未生成</span>',
-            '<div class="filename">' . $filename . '</div>',
-            '</td>'
-        ]);
-
+    checkFile('media/images/', $theme . '.png');
+    foreach ($rows as $row) {
+        checkFile('media/material/audio/', $row['id'] . '.cn1.m4a');
+        checkFile('media/material/video/', $row['id'] . '.cn1.listen.mp4');
+        checkFile('media/material/video/', $row['id'] . '.cn1.text.mp4');
+        checkFile('media/material/audio/', $row['id'] . '.cn2.m4a');
+        checkFile('media/material/video/', $row['id'] . '.cn2.listen.mp4');
+        checkFile('media/material/video/', $row['id'] . '.cn2.text.mp4');
+        checkFile('media/material/audio/', $row['id'] . '.en1.m4a');
+        checkFile('media/material/video/', $row['id'] . '.en1.listen.mp4');
+        checkFile('media/material/video/', $row['id'] . '.en1.text.mp4');
+        checkFile('media/material/audio/', $row['id'] . '.en2.m4a');
+        checkFile('media/material/video/', $row['id'] . '.en2.listen.mp4');
+        checkFile('media/material/video/', $row['id'] . '.en2.text.mp4');
+        checkFile('media/material/slide/', $row['id'] . '.text.png');
+        checkFile('media/material/slide/', $row['id'] . '.listen.png');
+        checkFile('media/material/video/', $row['id'] . '.ding.mp4');
     }
     ?>
     <div id="title">素材预览</div>
-    <table id="material">
+    <table class="material" id="data">
         <tr>
             <th>id</th>
             <th>课程</th>
@@ -59,54 +57,38 @@
         }
         ?>
     </table>
-    <table id="material">
-        <tr>
-            <th>中文素材1</th>
-            <th>中文素材2</th>
-            <th>英文素材1</th>
-            <th>英文素材2</th>
-        </tr>
-        <?php
-        foreach ($rows as $row) {
-            echo '<tr><td colspan="4" class="label">id: ' . $row['id'] . ', 类型: 语音</td></tr><tr>';
-            echo getAudioDom('media/material/audio/' . $row['id'] . '.cn1.m4a');
-            echo ($row['voice'] == '') ? getAudioDom('media/material/audio/' . $row['id'] . '.cn2.m4a') : '<td><span class="pass">不需要</span></td>';
-            echo getAudioDom('media/material/audio/' . $row['id'] . '.en1.m4a');
-            echo ($row['voice'] == '') ? getAudioDom('media/material/audio/' . $row['id'] . '.en2.m4a') : '<td><span class="pass">不需要</span></td>';
-            echo '</tr>';
-
-            echo '<tr><td colspan="4" class="label">id: ' . $row['id'] . ', 类型: 字幕视频</td></tr><tr>';
-            echo getVideoDom('media/material/video/' . $row['id'] . '.cn1.text.mp4');
-            echo ($row['voice'] == '') ? getVideoDom('media/material/video/' . $row['id'] . '.cn2.text.mp4') : '<td><span class="pass">不需要</span></td>';
-            echo getVideoDom('media/material/video/' . $row['id'] . '.en1.text.mp4');
-            echo ($row['voice'] == '') ? getVideoDom('media/material/video/' . $row['id'] . '.en2.text.mp4') : '<td><span class="pass">不需要</span></td>';
-            echo '</tr>';
-
-            echo '<tr><td colspan="4" class="label">id: ' . $row['id'] . ', 类型: 听力视频</td></tr><tr>';
-            echo getVideoDom('media/material/video/' . $row['id'] . '.cn1.listen.mp4');
-            echo ($row['voice'] == '') ? getVideoDom('media/material/video/' . $row['id'] . '.cn2.listen.mp4') : '<td><span class="pass">不需要</span></td>';
-            echo getVideoDom('media/material/video/' . $row['id'] . '.en1.listen.mp4');
-            echo ($row['voice'] == '') ? getVideoDom('media/material/video/' . $row['id'] . '.en2.listen.mp4') : '<td><span class="pass">不需要</span></td>';
-            echo '</tr>';
-
-        }
-        ?>
-    </table>
-    <table id="material">
+    <table class="material" id="slide_table">
         <tr>
             <th>背景图片</th>
             <th>字幕图片</th>
             <th>听力图片</th>
             <th>ding视频</th>
         </tr>
-        <tr>
-            <?= getImageDom('media/images/' . $theme . '.png') ?>
-            <?= getImageDom('media/material/slide/' . $id . '.text.png') ?>
-            <?= getImageDom('media/material/slide/' . $id . '.listen.png') ?>
-            <?= getVideoDom('media/material/video/' . $row['id'] . '.ding.mp4'); ?>
-        </tr>
     </table>
+    <table class="material" id="media_table">
+        <tr>
+            <th>中文素材1</th>
+            <th>中文素材2</th>
+            <th>英文素材1</th>
+            <th>英文素材2</th>
+        </tr>
 
+    </table>
 </body>
+<script src="lib/tool-conf.js"></script>
+<script>
+    let lines = <?= json_encode($rows, JSON_UNESCAPED_UNICODE); ?>;
+    conf.files = <?= json_encode($files, JSON_UNESCAPED_UNICODE); ?>;
+    conf.info.language = lines[0].lesson ? "chinese" : "english";
+    conf.rules = conf.programRules.listen;
+    conf.info.theme = "<?= $theme ?>";
+    conf.info.id = <?= $id ?>;
+    conf.materials = {};
+    for (let line of lines) {
+        conf.materials[line.id] = line;
+    }
+</script>
+<script src="lib/tool-util.js"></script>
+<script src="lib/preview.js"></script>
 
 </html>

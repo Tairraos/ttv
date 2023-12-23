@@ -8,7 +8,8 @@
     font-weight: 700;
 }
 
-#material {
+.material {
+    width: 100%;
     border-collapse: collapse;
     margin: 0 auto;
     font-size: 14px;
@@ -16,8 +17,8 @@
     width: 100%;
 }
 
-#material td,
-#material th {
+.material td,
+.material th {
     border: 1px solid #cad9ea;
     padding: 4px 6px;
     text-align: center;
@@ -25,15 +26,15 @@
     font-weight: normal;
 }
 
-#material tr:nth-child(odd) {
+.material tr:nth-child(odd) {
     background: #fff;
 }
 
-#material tr:nth-child(even) {
+.material tr:nth-child(even) {
     background: #eee;
 }
 
-#material th {
+.material th {
     background: #666;
     color: #fff;
 }
@@ -43,8 +44,12 @@
 }
 
 audio {
-    height: 30px;
-    width: 100%;
+    height: 40px;
+    width: 95%;
+    min-width: 300px;
+    margin-top: 10px;
+    border-radius: 40px;
+    border: 2px dashed #333;
 }
 
 video {
@@ -65,19 +70,19 @@ img {
     font-weight: 900;
 }
 
-#material td.label {
+.material td.label {
     text-align: left;
     font-size: 14px;
     line-height: 14px;
 }
 
-#material td .pass {
+.material td .pass {
     font-size: 14px;
     color: #888;
     font-weight: normal;
 }
 
-#material td {
+.material td {
     font-size: 16px;
     line-height: 20px;
     font-weight: bold;
