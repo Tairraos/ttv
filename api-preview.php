@@ -20,7 +20,7 @@
             $files[] = $filename;
         }
     }
-    checkFile('media/images/', $theme . '.png');
+    checkFile('media/material/', $theme . '.png');
     foreach ($rows as $row) {
         checkFile('media/material/audio/', $row['id'] . '.cn1.m4a');
         checkFile('media/material/video/', $row['id'] . '.cn1.listen.mp4');

@@ -136,6 +136,9 @@ body {
     margin: 5px 0;
     border: 1px solid #333;
     cursor: pointer;
+    font-size: 12px;
+    word-break: break-all;
+    display: inline-block;
 }
 
 .controls {

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="lib/page.css">
     <style>
         .backimg {
-            background-image: url('media/images/<?= $_REQUEST['theme'] ?? 'default' ?>.png');
+            background-image: url('media/material/<?= $_REQUEST['theme'] ?? 'default' ?>.png');
             background-size: 100% 100%;
         }
 

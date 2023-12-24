@@ -33,11 +33,8 @@ function getNewProjectid($lesson)
 function prepareThemeImg()
 {
     global $theme;
-    if (!file_exists("media/images/$theme.png")) {
-        $files = glob("media/images/*.png");
-        if ($files) {
-            rename($files[0], "media/images/$theme.png");
-        }
+    if (file_exists("media/images/$theme.png")) {
+        rename("media/images/$theme.png", "media/material/$theme.png");
     }
 }
 
@@ -56,7 +53,7 @@ function prepareFolder()
 }
 
 $projectid = getNewProjectid($lesson);
-$theme = $lesson_abbr."-". str_pad($projectid, 3, "0", STR_PAD_LEFT);
+$theme = $lesson_abbr . "-" . str_pad($projectid, 3, "0", STR_PAD_LEFT);
 
 if ($action == "create") {
     $stmt = $db->prepare("INSERT INTO `project` (projectid, lesson, lesson_cn, program, startid, endid, duration, theme, stamp) " .
@@ -64,7 +61,7 @@ if ($action == "create") {
     $stmt->execute();
     echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
 } else {
-    // prepareThemeImg();
+    prepareThemeImg();
     prepareFolder();
     $stmt = $db->query("SELECT MAX(`maxid`) as `maxid` FROM ( " .
         "SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `archive` WHERE `lesson` = '$lesson' " .
