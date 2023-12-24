@@ -3,7 +3,7 @@
 // 数据库存档
 // ************
 
-$theme = $_REQUEST['theme'];
+$lesson = $_REQUEST['lesson'];
 $stamp = date('Y-m-d H:i:s');
 
 $db = new PDO('sqlite:ttv-data.db');
@@ -17,17 +17,13 @@ $stmt->execute();
 $db->exec("DELETE FROM material;");
 
 // 把已经用过的目录移动到archive存档
-rename('media/material', 'media/archive/' . $theme);
+rename('media/material', 'media/archive/' . $lesson);
 
 // 创建新的空目录准备开始下一个工程
 mkdir('media/material');
 mkdir('media/material/audio');
 mkdir('media/material/video');
 mkdir('media/material/slide');
-
-// 把已经用过的图片移动到archive存档
-rename('media/images/' . $theme . '.png', 'media/archive/' . $theme . '/' . $theme . '.png');
-
 
 header('Content-Type: application/json');
 echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
