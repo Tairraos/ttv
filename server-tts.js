@@ -28,13 +28,15 @@ exports.textToSpeech = async function (args) {
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;")}<break time="800ms" />`,
+                .replace(/'/g, "&#039;")
+                .replace(/\[([^\]]+)\]/g, `<phoneme alphabet="sapi" ph="$1">`)
+                .replace(/\[\]/g, `</phoneme>`)}<break time="800ms" />`,
             is_rate ? "</prosody>" : "",
             `</voice>`,
             `</speak>`
         ].join(""),
         progress;
-
+    console.log(ssml);
     let saveLog = async function (text) {
         await fs.appendFileSync(path.join(base_path, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
         return text;
