@@ -42,8 +42,8 @@ exports.videoGenerator = async function (args) {
         process.chdir("media/material");
         await execCommand(
             [
-                `ffmpeg -loop 1 -i "${slidename}" -i "${audioname}"`,
-                `-c:v libx264 -tune stillimage -pix_fmt yuv420p`, // 视频用x264编码，stillimage优化静态图像，象素格式yuv420p
+                `ffmpeg -hwaccel cuda -loop 1 -i "${slidename}" -i "${audioname}"`,
+                `-c:v h264_nvenc -pix_fmt yuv420p`, // 视频用x264编码，stillimage优化静态图像，象素格式yuv420p
                 `-c:a copy`, // 音频直接复制，否则会有bug
                 `-shortest -v quiet -y "video/${filename}` // 视频长度和audio一致，静默执行，覆盖目标文件
             ].join(" ")

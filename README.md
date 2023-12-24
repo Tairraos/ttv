@@ -10,7 +10,7 @@ CREATE TABLE 'project' (
     'program'       TEXT NOT NULL DEFAULT '',
     'startid'       INTEGER NOT NULL DEFAULT 0, 
     'endid'         INTEGER NOT NULL DEFAULT 0, 
-    'duration'      REAL NOT NULL DEFAULT 0,
+    'duration'      TEXT NOT NULL DEFAULT '',
     'theme'         TEXT NOT NULL DEFAULT '',
     'stamp'         TEXT NOT NULL DEFAULT '',
     PRIMARY KEY ('projectid', 'lesson')

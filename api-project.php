@@ -2,10 +2,7 @@
 // ************
 // 工程表API
 // ************
-// 查询/新建/更新 工程记录：{action: "create|getid", lesson: "Living Chinese", duration: "300"}
-// 如果duration为0，则删除所有同样前缀未完成的记录，并在数据表插入一条新记录，projectid顺延
-// 否则更新duration
-// 无论如何，stamp都会被更新成当前时间，精确到秒
+// 查询/新建 工程记录：{action: "create|getid", lesson: "Living Chinese", duration: "03:25.3"}
 
 
 header('Content-Type: application/json');
@@ -16,7 +13,7 @@ $lesson_cn = $_REQUEST['lesson_cn'] ?? '';
 $program = $_REQUEST['program'] ?? '';
 $startid = $_REQUEST['startid'] ?? 0;
 $endid = $_REQUEST['endid'] ?? 0;
-$duration = $_REQUEST['duration'] ?? 0;
+$duration = $_REQUEST['duration'] ?? '';
 $lesson_abbr = $_REQUEST['lesson_abbr'] ?? 'Default';
 $stamp = date('Y-m-d H:i:s');
 
@@ -67,7 +64,7 @@ if ($action == "create") {
     $stmt->execute();
     echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
 } else {
-    prepareThemeImg();
+    // prepareThemeImg();
     prepareFolder();
     $stmt = $db->query("SELECT MAX(`maxid`) as `maxid` FROM ( " .
         "SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `archive` WHERE `lesson` = '$lesson' " .
