@@ -22,11 +22,8 @@ if (!file_exists('common/intro-cn.mp4')) {
 if (!file_exists('common/intro-en.mp4')) {
     copy('../work/intro-en.mp4', 'common/intro-en.mp4');
 }
-echo "公用文件已经准备好 media/dist/*.*<br>";
-if (!file_exists('dist')) {
-    mkdir('dist');
-}
-echo "目标输出目录已创建 media/dist 存放的是生成完成的 mp4 文件<br>";
+echo "公用文件已经准备好 media/common/*.*<br>";
+
 if (!file_exists('images')) {
     mkdir('images');
 }
@@ -34,7 +31,7 @@ echo "图片目录已创建 media/images 存放的未使用过的背景图片<br
 if (!file_exists('material')) {
     mkdir('material');
 }
-echo "素材目录已创建 media/material 存放的是生成视频过程中产生的素材<br>";
+echo "素材目录已创建 media/material 存放的是生成视频过程中产生的素材和编译输出<br>";
 
 chdir('material');
 if (!file_exists('audio')) {
@@ -45,6 +42,9 @@ if (!file_exists('video')) {
 }
 if (!file_exists('slide')) {
     mkdir('slide');
+}
+if (!file_exists('dist')) {
+    mkdir('dist');
 }
 echo "所有目录已创建<br>";
 ?>

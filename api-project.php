@@ -40,7 +40,10 @@ function prepareThemeImg()
 
 function prepareFolder()
 {
-    //检查目录 media/material/audio 是否存在，不存在则创建
+    //检查目录 media/material 是否存在，不存在则创建
+    if (!file_exists("media/material")) {
+        mkdir("media/material");
+    }
     if (!file_exists("media/material/audio")) {
         mkdir("media/material/audio");
     }
@@ -49,6 +52,9 @@ function prepareFolder()
     }
     if (!file_exists("media/material/slide")) {
         mkdir("media/material/slide");
+    }
+    if (!file_exists("media/material/dist")) {
+        mkdir("media/material/dist");
     }
 }
 
