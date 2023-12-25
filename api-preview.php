@@ -10,9 +10,9 @@
 <body>
     <?php
     $id = $_REQUEST['id'] ?? 0;
-    $theme = $_REQUEST['theme'] ?? '';
     require("api-data.php");
     $files = [];
+    $theme = $rows[0]['theme'];
     function checkFile($path, $filename)
     {
         global $files;
@@ -80,7 +80,7 @@
     conf.files = <?= json_encode($files, JSON_UNESCAPED_UNICODE); ?>;
     conf.info.language = lines[0].lesson ? "chinese" : "english";
     conf.rules = conf.programRules.listen;
-    conf.info.theme = "<?= $theme ?>";
+    conf.info.dist = "<?= $theme ?>";
     conf.info.id = <?= $id ?>;
     conf.materials = {};
     for (let line of lines) {

@@ -11,7 +11,7 @@ CREATE TABLE 'project' (
     'startid'       INTEGER NOT NULL DEFAULT 0, 
     'endid'         INTEGER NOT NULL DEFAULT 0, 
     'duration'      TEXT NOT NULL DEFAULT '',
-    'theme'         TEXT NOT NULL DEFAULT '',
+    'dist'          TEXT NOT NULL DEFAULT '',
     'stamp'         TEXT NOT NULL DEFAULT '',
     PRIMARY KEY ('projectid', 'lesson')
 );
@@ -26,6 +26,8 @@ CREATE TABLE 'material' (
     'chinese'       TEXT NOT NULL DEFAULT '',
     'english'       TEXT NOT NULL DEFAULT '', 
     'phonetic'      TEXT NOT NULL DEFAULT '', 
+    'comment'       TEXT NOT NULL DEFAULT '', 
+    'theme'         TEXT NOT NULL DEFAULT '', 
     PRIMARY KEY ('id', 'lesson')
 );
 
@@ -39,6 +41,8 @@ CREATE TABLE 'archive' (
     'chinese'       TEXT NOT NULL DEFAULT '',
     'english'       TEXT NOT NULL DEFAULT '', 
     'phonetic'      TEXT NOT NULL DEFAULT '', 
+    'comment'       TEXT NOT NULL DEFAULT '', 
+    'theme'         TEXT NOT NULL DEFAULT '', 
     PRIMARY KEY ('id', 'lesson')
 );
 ```

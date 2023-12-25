@@ -19,7 +19,10 @@
                         <li class="menu"><select id="lesson"></select></li>
                         <li class="menu"><select id="program"></select></li>
                         <li class="menu"><input type="text" id="projectid" /><button id="createProject">确认</button></li>
-                        <li class="menu"><img id="preview" src="lib/notheme.png" /></li>
+                        <li class="menu"><hr /></li>
+                        <li class="menu settheme">主题 <input type="text" id="themename" value="theme-000"/></li>
+                        <li class="menu settheme"><input type="text" id="themefrom" value="1" /> 到 <input type="text" id="themeto" value="1" /> <svg id="saveTheme" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M5 21h14a2 2 0 0 0 2-2V8l-5-5H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2M7 5h4v2h2V5h2v4H7zm0 8h10v6H7z"/></svg></li>
+                        <li class="menu"><hr /></li>
                         <li class="menu">
                             <div id="basket">
                                 <div>拖放导入数据</div>
@@ -63,7 +66,6 @@
         <div id="content"><table id="material"></table></div>
         <div id="edittool">
             <button id="doEditCell">Edit</button>
-            <button id="doGenAudioPiece">Audio</button>
             <button id="doEditDone">Done</button>
             <button id="doEditRestore">Restore</button>
         </div>

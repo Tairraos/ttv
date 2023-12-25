@@ -128,19 +128,6 @@ body {
     vertical-align: middle;
 }
 
-#preview {
-    width: 144px;
-    height: 81px;
-    background: #3333;
-    border-radius: 4px;
-    margin: 5px 0;
-    border: 1px solid #333;
-    cursor: pointer;
-    font-size: 12px;
-    word-break: break-all;
-    display: inline-block;
-}
-
 .controls {
     display: flex;
     flex-direction: row;
@@ -271,6 +258,12 @@ body {
     opacity: 0.25;
 }
 
+#material .chinese,
+#material .english,
+#material .phonetic {
+    text-align: left;
+}
+
 #server.ok::after {
     content: "正在服务";
     padding: 4px 10px;
@@ -309,6 +302,27 @@ body {
     }
 }
 
+#themename {
+    width: 90px;
+    text-align: center;
+    padding: 3px 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+#themefrom,
+#themeto {
+    width: 30px;
+    text-align: center;
+    padding: 3px 2px;
+    margin: 5px 0;
+}
+.settheme {
+    font-size: 14px;
+}
+#saveTheme {
+    vertical-align: middle;
+    cursor: pointer;
+}
 #startid,
 #endid {
     width: 30px;
@@ -353,4 +367,22 @@ body {
 .selecting {
     background: #c9c9c9 !important;
     opacity: 1 !important;
+}
+
+#material .action {
+    width: 60px;
+}
+
+#material .svg.action-preview {
+    margin-left: 6px;
+}
+#material .svg.action-page,
+#material .svg.action-preview {
+    fill: #333;
+    cursor: pointer;
+}
+
+#material .svg.action-page:hover,
+#material .svg.action-preview:hover {
+    fill: #4ae;
 }

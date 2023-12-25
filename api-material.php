@@ -15,10 +15,10 @@ if (!isset($_REQUEST['id'])) {
 $db = new PDO('sqlite:ttv-data.db');
 
 if ($field) { // 传入修改
-    $ids = array_map(fn($item) => '`id`=' . $item, explode(',', $_REQUEST['id']));
+    $id = $_REQUEST['id'];
+    $toid = $_REQUEST['toid'] ?? $id;
     $value = $_REQUEST['value'] ?? '';
-    $condition = 'WHERE ' . implode(' OR ', $ids);
-
+    $condition = 'WHERE id >=' . $id . ' AND id <= ' . $toid;
     $stmt = $db->prepare("UPDATE `material` SET `$field` = ? $condition");
     $stmt->bindParam(1, $value);
     $stmt->execute();
@@ -33,7 +33,9 @@ if ($field) { // 传入修改
     $chinese = $_REQUEST['chinese'] ?? '';
     $english = $_REQUEST['english'] ?? '';
     $phonetic = $_REQUEST['phonetic'] ?? '';
-    $stmt = $db->prepare("INSERT INTO `material` (`id`, `lesson`, `type`, `group`, `voice`,`chinese`, `english`, `phonetic`) VALUES ($id, ?, ?, ?, ?, ?, ?, ?)");
+    $comment = $_REQUEST['comment'] ?? '';
+    $theme = $_REQUEST['theme'] ?? '';
+    $stmt = $db->prepare("INSERT INTO `material` (`id`, `lesson`, `type`, `group`, `voice`,`chinese`, `english`, `phonetic`, `comment`, `theme`) VALUES ($id, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bindParam(1, $lesson);
     $stmt->bindParam(2, $type);
     $stmt->bindParam(3, $group);
@@ -41,6 +43,8 @@ if ($field) { // 传入修改
     $stmt->bindParam(5, $chinese);
     $stmt->bindParam(6, $english);
     $stmt->bindParam(7, $phonetic);
+    $stmt->bindParam(8, $comment);
+    $stmt->bindParam(9, $theme);
     $stmt->execute();
 
     $results = $db->query("SELECT * FROM `material` WHERE id = $id");

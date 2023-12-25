@@ -30,14 +30,6 @@ function getNewProjectid($lesson)
     return $rows[0]['maxid'] + 1;
 }
 
-function prepareThemeImg()
-{
-    global $theme;
-    if (file_exists("media/images/$theme.png")) {
-        rename("media/images/$theme.png", "media/material/$theme.png");
-    }
-}
-
 function prepareFolder()
 {
     //检查目录 media/material 是否存在，不存在则创建
@@ -59,15 +51,14 @@ function prepareFolder()
 }
 
 $projectid = getNewProjectid($lesson);
-$theme = $lesson_abbr . "-" . str_pad($projectid, 3, "0", STR_PAD_LEFT);
+$dist = $lesson_abbr . "-" . str_pad($projectid, 3, "0", STR_PAD_LEFT);
 
 if ($action == "create") {
-    $stmt = $db->prepare("INSERT INTO `project` (projectid, lesson, lesson_cn, program, startid, endid, duration, theme, stamp) " .
-        "VALUES($projectid, '$lesson', '$lesson_cn', '$program', +$startid, +$endid, +$duration, '$theme', '$stamp')");
+    $stmt = $db->prepare("INSERT INTO `project` (projectid, lesson, lesson_cn, program, startid, endid, duration, dist, stamp) " .
+        "VALUES($projectid, '$lesson', '$lesson_cn', '$program', +$startid, +$endid, +$duration, '$dist', '$stamp')");
     $stmt->execute();
     echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
 } else {
-    prepareThemeImg();
     prepareFolder();
     $stmt = $db->query("SELECT MAX(`maxid`) as `maxid` FROM ( " .
         "SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `archive` WHERE `lesson` = '$lesson' " .

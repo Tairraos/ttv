@@ -3,7 +3,6 @@
  * @param {*} args
  * @param {number} args.id          - 图片对应的数据库记录，如果id=0，内容为耳朵听力图标
  * @param {string} args.filename    - 要生成的图片名称，图片会生成在 media/material 目录下
- * @param {string} args.theme       - 指定背景图名字，背景图是放在 media/material 目录下的 png 文件
  * @param {string} args.language    - 教学的是英语还是汉语
  * @return {JSON}
  */

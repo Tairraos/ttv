@@ -8,6 +8,9 @@ $filename = $_REQUEST['filename'] ?? '';
 header('Content-Type: application/json');
 
 //检查目录 media/material/audio 是否存在，不存在则创建
+if (!file_exists("media/material")) {
+    mkdir("media/material");
+}
 if (!file_exists("media/material/audio")) {
     mkdir("media/material/audio");
 }
@@ -28,10 +31,12 @@ if ($filename != '') {
     $audio = scandir('media/material/audio/');
     $video = scandir('media/material/video/');
     $slide = scandir('media/material/slide/');
+    $theme = scandir('media/material/');
     $audio = array_values(array_filter($audio, fn($filename) => preg_match('/^\d/', $filename)));
     $video = array_values(array_filter($video, fn($filename) => preg_match('/^\d/', $filename)));
     $slide = array_values(array_filter($slide, fn($filename) => preg_match('/^\d/', $filename)));
-    echo json_encode(['result' => 'success', 'files' => array_merge($audio, $video, $slide)]);
+    $theme = array_values(array_filter($theme, fn($filename) => preg_match('/\.png$/', $filename)));
+    echo json_encode(['result' => 'success', 'files' => array_merge($audio, $video, $slide, $theme)]);
 }
 
 ?>

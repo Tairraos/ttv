@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <title>Moore's Language</title>
     <link rel="stylesheet" href="lib/page.css">
+    <?php require("api-data.php"); ?>
     <style>
         .backimg {
-            background-image: url('media/material/<?= $_REQUEST['theme'] ?? 'default' ?>.png');
+            background-image: url('media/material/<?= $rows[0]['theme'] ?? 'default' ?>.png');
             background-size: 100% 100%;
         }
 
@@ -38,7 +39,6 @@
                 echo '缺少参数 language';
             } else {
                 $language = $_REQUEST['language'];
-                require("api-data.php");
                 //$rows的长度
                 $vol = count($rows);
                 foreach ($rows as $index => $row) {
