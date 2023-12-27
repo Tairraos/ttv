@@ -43,6 +43,7 @@
                 $vol = count($rows);
                 foreach ($rows as $index => $row) {
                     $id = $row['id'];
+                    $sid = $row['sid'];
                     $type = $row['type'];
                     $english = $row['english'];
                     $chinese = $row['chinese'];
@@ -52,7 +53,7 @@
 
                     echo '<div class="subtitle vol-' . $vol . '">';
                     echo '<div class="subtitle-id">';
-                    echo $id;
+                    echo $sid;
                     echo '</div>';
                     echo '<div class="text lesson-' . $language . ' type-' . $type . '">';
                     if ($language == "chinese") {

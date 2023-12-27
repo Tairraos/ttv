@@ -14,8 +14,10 @@ if (!isset($_REQUEST['id'])) {
 
 $db = new PDO('sqlite:ttv-data.db');
 
+$id = +$_REQUEST['id'];
+$sid = +$_REQUEST['sid'] ?? 0;
+
 if ($field) { // 传入修改
-    $id = $_REQUEST['id'];
     $toid = $_REQUEST['toid'] ?? $id;
     $value = $_REQUEST['value'] ?? '';
     $condition = 'WHERE id >=' . $id . ' AND id <= ' . $toid;
@@ -25,7 +27,6 @@ if ($field) { // 传入修改
 
     echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
 } else { // 插入
-    $id = +$_REQUEST['id'];
     $lesson = $_REQUEST['lesson'] ?? 'Living Chinese';
     $type = $_REQUEST['type'] ?? 'sentence';
     $group = $_REQUEST['group'] ?? '';
@@ -35,7 +36,7 @@ if ($field) { // 传入修改
     $phonetic = $_REQUEST['phonetic'] ?? '';
     $comment = $_REQUEST['comment'] ?? '';
     $theme = $_REQUEST['theme'] ?? '';
-    $stmt = $db->prepare("INSERT INTO `material` (`id`, `lesson`, `type`, `group`, `voice`,`chinese`, `english`, `phonetic`, `comment`, `theme`) VALUES ($id, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $db->prepare("INSERT INTO `material` (`id`, `sid`, `lesson`, `type`, `group`, `voice`,`chinese`, `english`, `phonetic`, `comment`, `theme`) VALUES ($id, $sid, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bindParam(1, $lesson);
     $stmt->bindParam(2, $type);
     $stmt->bindParam(3, $group);

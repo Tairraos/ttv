@@ -52,7 +52,7 @@ exports.videoGenerator = async function (args) {
         let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${audioname}`);
         process.chdir(base_path);
         return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
-    } else if (action === "video") {
+    } else if (action === "concat") {
         /********************************/
         // 把所有的video片段合并成一个大的video
         /********************************/
@@ -67,7 +67,23 @@ exports.videoGenerator = async function (args) {
         let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "dist/${filename}"`);
         process.chdir(base_path);
         return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
+    } else if (action === "encode") {
+        /********************************/
+        // 把所有的video片段合并成一个大的video
+        /********************************/
+        let inputvideo = args.inputvideo;
+        await execCommand(
+            [
+                `ffmpeg -i "${inputvideo}" -hwaccel cuda`,
+                `-c:a aac -b:a 128k -ar 44100 -ac 2`,
+                `-c:v h264_nvenc -pix_fmt yuv420p`,
+                `-v quiet -y "dist/${filename}"`
+            ].join(" ")
+        ); // 合并
 
+        let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "dist/${filename}"`);
+        process.chdir(base_path);
+        return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
     } else if (action === "duration") {
         /********************************/
         // 返回给定media文件的长度
@@ -77,7 +93,6 @@ exports.videoGenerator = async function (args) {
             duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${media_path}/${filename}"`);
         process.chdir(base_path);
         return { result: "success", duration: +(+duration).toFixed(3) };
-
     } else {
         return { result: "failed", action, reason: "unknown action" };
     }

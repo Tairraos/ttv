@@ -9,8 +9,8 @@ $stamp = date('Y-m-d H:i:s');
 $db = new PDO('sqlite:ttv-data.db');
 
 // 插入数据到archive表
-$stmt = $db->prepare("INSERT INTO archive (`id`, `lesson`, `type`, `group`, `voice`, `chinese`, `english`, `phonetic`, `comment`, `theme`) " .
-    " SELECT `id`, `lesson`, `type`, `group`, `voice`, `chinese`, `english`, `phonetic`, `comment`, `theme` FROM material");
+$stmt = $db->prepare("INSERT INTO archive (`id`, `sid`, `lesson`, `type`, `group`, `voice`, `chinese`, `english`, `phonetic`, `comment`, `theme`) " .
+    " SELECT `id`, `sid`, `lesson`, `type`, `group`, `voice`, `chinese`, `english`, `phonetic`, `comment`, `theme` FROM material");
 $stmt->execute();
 
 // 删除material表中的数据

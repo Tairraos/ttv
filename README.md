@@ -19,6 +19,7 @@ CREATE TABLE 'project' (
 DROP TABLE IF EXISTS 'material';
 CREATE TABLE 'material' (
     'id'            INTEGER NOT NULL DEFAULT 0, 
+    'sid'           INTEGER NOT NULL DEFAULT 0, 
     'lesson'        TEXT NOT NULL DEFAULT '',
     'type'          TEXT NOT NULL DEFAULT '',
     'group'         INTEGER NOT NULL DEFAULT 0,
@@ -34,6 +35,7 @@ CREATE TABLE 'material' (
 DROP TABLE IF EXISTS 'archive';
 CREATE TABLE 'archive' (
     'id'            INTEGER NOT NULL DEFAULT 0, 
+    'sid'           INTEGER NOT NULL DEFAULT 0, 
     'lesson'        TEXT NOT NULL DEFAULT '',
     'type'          TEXT NOT NULL DEFAULT '',
     'group'         INTEGER NOT NULL DEFAULT 0,
@@ -45,6 +47,7 @@ CREATE TABLE 'archive' (
     'theme'         TEXT NOT NULL DEFAULT '', 
     PRIMARY KEY ('id', 'lesson')
 );
+
 ```
 
 ### 2 虚拟机配置
