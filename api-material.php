@@ -15,7 +15,7 @@ if (!isset($_REQUEST['id'])) {
 $db = new PDO('sqlite:ttv-data.db');
 
 $id = +$_REQUEST['id'];
-$sid = +$_REQUEST['sid'] ?? 0;
+$sid = +($_REQUEST['sid'] ?? 0);
 
 if ($field) { // 传入修改
     $toid = $_REQUEST['toid'] ?? $id;
