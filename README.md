@@ -32,6 +32,14 @@ CREATE TABLE 'material' (
     PRIMARY KEY ('id', 'lesson')
 );
 
+DROP TABLE IF EXISTS 'lesson';
+CREATE TABLE 'lesson' (
+    'lesson'       TEXT NOT NULL DEFAULT '',
+    'lesson_cn'    TEXT NOT NULL DEFAULT '',
+    'abbr'         TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY ('lesson')
+);
+
 DROP TABLE IF EXISTS 'archive';
 CREATE TABLE 'archive' (
     'id'            INTEGER NOT NULL DEFAULT 0, 
