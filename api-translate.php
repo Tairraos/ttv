@@ -14,7 +14,7 @@ if (isset($_REQUEST['text'])) {
     die(json_encode(['result' => 'success', 'data' => implode("\n", $translated_list)], JSON_UNESCAPED_UNICODE));
 }
 
-die(json_encode(['result' => 'faild', 'reason' => '未传入要翻译的内容'], JSON_UNESCAPED_UNICODE));
+die(json_encode(['result' => 'failed', 'reason' => '未传入要翻译的内容'], JSON_UNESCAPED_UNICODE));
 
 
 /********************************************

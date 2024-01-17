@@ -8,7 +8,7 @@
 header('Content-Type: application/json');
 
 $action = $_REQUEST['action'] ?? '';
-$lesson = $_REQUEST['lesson'] ?? '';
+$lessons = $_REQUEST['lesson'] ?? '';
 $lesson_cn = $_REQUEST['lesson_cn'] ?? '';
 $program = $_REQUEST['program'] ?? '';
 $startid = $_REQUEST['startid'] ?? 0;
@@ -17,8 +17,8 @@ $duration = $_REQUEST['duration'] ?? '';
 $lesson_abbr = $_REQUEST['lesson_abbr'] ?? 'Default';
 $stamp = date('Y-m-d H:i:s');
 
-if (!$action || !$lesson) {
-    die(json_encode(['result' => 'faild', 'reason' => '未传入action或lesson'], JSON_UNESCAPED_UNICODE));
+if (!$action || !$lessons) {
+    die(json_encode(['result' => 'failed', 'reason' => '未传入action或lesson'], JSON_UNESCAPED_UNICODE));
 }
 
 $db = new PDO('sqlite:ttv-data.db');
@@ -50,24 +50,26 @@ function prepareFolder()
     }
 }
 
-$projectid = getNewProjectid($lesson);
+$projectid = getNewProjectid($lessons);
 $dist = $lesson_abbr . "-" . str_pad($projectid, 3, "0", STR_PAD_LEFT);
 
 if ($action == "create") {
     $stmt = $db->prepare("INSERT INTO `project` (projectid, lesson, lesson_cn, program, startid, endid, duration, dist, stamp) " .
-        "VALUES($projectid, '$lesson', '$lesson_cn', '$program', +$startid, +$endid, '$duration', '$dist', '$stamp')");
+        "VALUES($projectid, '$lessons', '$lesson_cn', '$program', +$startid, +$endid, '$duration', '$dist', '$stamp')");
     $stmt->execute();
-    echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
-} else {
+    echo json_encode(['result' => 'success']);
+} else if ($action == "getid") {
     prepareFolder();
     $stmt = $db->query("SELECT MAX(`maxid`) as `maxid` FROM ( " .
-        "SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `archive` WHERE `lesson` = '$lesson' " .
+        "SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `archive` WHERE `lesson` = '$lessons' " .
         "UNION ALL " .
-        "SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `material` WHERE `lesson` = '$lesson'" .
+        "SELECT IFNULL(MAX(`id`), 0) AS `maxid` FROM `material` WHERE `lesson` = '$lessons'" .
         ")");
     $maxid = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode(['result' => 'success', 'projectid' => $projectid, 'maxid' => $maxid[0]['maxid']], JSON_UNESCAPED_UNICODE);
+} else {
+    echo json_encode(['result' => 'failed', 'reason' => "未指定 action"], JSON_UNESCAPED_UNICODE);
 }
 $db = NULL;
 ?>

@@ -51,15 +51,16 @@ let ui = {
     // 管理工具
     /*********************/
     initAsstant(materialLesson, archiveLesson) {
-        let html = [`<select name="materialLesson" multiple size="${materialLesson.length}">`];
+        let html = [`<select id="materialLesson" multiple size="${materialLesson.length || 1}">`];
         materialLesson.forEach((item, index) => html.push(`<option value="${item.lesson}"${index?"":" selected"}>${item.lesson_cn}</option>`));
         html.push(`</select>`);
         $material_lessons.innerHTML = html.join("");
-        html = [`<select name="archiveLesson" multiple size="${archiveLesson.length}">`];
+        html = [`<select id="archiveLesson" multiple size="${archiveLesson.length || 1}">`];
         archiveLesson.forEach((item, index) => html.push(`<option value="${item.lesson}"${index?"":" selected"}>${item.lesson_cn}</option>`));
         html.push(`</select>`);
         $archive_lessons.innerHTML = html.join("");
     },
+
     /*********************/
     // 切换工具
     /*********************/
@@ -232,9 +233,9 @@ let ui = {
         } else if (target.match(/^slide/)) {
             action.genSlidePiece(id, target.replace(/slide-/, ""), conf.materials[id].theme, true); // force=true,覆盖生成
         } else if (target === "action-page") {
-            window.open(`api-page.php?id=${id}&language=${conf.info.language}`, "preview");
+            window.open(`html-slide?id=${id}&language=${conf.info.language}`, "preview");
         } else if (target === "action-preview") {
-            window.open(`api-preview.php?id=${id}`, "preview");
+            window.open(`html-overview.php?id=${id}`, "preview");
         }
         if (field === "id" && conf.range.selected && event.shiftKey) {
             ui.putInputData("endid", id);
@@ -445,3 +446,7 @@ document.getElementById("doPing").addEventListener("click", ui.doPing, false);
 
 document.getElementById("show_tool_a").addEventListener("click", ui.switchTool, false);
 document.getElementById("show_tool_b").addEventListener("click", ui.switchTool, false);
+document.getElementById("doArchive").addEventListener("click", action.doArchive, false);
+document.getElementById("doUnarchive").addEventListener("click", action.doUnarchive, false);
+document.getElementById("doDelMaterial").addEventListener("click", action.doDelMaterial, false);
+document.getElementById("doDelArchive").addEventListener("click", action.doDelArchive, false);

@@ -16,6 +16,14 @@ CREATE TABLE 'project' (
     PRIMARY KEY ('projectid', 'lesson')
 );
 
+DROP TABLE IF EXISTS 'lesson';
+CREATE TABLE 'lesson' (
+    'lesson'       TEXT NOT NULL DEFAULT '',
+    'lesson_cn'    TEXT NOT NULL DEFAULT '',
+    'abbr'         TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY ('lesson')
+);
+
 DROP TABLE IF EXISTS 'material';
 CREATE TABLE 'material' (
     'id'            INTEGER NOT NULL DEFAULT 0, 
@@ -32,16 +40,24 @@ CREATE TABLE 'material' (
     PRIMARY KEY ('id', 'lesson')
 );
 
-DROP TABLE IF EXISTS 'lesson';
-CREATE TABLE 'lesson' (
-    'lesson'       TEXT NOT NULL DEFAULT '',
-    'lesson_cn'    TEXT NOT NULL DEFAULT '',
-    'abbr'         TEXT NOT NULL DEFAULT '',
-    PRIMARY KEY ('lesson')
-);
-
 DROP TABLE IF EXISTS 'archive';
 CREATE TABLE 'archive' (
+    'id'            INTEGER NOT NULL DEFAULT 0, 
+    'sid'           INTEGER NOT NULL DEFAULT 0, 
+    'lesson'        TEXT NOT NULL DEFAULT '',
+    'type'          TEXT NOT NULL DEFAULT '',
+    'group'         INTEGER NOT NULL DEFAULT 0,
+    'voice'         TEXT NOT NULL DEFAULT '',
+    'chinese'       TEXT NOT NULL DEFAULT '',
+    'english'       TEXT NOT NULL DEFAULT '', 
+    'phonetic'      TEXT NOT NULL DEFAULT '', 
+    'comment'       TEXT NOT NULL DEFAULT '', 
+    'theme'         TEXT NOT NULL DEFAULT '', 
+    PRIMARY KEY ('id', 'lesson')
+);
+
+DROP TABLE IF EXISTS 'recycle';
+CREATE TABLE 'recycle' (
     'id'            INTEGER NOT NULL DEFAULT 0, 
     'sid'           INTEGER NOT NULL DEFAULT 0, 
     'lesson'        TEXT NOT NULL DEFAULT '',

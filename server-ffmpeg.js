@@ -94,6 +94,6 @@ exports.videoGenerator = async function (args) {
         process.chdir(base_path);
         return { result: "success", duration: +(+duration).toFixed(3) };
     } else {
-        return { result: "failed", action, reason: "unknown action" };
+        return { result: "failed", action, reason: "未指定 action" };
     }
 };

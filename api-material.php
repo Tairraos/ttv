@@ -5,17 +5,38 @@
 // 插入：{ id: "99", lesson:"", type:"", group:"", chinese:"", english:"", phonetic:""  }
 // 更新：{ id: "1,2,3", field: 'phonetic', value: '5.chinese.(920.33).mp4' }
 
-$action = $_REQUEST['action'] ?? 'getall';
+$action = $_REQUEST['action'] ?? '';
+$lessons = $_REQUEST['lesson'] ?? '';
 
 header('Content-Type: application/json');
 $db = new PDO('sqlite:ttv-data.db');
 
+function delLeson($source, $lesson)
+{
+    global $db;
+
+    $stmt = $db->prepare("DELETE FROM `recycle` WHERE `lesson` = ?");
+    $stmt->bindParam(1, $lesson);
+    $stmt->execute();
+
+    $stmt = $db->prepare(
+        "INSERT INTO recycle (`id`, `sid`, `lesson`, `type`, `group`, `voice`, `chinese`, `english`, `phonetic`, `comment`, `theme`) " .
+        "SELECT `id`, `sid`, `lesson`, `type`, `group`, `voice`, `chinese`, `english`, `phonetic`, `comment`, `theme` FROM $source WHERE `lesson`= ?"
+    );
+    $stmt->bindParam(1, $lesson);
+    $stmt->execute();
+
+    $stmt = $db->prepare("DELETE FROM $source WHERE `lesson` = ?");
+    $stmt->bindParam(1, $lesson);
+    $stmt->execute();
+}
+
 if ($action == 'getall') {
     $results = $db->query("SELECT * FROM `material`");
-    $material = $results->fetchAll(PDO::FETCH_ASSOC);
+    $materials = $results->fetchAll(PDO::FETCH_ASSOC);
     $results = $db->query("SELECT * FROM `lesson`");
-    $lesson = $results->fetchAll(PDO::FETCH_ASSOC);
-    echo json_encode(['result' => 'success', 'data' => $material, 'lesson' => $lesson], JSON_UNESCAPED_UNICODE);
+    $lessons = $results->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode(['result' => 'success', 'data' => $materials, 'lesson' => $lessons], JSON_UNESCAPED_UNICODE);
 
 
 } else if ($action == 'getlesson') {
@@ -25,10 +46,8 @@ if ($action == 'getall') {
 
 
 } else if ($action == "delete") {
-    $stmt = $db->prepare("DELETE FROM `material` WHERE `lesson` = ?");
-    $stmt->bindParam(1, $lesson);
-    $stmt->execute();
-    echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
+    delLeson('material', $lessons);
+    echo json_encode(['result' => 'success']);
 
 
 } else if ($action == 'update') { // 传入修改
@@ -41,13 +60,13 @@ if ($action == 'getall') {
     $stmt = $db->prepare("UPDATE `material` SET `$field` = ? $condition");
     $stmt->bindParam(1, $value);
     $stmt->execute();
-    echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['result' => 'success']);
 
 
 } else if ($action == 'insert') { // 插入
     $id = +$_REQUEST['id'];
     $sid = +($_REQUEST['sid'] ?? 0);
-    $lesson = $_REQUEST['lesson'] ?? 'Living Chinese';
+    $lessons = $_REQUEST['lesson'] ?? 'Living Chinese';
     $type = $_REQUEST['type'] ?? 'sentence';
     $group = $_REQUEST['group'] ?? '';
     $voice = $_REQUEST['voice'] ?? '';
@@ -57,7 +76,7 @@ if ($action == 'getall') {
     $comment = $_REQUEST['comment'] ?? '';
     $theme = $_REQUEST['theme'] ?? '';
     $stmt = $db->prepare("INSERT INTO `material` (`id`, `sid`, `lesson`, `type`, `group`, `voice`,`chinese`, `english`, `phonetic`, `comment`, `theme`) VALUES ($id, $sid, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bindParam(1, $lesson);
+    $stmt->bindParam(1, $lessons);
     $stmt->bindParam(2, $type);
     $stmt->bindParam(3, $group);
     $stmt->bindParam(4, $voice);
@@ -71,5 +90,7 @@ if ($action == 'getall') {
     $results = $db->query("SELECT * FROM `material` WHERE id = $id");
     $rows = $results->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode(['result' => 'success', 'data' => $rows[0]], JSON_UNESCAPED_UNICODE);
+} else {
+    echo json_encode(['result' => 'failed', 'reason' => "未指定 action"], JSON_UNESCAPED_UNICODE);
 }
 $db = NULL;

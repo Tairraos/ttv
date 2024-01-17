@@ -48,7 +48,20 @@ let action = {
                     sid = sid !== "auto" ? +sid : type === "title" ? 0 : autosid++;
                     group = current_group === 0 ? 0 : current_group !== last_group ? id : group;
                     last_group = current_group;
-                    let ret = await util.fetchApi("api-material.php", {  action: "insert", id, sid, lesson, type, group, voice, chinese, english, phonetic, comment, theme });
+                    let ret = await util.fetchApi("api-material.php", {
+                        action: "insert",
+                        id,
+                        sid,
+                        lesson,
+                        type,
+                        group,
+                        voice,
+                        chinese,
+                        english,
+                        phonetic,
+                        comment,
+                        theme
+                    });
                     counter++;
                     ret.result === "success" && ui.loadMaterial(ret.data);
                     ui.done(log);
@@ -263,26 +276,47 @@ let action = {
         util.getProjectid();
         window.open(`media/material/dist/${conf.info.dist}.mp4`, "preview");
     },
-    /***********************/
-    // 8.存档数据
-    /***********************/
+
+    /*********************/
+    // 管理工具
+    /*********************/
     async doArchive() {
-        let lesson = conf.lesson[conf.info.lesson].cn,
+        let lesson = ui.getSelectData("materialLesson"),
             log = ui.log(`正在存档 ${lesson}...`, "highlight");
-        await util.fetchApi("api-archive.php", { action:"archive", lesson });
+        await util.fetchApi("api-archive.php", { action: "archive", lesson });
         ui.done(log);
-        // 如果表格里的素材已经被下载了, 则更新UI, 否则等下载
-        ui.log(`8.数据存档完成，刷新页面重新开工。`, "pass");
-        ui.log(`记得先导出课件哟`, "pass");
+        ui.log(`数据存档完成`, "pass");
+        util.initAssistant();
     },
 
+    async doUnarchive() {
+        let lesson = ui.getSelectData("archiveLesson"),
+            log = ui.log(`正在恢复 ${lesson}...`, "highlight"),
+            ret = await util.fetchApi("api-archive.php", { action: "unarchive", lesson });
+        if (ret.result === "failed") {
+            ui.err(ret.reason);
+        } else {
+            ui.done(log);
+            ui.log(`数据存档已经恢复，刷新页面重新开工`, "pass");
+            util.initAssistant();
+        }
+    },
 
-    async doUnarchive(lesson) {
-        let log = ui.log(`正在存档 ${lesson}...`, "highlight");
-        await util.fetchApi("api-archive.php", { action:"unarchive", lesson });
+    async doDelMaterial() {
+        let lesson = ui.getSelectData("materialLesson"),
+            log = ui.log(`正在从 Material 删除 ${lesson}...`, "highlight");
+        await util.fetchApi("api-material.php", { action: "delete", lesson });
         ui.done(log);
-        // 如果表格里的素材已经被下载了, 则更新UI, 否则等下载
-        ui.log(`8.数据存档完成，刷新页面重新开工。`, "pass");
-        ui.log(`记得先导出课件哟`, "pass");
+        ui.log(`删除完成`, "pass");
+        util.initAssistant();
+    },
+
+    async doDelArchive() {
+        let lesson = ui.getSelectData("archiveLesson"),
+            log = ui.log(`正在从 Archive 删除 ${lesson}...`, "highlight");
+        await util.fetchApi("api-archive.php", { action: "delete", lesson });
+        ui.done(log);
+        ui.log(`删除完成`, "pass");
+        util.initAssistant();
     }
 };
