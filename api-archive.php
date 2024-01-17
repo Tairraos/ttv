@@ -109,4 +109,3 @@ if ($action == "archive") {
     echo json_encode(['result' => 'failed', 'reason' => "未指定 action"], JSON_UNESCAPED_UNICODE);
 }
 $db = NULL;
-?>

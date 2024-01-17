@@ -112,4 +112,3 @@ function convert(&$args)
     }
     return $args;
 }
-?>
