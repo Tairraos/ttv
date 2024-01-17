@@ -5,28 +5,48 @@
 // 插入：{ id: "99", lesson:"", type:"", group:"", chinese:"", english:"", phonetic:""  }
 // 更新：{ id: "1,2,3", field: 'phonetic', value: '5.chinese.(920.33).mp4' }
 
-$field = $_REQUEST['field'] ?? '';
+$action = $_REQUEST['action'] ?? 'getall';
 
 header('Content-Type: application/json');
-if (!isset($_REQUEST['id'])) {
-    die(json_encode(['result' => 'failed', 'reason' => '缺少参数'], JSON_UNESCAPED_UNICODE));
-}
-
 $db = new PDO('sqlite:ttv-data.db');
 
-$id = +$_REQUEST['id'];
-$sid = +($_REQUEST['sid'] ?? 0);
+if ($action == 'getall') {
+    $results = $db->query("SELECT * FROM `material`");
+    $material = $results->fetchAll(PDO::FETCH_ASSOC);
+    $results = $db->query("SELECT * FROM `lesson`");
+    $lesson = $results->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode(['result' => 'success', 'data' => $material, 'lesson' => $lesson], JSON_UNESCAPED_UNICODE);
 
-if ($field) { // 传入修改
+
+} else if ($action == 'getlesson') {
+    $results = $db->query("SELECT DISTINCT `material`.`lesson`, `lesson`.* FROM `material` JOIN `lesson` ON `material`.`lesson` = `lesson`.`lesson`");
+    $rows = $results->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode(['result' => 'success', 'data' => $rows], JSON_UNESCAPED_UNICODE);
+
+
+} else if ($action == "delete") {
+    $stmt = $db->prepare("DELETE FROM `material` WHERE `lesson` = ?");
+    $stmt->bindParam(1, $lesson);
+    $stmt->execute();
+    echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
+
+
+} else if ($action == 'update') { // 传入修改
+    $id = +$_REQUEST['id'];
+    $sid = +($_REQUEST['sid'] ?? 0);
+    $field = $_REQUEST['field'];
     $toid = $_REQUEST['toid'] ?? $id;
     $value = $_REQUEST['value'] ?? '';
     $condition = 'WHERE id >=' . $id . ' AND id <= ' . $toid;
     $stmt = $db->prepare("UPDATE `material` SET `$field` = ? $condition");
     $stmt->bindParam(1, $value);
     $stmt->execute();
-
     echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
-} else { // 插入
+
+
+} else if ($action == 'insert') { // 插入
+    $id = +$_REQUEST['id'];
+    $sid = +($_REQUEST['sid'] ?? 0);
     $lesson = $_REQUEST['lesson'] ?? 'Living Chinese';
     $type = $_REQUEST['type'] ?? 'sentence';
     $group = $_REQUEST['group'] ?? '';

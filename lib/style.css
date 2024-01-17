@@ -68,7 +68,7 @@ body {
 
 #basket {
     width: 144px;
-    padding: 17px 0;
+    padding: 15px 0;
     transition: background-color 1s, height 0s;
     border: 2px dashed #333;
     border-radius: 10px;
@@ -113,7 +113,7 @@ body {
 
 .menu button {
     font: 16px/16px bold;
-    padding: 5px 10px;
+    padding: 7px 10px;
     margin: 5px 0;
     cursor: pointer;
 }
@@ -388,9 +388,19 @@ body {
 }
 
 /***********************************************************/
-/*    助手的助手    */
+/*    管理工具    */
 /***********************************************************/
+.switcher button{
+    margin: 10px 10px 0 10px;
+}
+#tool_b button{
+    width: 80px;
+    margin: 0 10px 10px;
+}
 
-#assistant-content{}
-
-.assistant{}
+#tool_b select{
+    width: 220px;
+    padding: 5px;
+    margin: 10px 0;
+    border-radius: 4px;
+}

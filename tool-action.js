@@ -48,7 +48,7 @@ let action = {
                     sid = sid !== "auto" ? +sid : type === "title" ? 0 : autosid++;
                     group = current_group === 0 ? 0 : current_group !== last_group ? id : group;
                     last_group = current_group;
-                    let ret = await util.fetchApi("api-material.php", { id, sid, lesson, type, group, voice, chinese, english, phonetic, comment, theme });
+                    let ret = await util.fetchApi("api-material.php", {  action: "insert", id, sid, lesson, type, group, voice, chinese, english, phonetic, comment, theme });
                     counter++;
                     ret.result === "success" && ui.loadMaterial(ret.data);
                     ui.done(log);
@@ -270,6 +270,16 @@ let action = {
         let lesson = conf.lesson[conf.info.lesson].cn,
             log = ui.log(`正在存档 ${lesson}...`, "highlight");
         await util.fetchApi("api-archive.php", { action:"archive", lesson });
+        ui.done(log);
+        // 如果表格里的素材已经被下载了, 则更新UI, 否则等下载
+        ui.log(`8.数据存档完成，刷新页面重新开工。`, "pass");
+        ui.log(`记得先导出课件哟`, "pass");
+    },
+
+
+    async doUnarchive(lesson) {
+        let log = ui.log(`正在存档 ${lesson}...`, "highlight");
+        await util.fetchApi("api-archive.php", { action:"unarchive", lesson });
         ui.done(log);
         // 如果表格里的素材已经被下载了, 则更新UI, 否则等下载
         ui.log(`8.数据存档完成，刷新页面重新开工。`, "pass");

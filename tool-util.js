@@ -4,13 +4,11 @@ let util = {
     // 初始化数据，从数据库里读入
     /*********************/
     async initMaterial() {
-        let ret = await util.fetchApi("api-data.php", { action: "lesson" });
+        let ret = await util.fetchApi("api-material.php", { action: "getall" });
         conf.lesson = {};
-        ret.data.forEach((line) => (conf.lesson[line.lesson] = { cn: line.lesson_cn, en: line.lesson, abbr: line.abbr }));
+        ret.lesson.forEach((line) => (conf.lesson[line.lesson] = { cn: line.lesson_cn, en: line.lesson, abbr: line.abbr }));
         ui.initLessonSelector();
         ui.initProgramSelector();
-
-        ret = await util.fetchApi("api-data.php", { action: "material" });
         ui.initMaterialsTable();
 
         conf.info.program = "listen";
@@ -34,6 +32,13 @@ let util = {
         util.ping();
     },
 
+    async initAssistant() {
+        let ret1 = await util.fetchApi("api-material.php", { action: "getlesson" }),
+            materialLesson = ret1.data,
+            ret2 = await util.fetchApi("api-archive.php", { action: "getlesson" }),
+            archiveLesson = ret2.data;
+        ui.initAsstant(materialLesson, archiveLesson);
+    },
     /*********************/
     // 修改数据，会同时修改界面，内存以及数据库里的数据
     /*********************/
@@ -44,7 +49,7 @@ let util = {
             for (let i = +id; i <= toid; i++) {
                 ui.getCell(i, field).innerText = data;
             }
-            await util.fetchApi("api-material.php", { id: +id, field, value: data, toid });
+            await util.fetchApi("api-material.php", { action: "update", id: +id, field, value: data, toid });
             ui.updateDownloadLink("Content"); // 更新导出链接
         } else if (field === "mediafile") {
             conf.files.push(data);

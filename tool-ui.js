@@ -12,6 +12,12 @@ let $basket = document.getElementById("basket"),
     $doEditDone = document.getElementById("doEditDone"),
     $doEditRestore = document.getElementById("doEditRestore");
 
+let $tool_a = document.getElementById("tool_a"),
+    $tool_b = document.getElementById("tool_b"),
+    $rangeconfig = document.querySelector(".rangeconfig"),
+    $material_lessons = document.getElementById("material_lessons"),
+    $archive_lessons = document.getElementById("archive_lessons");
+
 let ui = {
     /*********************/
     // 创建工程
@@ -41,6 +47,34 @@ let ui = {
         ui.confirmRange(); // confirm一次
     },
 
+    /*********************/
+    // 管理工具
+    /*********************/
+    initAsstant(materialLesson, archiveLesson) {
+        let html = [`<select name="materialLesson" multiple size="${materialLesson.length}">`];
+        materialLesson.forEach((item, index) => html.push(`<option value="${item.lesson}"${index?"":" selected"}>${item.lesson_cn}</option>`));
+        html.push(`</select>`);
+        $material_lessons.innerHTML = html.join("");
+        html = [`<select name="archiveLesson" multiple size="${archiveLesson.length}">`];
+        archiveLesson.forEach((item, index) => html.push(`<option value="${item.lesson}"${index?"":" selected"}>${item.lesson_cn}</option>`));
+        html.push(`</select>`);
+        $archive_lessons.innerHTML = html.join("");
+    },
+    /*********************/
+    // 切换工具
+    /*********************/
+    switchTool(e) {
+        if (e.target.id === "show_tool_a") {
+            $tool_a.style.display = "flex";
+            $rangeconfig.style.display = "block";
+            $tool_b.style.display = "none";
+        } else {
+            $tool_a.style.display = "none";
+            $rangeconfig.style.display = "none";
+            $tool_b.style.display = "block";
+            util.initAssistant();
+        }
+    },
     /*********************/
     // 读写页面中的DOM
     /*********************/
@@ -408,3 +442,6 @@ $doEditRestore.addEventListener("click", ui.doEditRestore, false);
 // 绑编辑工具
 /*********************/
 document.getElementById("doPing").addEventListener("click", ui.doPing, false);
+
+document.getElementById("show_tool_a").addEventListener("click", ui.switchTool, false);
+document.getElementById("show_tool_b").addEventListener("click", ui.switchTool, false);
