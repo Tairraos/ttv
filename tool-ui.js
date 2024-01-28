@@ -2,9 +2,6 @@
 let $basket = document.getElementById("basket"),
     $content = document.getElementById("content"),
     $materials = document.getElementById("material"),
-    $projectid = document.getElementById("projectid"),
-    $lesson = document.getElementById("lesson"),
-    $program = document.getElementById("program"),
     $log = document.getElementById("log"),
     $edittool = document.getElementById("edittool"),
     $server = document.getElementById("server"),
@@ -14,51 +11,15 @@ let $basket = document.getElementById("basket"),
 
 let $tool_a = document.getElementById("tool_a"),
     $tool_b = document.getElementById("tool_b"),
-    $rangeconfig = document.querySelector(".rangeconfig"),
-    $material_lessons = document.getElementById("material_lessons"),
-    $archive_lessons = document.getElementById("archive_lessons");
+    $rangeconfig = document.querySelector(".rangeconfig");
 
 let ui = {
     /*********************/
     // 创建工程
     /*********************/
-    initLessonSelector() {
-        for (let [key, value] of Object.entries(conf.lesson)) {
-            $lesson.innerHTML += `<option value="${key}">${value.cn}</option>`;
-        }
-    },
-
-    initProgramSelector() {
-        for (let [key, value] of Object.entries(conf.program)) {
-            $program.innerHTML += `<option value="${key}">${value.name}</option>`;
-        }
-    },
 
     initMaterialsTable() {
         $materials.innerHTML = "<tr>" + conf.uiFields.map((item) => `<th>${item}</th>`).join("") + "</tr>";
-    },
-
-    initRangeBox() {
-        conf.range.idList = Object.keys(conf.materials).map((i) => +i);
-        conf.range.min = Math.min(...conf.range.idList, 1);
-        conf.range.max = Math.max(...conf.range.idList, 1);
-        ui.putInputData("startid", conf.range.min); //填上缺省值
-        ui.putInputData("endid", conf.range.max);
-        ui.confirmRange(); // confirm一次
-    },
-
-    /*********************/
-    // 管理工具
-    /*********************/
-    initAsstant(materialLesson, archiveLesson) {
-        let html = [`<select id="materialLesson" multiple size="${materialLesson.length || 1}">`];
-        materialLesson.forEach((item, index) => html.push(`<option value="${item.lesson}"${index?"":" selected"}>${item.lesson_cn}</option>`));
-        html.push(`</select>`);
-        $material_lessons.innerHTML = html.join("");
-        html = [`<select id="archiveLesson" multiple size="${archiveLesson.length || 1}">`];
-        archiveLesson.forEach((item, index) => html.push(`<option value="${item.lesson}"${index?"":" selected"}>${item.lesson_cn}</option>`));
-        html.push(`</select>`);
-        $archive_lessons.innerHTML = html.join("");
     },
 
     /*********************/
@@ -73,7 +34,6 @@ let ui = {
             $tool_a.style.display = "none";
             $rangeconfig.style.display = "none";
             $tool_b.style.display = "block";
-            util.initAssistant();
         }
     },
     /*********************/
@@ -87,24 +47,10 @@ let ui = {
     getRow: (id) => document.querySelector(`#material-${id}`),
 
     /*********************/
-    // 操作名字和类型
-    /*********************/
-    onProjectChange() {
-        let lesson = ui.getSelectData("lesson") || "Living Chinese";
-        conf.info.projectid = ui.getInputData("projectid") || "0001";
-        conf.info.lesson = lesson;
-        conf.info.lesson_cn = conf.lesson[lesson].cn;
-        conf.info.lesson_abbr = conf.lesson[lesson].abbr;
-        conf.info.language = lesson.match(/chinese/i) ? "chinese" : "english";
-        conf.info.dist = util.getDist(conf.info.projectid, lesson);
-        ui.log(`当前课程选择：${conf.lesson[lesson].cn}`, "highlight");
-    },
-
-    /*********************/
     // 听力和阅读选择
     /*********************/
     onProgramChange() {
-        let program = ui.getSelectData("program");
+        let program = document.querySelector("input[name='program']:checked").value;
         conf.info.program = program;
         conf.rules = conf.programRules[program];
         util.checkMaterials(); // 检查所有语料的素材是否准备完全
@@ -362,17 +308,6 @@ let ui = {
     done: ($dom) => ($dom.innerHTML += `<span class="done"></span>`),
 
     /*********************/
-    // 生成导出模板按钮
-    /*********************/
-    updateDownloadLink(type = "Template") {
-        let link = document.getElementById("download" + type),
-            binary = util.getXlsxBinary(...util.getMaterialForExport(type));
-        link.download = type === "Template" ? "template.xlsx" : `${conf.lesson[conf.info.lesson].cn}.xlsx`;
-        link.href = URL.createObjectURL(new Blob([binary]));
-        conf.contentDownloaded = false;
-    },
-
-    /*********************/
     // 更析服务检测状态
     /*********************/
     updateServerStatus(is_ok) {
@@ -393,14 +328,12 @@ let ui = {
 /*********************/
 // 工程配置
 /*********************/
-$projectid.addEventListener("input", ui.onProjectChange, false);
-$projectid.addEventListener("paste", ui.onProjectChange, false);
-$lesson.addEventListener("change", ui.onProjectChange, false);
-$program.addEventListener("change", ui.onProgramChange, false);
+document.getElementById("resetRange").addEventListener("click", ui.resetRange, false);
+document.getElementById("resetRange").addEventListener("click", ui.resetRange, false);
 document.getElementById("saveTheme").addEventListener("click", ui.saveTheme, false);
-document.getElementById("createProject").addEventListener("click", util.getProjectid, false);
 document.getElementById("confirmRange").addEventListener("click", ui.confirmRange, false);
 document.getElementById("resetRange").addEventListener("click", ui.resetRange, false);
+document.querySelectorAll(".radio [name='program']").forEach((item) => item.addEventListener("click", ui.onProgramChange, false));
 
 /*********************/
 // 绑UI拖放事件
@@ -420,7 +353,8 @@ document.getElementById("doGenSlide").addEventListener("click", action.doGenSlid
 document.getElementById("doGenVideo").addEventListener("click", action.doGenVideo, false); // 5.视频素材
 document.getElementById("doEstimate").addEventListener("click", action.doEstimate, false); // 6.工程估算
 document.getElementById("doBuild").addEventListener("click", action.doBuild, false); // 7.生成作品
-document.getElementById("doArchive").addEventListener("click", action.doArchive, false); // 8.存档数据
+document.getElementById("downloadTemplate").addEventListener("click", action.downloadTemplate, false); // 8.存档数据
+document.getElementById("downloadContent").addEventListener("click", action.downloadContent, false); // 8.存档数据
 
 /*********************/
 // 绑表格点击事件
@@ -443,10 +377,5 @@ $doEditRestore.addEventListener("click", ui.doEditRestore, false);
 // 绑编辑工具
 /*********************/
 document.getElementById("doPing").addEventListener("click", ui.doPing, false);
-
 document.getElementById("show_tool_a").addEventListener("click", ui.switchTool, false);
 document.getElementById("show_tool_b").addEventListener("click", ui.switchTool, false);
-document.getElementById("doArchive").addEventListener("click", action.doArchive, false);
-document.getElementById("doUnarchive").addEventListener("click", action.doUnarchive, false);
-document.getElementById("doDelMaterial").addEventListener("click", action.doDelMaterial, false);
-document.getElementById("doDelArchive").addEventListener("click", action.doDelArchive, false);

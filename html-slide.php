@@ -40,10 +40,10 @@
             } else {
                 $language = $_REQUEST['language'];
                 //$rows的长度
-                $vol = count($rows);
+                $vol = count($rows); // 字幕行数
                 foreach ($rows as $index => $row) {
                     $id = $row['id'];
-                    $sid = $row['sid'];
+                    $sid = $row['sid']; //真正的内容id，有些slide是标题，不算内容成份
                     $type = $row['type'];
                     $english = $row['english'];
                     $chinese = $row['chinese'];
@@ -52,10 +52,8 @@
                     $pyarr = array_map(fn($item) => mb_ereg_replace('[、，。？！：.,:?!]', ' ', $item), explode(' ', $row['phonetic']));
 
                     echo '<div class="subtitle vol-' . $vol . '">';
-                    echo '<div class="subtitle-id">';
-                    echo $sid;
-                    echo '</div>';
-                    echo '<div class="text lesson-' . $language . ' type-' . $type . '">';
+                    echo '<div class="subtitle-id">' . ($sid == 0 ? '' : $sid) . '</div>';
+                    echo '<div class="text book-' . $language . ' type-' . $type . '">';
                     if ($language == "chinese") {
                         echo '<div class="combined">';
                         foreach ($cnarr as $key => $value) {

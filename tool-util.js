@@ -1,46 +1,22 @@
-/* global conf, ui, XLSX */
+/* global conf, ui */
 let util = {
     /*********************/
-    // 初始化数据，从数据库里读入
+    // 初始化UI
     /*********************/
     async initMaterial() {
-        let ret = await util.fetchApi("api-material.php", { action: "getall" });
         conf.lesson = {};
-        ret.lesson.forEach((line) => (conf.lesson[line.lesson] = { cn: line.lesson_cn, en: line.lesson, abbr: line.abbr }));
-        ui.initLessonSelector();
-        ui.initProgramSelector();
         ui.initMaterialsTable();
 
         conf.info.program = "listen";
         conf.rules = conf.programRules.listen;
-        conf.files = (await util.fetchApi("api-check.php")).files;
-        await util.getProjectid(); // 获得合适的projectid
-
-        if (ret.result === "success" && ret.data.length) {
-            ui.putSelectData("lesson", ret.data[0].lesson); // 用db里的lesson值填入
-            ret.data.forEach((line) => ui.loadMaterial(line));
-            ui.log("读取到内容数据 " + ret.data.length + " 条");
-            ui.initRangeBox();
-            ui.updateDownloadLink("Content"); // 更新导出链接
-            util.checkMaterials(); // 检查所有语料的素材是否准备完全
-        }
-
         conf.dict = await util.fetchApi("lib/dict.json");
         ui.log("读取到字典数据 " + Object.keys(conf.dict).length + " 条");
 
-        ui.updateDownloadLink("Template");
         util.ping();
     },
 
-    async initAssistant() {
-        let ret1 = await util.fetchApi("api-material.php", { action: "getlesson" }),
-            materialLesson = ret1.data,
-            ret2 = await util.fetchApi("api-archive.php", { action: "getlesson" }),
-            archiveLesson = ret2.data;
-        ui.initAsstant(materialLesson, archiveLesson);
-    },
     /*********************/
-    // 修改数据，会同时修改界面，内存以及数据库里的数据
+    // 修改数据，会同时修改界面，内存
     /*********************/
     async updateMaterial(id, data, field, toid = 0) {
         conf.materials[id][field] = data;
@@ -49,8 +25,6 @@ let util = {
             for (let i = +id; i <= toid; i++) {
                 ui.getCell(i, field).innerText = data;
             }
-            await util.fetchApi("api-material.php", { action: "update", id: +id, field, value: data, toid });
-            ui.updateDownloadLink("Content"); // 更新导出链接
         } else if (field === "mediafile") {
             conf.files.push(data);
             util.checkMaterials(); // 检查所有语料的素材是否准备完全
@@ -214,18 +188,6 @@ let util = {
     },
 
     /*********************/
-    // 同步project表数据
-    /*********************/
-    async getProjectid() {
-        let lesson = ui.getSelectData("lesson"),
-            ret = await util.fetchApi("api-project.php", { action: "getid", lesson, lesson_abbr: conf.lesson[lesson].abbr });
-        conf.maxid = +ret.maxid;
-        ui.putInputData("projectid", (+ret.projectid).toString().padStart(4, "0")); // 用请求返回里的值填入
-        conf.info.projectid = +ret.projectid;
-        ui.onProjectChange(); // 并触发值改变事件
-    },
-
-    /*********************/
     // 根据条件从所有记录中过滤，并按指定size打包（size打包用于批量翻译，节约时间）
     /*********************/
     getMaterial(condition, size) {
@@ -240,15 +202,13 @@ let util = {
     getModel: (language, character) => `${language === "english" ? "en-US" : "zh-CN"}-${conf.voice[language][character]}Neural`,
 
     /*********************/
-    // 计算出使用的背景图片名字
-    /*********************/
-    getDist: (projectid, lesson) => `${conf.lesson[lesson].abbr}-${(+projectid).toString().padStart(3, "0")}`,
-
-    /*********************/
     // 当前课程是否英语课程
     /*********************/
-    isLessonEnglish: () => !conf.info.lesson.match(/chinese/i),
+    isBookEnglish: () => !conf.info.book_en.match(/chinese/i),
 
+    /*********************/
+    // 格式化视频时长
+    /*********************/
     fmtDuration: (s) => ("0" + Math.floor(s / 60)).slice(-2) + ":" + ("0" + Math.floor(s % 60)).slice(-2) + (s % 1).toFixed(1).slice(1),
 
     /*********************/
@@ -264,27 +224,6 @@ let util = {
     },
 
     /*********************/
-    // 按导出格式打包数组
-    /*********************/
-    getMaterialForExport(type) {
-        if (type === "Template") {
-            let template = Array.from(Array(50), (v, k) => k + 1).map((i) => [i, "auto", "", "", "", "", "", "", "", ""]);
-            return [[conf.exportTitles].concat(template)];
-        } else {
-            let materials = Object.values(conf.materials),
-                exportMaterils = materials.map((line) => conf.dataFields.map((field) => (line[field] !== 0 ? line[field] : ""))),
-                exportCourseware = [];
-            for (let line of materials) {
-                let id = line.sid ? line.sid.toString() : "";
-                util.isLessonEnglish()
-                    ? exportCourseware.push([id], [line.english + line.phonetic], [line.chinese], [""])
-                    : exportCourseware.push(["", line.phonetic], [id, line.chinese], ["", line.english], [""]);
-            }
-            return [[conf.exportTitles].concat(exportMaterils), exportCourseware];
-        }
-    },
-
-    /*********************/
     // 生成音频配置
     /*********************/
     getMediaSetup(id, language) {
@@ -294,41 +233,9 @@ let util = {
     },
 
     /*********************/
-    // 用content数组生成XLSX
+    // 获取下一本书的ID，没有容错，dist目录不能有除生成视频外的其它文件
     /*********************/
-    getXlsxBinary(maerial, courseware) {
-        let workbook = XLSX.utils.book_new(),
-            maerial_sheet = XLSX.utils.aoa_to_sheet(maerial);
-
-        maerial_sheet["!cols"] = conf.exportWidth.map((i) => ({ wpx: i })); // 调整每一列宽度
-        Object.keys(maerial_sheet).forEach((key) => {
-            // 调整单元格样式
-            let is_title = key.match(/^[A-Z]1$/), //第一行
-                is_center = is_title || key.match(/^[ABCDHIJKL]\d+$/); // 第一行或ABCDHIJKL列
-            if (!key.startsWith("!")) {
-                maerial_sheet[key].s = {
-                    font: { name: "微软雅黑", sz: "11", color: { rgb: is_title ? "FFFFFF" : "000000" } }, // 字体
-                    fill: is_title ? { fgColor: { rgb: "333333" } } : undefined, // 背景颜色
-                    alignment: { horizontal: is_center ? "center" : "left", vertical: "center", wrapText: true } // 对齐方式
-                };
-            }
-        });
-
-        XLSX.utils.book_append_sheet(workbook, maerial_sheet, `${conf.lesson[conf.info.lesson].cn} 素材`);
-
-        // 如果有课件，添加课件sheet
-        if (courseware) {
-            let courseware_sheet = XLSX.utils.aoa_to_sheet(courseware);
-            courseware_sheet["!cols"] = [{ wpx: 40 }, { wpx: 475 }];
-            let style = conf.exportStyle[conf.info.language];
-            Object.keys(courseware_sheet).forEach((key) => {
-                if (!key.startsWith("!")) {
-                    courseware_sheet[key].s = style[+key.replace(/[^\d]/g, "") % style.length];
-                }
-            });
-            XLSX.utils.book_append_sheet(workbook, courseware_sheet, `${conf.lesson[conf.info.lesson].cn} 课件`);
-        }
-
-        return XLSX.write(workbook, { type: "array", bookType: "xlsx" });
+    getNewBookName() {
+        return `${conf.info.book_abbr}-${(conf.info.maxid + 1).toString().padStart(3, "0")}`;
     }
 };

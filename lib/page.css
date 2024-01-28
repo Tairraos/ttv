@@ -78,12 +78,12 @@ body {
 }
 
 /* 样式定义 */
-.lesson-chinese .english {
+.book-chinese .english {
     color: #fea;
     line-height: 1.5;
 }
 
-.lesson-english .chinese {
+.book-english .chinese {
     color: #fea;
     line-height: 1.5;
 }
@@ -92,11 +92,11 @@ body {
     padding: 0 30px;
 }
 
-.lesson-chinese .text {
+.book-chinese .text {
     line-height: 2;
 }
 
-.lesson-english .text {
+.book-english .text {
     line-height: 1.5;
 }
 
@@ -129,114 +129,114 @@ body {
 }
 
 /* 中文课的拼音py */
-.subtitle.vol-1 .lesson-chinese .py {
+.subtitle.vol-1 .book-chinese .py {
     font-size: 45px;
 }
 
 /* 中文课的中文单字cn */
-.subtitle.vol-1 .lesson-chinese .cn {
+.subtitle.vol-1 .book-chinese .cn {
     font-size: 95px;
 }
 
 /* 中文课的英文 */
-.subtitle.vol-1 .lesson-chinese .english {
+.subtitle.vol-1 .book-chinese .english {
     font-size: 52px;
 }
 
 /* 中文课的拼音py */
-.subtitle.vol-2 .lesson-chinese .py {
+.subtitle.vol-2 .book-chinese .py {
     font-size: 45px;
 }
 
 /* 中文课的中文单字cn */
-.subtitle.vol-2 .lesson-chinese .cn {
+.subtitle.vol-2 .book-chinese .cn {
     font-size: 90px;
 }
 
 /* 中文课的英文 */
-.subtitle.vol-2 .lesson-chinese .english {
+.subtitle.vol-2 .book-chinese .english {
     font-size: 50px;
 }
 /* 中文课的拼音py */
-.subtitle.vol-3 .lesson-chinese .py {
+.subtitle.vol-3 .book-chinese .py {
     font-size: 42px;
 }
 
 /* 中文课的中文单字cn */
-.subtitle.vol-3 .lesson-chinese .cn {
+.subtitle.vol-3 .book-chinese .cn {
     font-size: 80px;
 }
 
 /* 中文课的英文 */
-.subtitle.vol-3 .lesson-chinese .english {
+.subtitle.vol-3 .book-chinese .english {
     font-size: 48px;
 }
 /* 中文课的拼音py */
-.subtitle.vol-4 .lesson-chinese .py {
+.subtitle.vol-4 .book-chinese .py {
     font-size: 35px;
 }
 
 /* 中文课的中文单字cn */
-.subtitle.vol-4 .lesson-chinese .cn {
+.subtitle.vol-4 .book-chinese .cn {
     font-size: 70px;
 }
 
 /* 中文课的英文 */
-.subtitle.vol-4 .lesson-chinese .english {
+.subtitle.vol-4 .book-chinese .english {
     font-size: 42px;
 }
 
-.subtitle.vol-1 .lesson-english .en {
+.subtitle.vol-1 .book-english .en {
     font-size: 100px;
 }
-.subtitle.vol-1 .lesson-english .phonetic {
+.subtitle.vol-1 .book-english .phonetic {
     font-size: 60px;
 }
-.subtitle.vol-1 .lesson-english .english {
+.subtitle.vol-1 .book-english .english {
     font-size: 70px;
     line-height: 1.5;
 }
-.subtitle.vol-1 .lesson-english .chinese {
+.subtitle.vol-1 .book-english .chinese {
     font-size: 45px;
     line-height: 1.5;
     padding-top: 30px;
 }
-.subtitle.vol-2 .lesson-english .en {
+.subtitle.vol-2 .book-english .en {
     font-size: 60px;
 }
-.subtitle.vol-2 .lesson-english .phonetic {
+.subtitle.vol-2 .book-english .phonetic {
     font-size: 60px;
 }
-.subtitle.vol-2 .lesson-english .english {
+.subtitle.vol-2 .book-english .english {
     font-size: 70px;
 }
-.subtitle.vol-2 .lesson-english .chinese {
+.subtitle.vol-2 .book-english .chinese {
     font-size: 55px;
     padding-top: 30px;
 }
-.subtitle.vol-3 .lesson-english .en {
+.subtitle.vol-3 .book-english .en {
     font-size: 60px;
 }
-.subtitle.vol-3 .lesson-english .phonetic {
+.subtitle.vol-3 .book-english .phonetic {
     font-size: 60px;
 }
-.subtitle.vol-3 .lesson-english .english {
+.subtitle.vol-3 .book-english .english {
     font-size: 65px;
 }
-.subtitle.vol-3 .lesson-english .chinese {
+.subtitle.vol-3 .book-english .chinese {
     font-size: 50px;
     padding-top: 30px;
 }
-.subtitle.vol-4 .lesson-english .en {
+.subtitle.vol-4 .book-english .en {
     font-size: 60px;
 }
-.subtitle.vol-4 .lesson-english .phonetic {
+.subtitle.vol-4 .book-english .phonetic {
     font-size: 60px;
 }
-.subtitle.vol-4 .lesson-english .english {
+.subtitle.vol-4 .book-english .english {
     font-size: 60px;
 }
-.subtitle.vol-4 .lesson-english .chinese {
+.subtitle.vol-4 .book-english .chinese {
     font-size: 45px;
     padding-top: 20px;
 }

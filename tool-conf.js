@@ -3,18 +3,24 @@ let conf = {
     dict: null, // 英文单词翻译用字典加载在此
     durations: {}, // 所有已经生成的视频素材，长度记录在此
     tasks: [], // 任务就是素材列表，素材可能会重复使用，读多遍
-    files: [], // material目录下的素材文件列表
-    range: {}, // 素材范围
-    maxid: 0
+    files: {}, // material目录下的素材文件列表
+    range: {} // 素材范围
 };
 
 // 生成视频需要的信息在此
 conf.info = {
-    theme: "",
-    lesson: "",
-    projectid: "",
-    language: ""
+    book_cn: "", //中文名
+    book_en: "", //英文名
+    book_abbr: "", //缩写
+    language: "", //课程语言
+    version: "", //数据文件版本
+    maxid: 0 //最大视频编号
 };
+
+//已经生成的video
+conf.videos = [
+    //[文件名, 类型, 起始课本ID, 结束课本ID, 视频长度, 生成时间]
+];
 
 // 语料编辑工具，可以临时在页面中编辑语料（不会存入数据库），用以生成指定的语音内容
 conf.editTool = {
@@ -24,31 +30,28 @@ conf.editTool = {
     language: ""
 };
 
-// UI显示的字段名
-conf.uiFields = [
-    "id",
-    "sid",
-    "type",
-    "group",
-    "voice",
-    "chinese",
-    "english",
-    "phonetic",
-    "comment",
-    "theme",
-    "media_cn1",
-    "media_cn2",
-    "media_en1",
-    "media_en2",
-    "slide",
-    "action"
-];
 // 实际导入导出需要的data字段
 conf.dataFields = ["id", "sid", "type", "group", "voice", "chinese", "english", "phonetic", "comment", "theme"];
-// 导出时标题栏对应的名字
-conf.exportTitles = ["id", "sid", "类型", "分组", "音色", "中文", "英文", "音标或拼音", "注释", "主题"];
-// 导出时每列的宽度
-conf.exportWidth = [50, 50, 70, 50, 70, 350, 350, 350, 150, 80];
+// UI显示的字段名
+conf.uiFields = conf.dataFields.concat(["media_cn1", "media_cn2", "media_en1", "media_en2", "slide", "action"]);
+conf.sheet = {
+    book: {
+        name: ["ID", "显示ID", "类型", "分组", "音色", "中文", "英文", "音标或拼音", "角注", "背景图"],
+        width: [50, 50, 70, 50, 70, 350, 350, 350, 150, 80],
+        center: /^[ABCDEIJKL]\d+$/
+    },
+    info: {
+        name: ["中文名", "英文名", "缩写码", "教学目标", "版本"],
+        width: [250, 250, 80, 100, 80],
+        center: /^[ABCDE]\d+$/
+    },
+    video: {
+        name: ["文件名", "类型", "起始课本ID", "结束课本ID", "视频长度", "生成时间"],
+        width: [120, 70, 70, 70, 70, 120],
+        center: /^[ABCDEF]\d+$/
+    }
+};
+
 // 导出课件的style配置, 注意，需要使用全开源字体，不然不能发网上
 conf.exportStyle = {
     chinese: [
@@ -135,8 +138,4 @@ conf.programRules = {
     }
 };
 
-conf.program = {
-    listen: { name: "听力练习", value: "listen" },
-    read: { name: "双语朗读", value: "read" },
-    pure: { name: "单语朗读", value: "pure" }
-};
+conf.program = { listen: "听力练习", read: "双语朗读", pure: "单语朗读" };

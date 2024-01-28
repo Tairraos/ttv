@@ -1,75 +1,21 @@
-/* global conf, util, ui, pinyinPro, XLSX */
+/* global conf, util, io, ui, pinyinPro */
 
 let action = {
     /*********************/
     // 拖放导入数据
     /*********************/
-    doImportMaterials(file) {
+    async doImportMaterials(file) {
         if (!file.name.match(/\.xlsx$/)) {
             return ui.err(`拖入的文件不是xlsx: "${file.name}"`);
         }
         ui.log(`开始导入 ${file.name}...`);
         let reader = new FileReader();
         reader.onload = async function (e) {
-            let data = e.target.result,
-                workbook = XLSX.read(data, { type: "binary" }),
-                worksheet = Object.values(workbook.Sheets)[0],
-                range = XLSX.utils.decode_range(worksheet["!ref"]),
-                w = worksheet,
-                autosid = 1,
-                last_group = 0,
-                group = 0;
-
-            if (range.e.c < 6) {
-                return ui.err(`拖入的文件列数不对: "${file.name}"`);
-            }
-            let g = (r) => (w[r] ? w[r].v : ""),
-                counter = 0;
-            for (let row = 2; row <= range.e.r + 1; row++) {
-                if (g(`A${row}`) !== "") {
-                    let id = ++conf.maxid,
-                        lesson = conf.info.lesson,
-                        sid = g(`B${row}`),
-                        type =
-                            g(`C${row}`)
-                                .replace(/词语|词汇|词组|短语|单词/, "word")
-                                .replace(/句子|句型/, "sentence")
-                                .replace(/故事|短文/, "story")
-                                .replace(/标题|章节/, "title") || "sentence",
-                        // group = g(`D${row}`)
-                        voice = g(`E${row}`),
-                        chinese = g(`F${row}`),
-                        english = g(`G${row}`),
-                        phonetic = g(`H${row}`),
-                        comment = g(`I${row}`),
-                        theme = g(`J${row}`),
-                        log = ui.log(`导入 ${chinese || english}...`),
-                        current_group = +g(`D${row}`);
-                    sid = sid !== "auto" ? +sid : type === "title" ? 0 : autosid++;
-                    group = current_group === 0 ? 0 : current_group !== last_group ? id : group;
-                    last_group = current_group;
-                    let ret = await util.fetchApi("api-material.php", {
-                        action: "insert",
-                        id,
-                        sid,
-                        lesson,
-                        type,
-                        group,
-                        voice,
-                        chinese,
-                        english,
-                        phonetic,
-                        comment,
-                        theme
-                    });
-                    counter++;
-                    ret.result === "success" && ui.loadMaterial(ret.data);
-                    ui.done(log);
-                }
-            }
-            ui.log(`0.导入完成，导入${counter}条，共有${Object.keys(conf.materials).length}条语料`, "pass");
-            ui.updateDownloadLink("Content"); // 更新导出链接
+            let data = e.target.result;
+            await io.importXlsx(data);
+            conf.info.maxid = Math.max(0, ...conf.videos.map((item) => item[0].replace(/[^-]+-(\d{3})\.mp4/, "$1")));
             util.checkMaterials(); // 检查所有语料的素材是否准备完全
+            conf.files = (await util.fetchApi("api-files.php")).files;
             conf.tasks = []; // 每次导入都清空任务列表，需要重新估算新产生任务列表
         };
         reader.readAsBinaryString(file);
@@ -82,7 +28,7 @@ let action = {
         await action.fetchTranslation("chinese", "english"); // 通过翻译api, 中译英，会跳过英语课的词汇
         await action.fetchTranslation("english", "chinese"); // 通过翻译api，英译中
         // 英语词汇，查字典，带词性和多个意思
-        for (let line of util.getMaterial((line) => util.isLessonEnglish() && line.type === "word" && line.english && !line.chinese)) {
+        for (let line of util.getMaterial((line) => util.isBookEnglish() && line.type === "word" && line.english && !line.chinese)) {
             await util.updateMaterial(line.id, conf.dict[line.english.toLowerCase()].mean, "chinese");
         }
         ui.log(`1.素材翻译完成`, "pass");
@@ -90,7 +36,7 @@ let action = {
 
     async fetchTranslation(from, to) {
         // 所有目标语言为空白的字段，跳过英语课的词汇，英语词汇用查字典翻译，带词性和多个意思
-        for (let bundle of util.getMaterial((line) => !line[to] && !(util.isLessonEnglish() && line.type === "word"), 10)) {
+        for (let bundle of util.getMaterial((line) => !line[to] && !(util.isBookEnglish() && line.type === "word"), 10)) {
             ui.log(`开始翻译 id=${bundle[0].id} 开始的一批数据`);
             let ret = await util.fetchApi("api-translate.php", { to: to === "english" ? "en" : "zh", text: bundle.map((line) => line[from]).join("\n") });
             if (ret.result === "success") {
@@ -112,13 +58,13 @@ let action = {
     async doGenPhonetic() {
         let log;
         // 中文课，所有中文使用pinyin接口获得读音
-        for (let line of util.getMaterial((line) => line.chinese && !util.isLessonEnglish() && !line.phonetic)) {
+        for (let line of util.getMaterial((line) => line.chinese && !util.isBookEnglish() && !line.phonetic)) {
             log = ui.log(`标注拼音：${line.chinese}`);
             await util.updateMaterial(line.id, pinyinPro.pinyin(line.chinese.replace(/0|1|2|3|4|5|6|7|8|9/g, (n) => "零一二三四五六七八九"[+n])), "phonetic");
             ui.done(log);
         }
         // 英文课，词汇，查字典获得音标，英文句子不需要拼音或音标
-        for (let line of util.getMaterial((line) => line.english && util.isLessonEnglish() && line.type === "word" && !line.phonetic)) {
+        for (let line of util.getMaterial((line) => line.english && util.isBookEnglish() && line.type === "word" && !line.phonetic)) {
             log = ui.log(`标注音标：${line.english}`);
             await util.updateMaterial(line.id, conf.dict[line.english.toLowerCase()].accent, "phonetic");
             ui.done(log);
@@ -259,64 +205,31 @@ let action = {
         if (ret.result === "success") {
             ui.done(log);
             ui.log(`视频实际长度：${util.fmtDuration(ret.duration)}秒`, "highlight");
-            await util.fetchApi("api-project.php", {
-                action: "create",
-                lesson: conf.info.lesson,
-                lesson_cn: conf.lesson[conf.info.lesson].cn,
-                lesson_abbr: conf.lesson[conf.info.lesson].abbr,
-                program: conf.program[conf.info.program].name,
-                startid: conf.range.start,
-                endid: conf.range.end,
-                duration: util.fmtDuration(ret.duration)
-            });
+            // await util.fetchApi("api-project.php", {
+            //     action: "create",
+            //     book_en: conf.info.book_en,
+            //     book_cn: conf.lesson[conf.info.book_en].cn,
+            //     book_abbr: conf.lesson[conf.info.book_en].abbr,
+            //     program: conf.program[conf.info.program].name,
+            //     startid: conf.range.start,
+            //     endid: conf.range.end,
+            //     duration: util.fmtDuration(ret.duration)
+            // });
         } else {
             return ui.err(`生成作品 ${conf.info.dist}.mp4 时遇到错误`);
         }
         ui.log(`7.作品已经生成`, "pass");
-        util.getProjectid();
-        window.open(`media/material/dist/${conf.info.dist}.mp4`, "preview");
+        window.open(`media/material/dist/${util.getNewBookName()}.mp4`, "preview");
     },
 
     /*********************/
-    // 管理工具
+    // 下载Xlsx
     /*********************/
-    async doArchive() {
-        let lesson = ui.getSelectData("materialLesson"),
-            log = ui.log(`正在存档 ${lesson}...`, "highlight");
-        await util.fetchApi("api-archive.php", { action: "archive", lesson });
-        ui.done(log);
-        ui.log(`数据存档完成`, "pass");
-        util.initAssistant();
+    downloadContent() {
+        io.exportData("Content");
     },
 
-    async doUnarchive() {
-        let lesson = ui.getSelectData("archiveLesson"),
-            log = ui.log(`正在恢复 ${lesson}...`, "highlight"),
-            ret = await util.fetchApi("api-archive.php", { action: "unarchive", lesson });
-        if (ret.result === "failed") {
-            ui.err(ret.reason);
-        } else {
-            ui.done(log);
-            ui.log(`数据存档已经恢复，刷新页面重新开工`, "pass");
-            util.initAssistant();
-        }
-    },
-
-    async doDelMaterial() {
-        let lesson = ui.getSelectData("materialLesson"),
-            log = ui.log(`正在从 Material 删除 ${lesson}...`, "highlight");
-        await util.fetchApi("api-material.php", { action: "delete", lesson });
-        ui.done(log);
-        ui.log(`删除完成`, "pass");
-        util.initAssistant();
-    },
-
-    async doDelArchive() {
-        let lesson = ui.getSelectData("archiveLesson"),
-            log = ui.log(`正在从 Archive 删除 ${lesson}...`, "highlight");
-        await util.fetchApi("api-archive.php", { action: "delete", lesson });
-        ui.done(log);
-        ui.log(`删除完成`, "pass");
-        util.initAssistant();
+    downloadTemplate() {
+        io.exportData("Template");
     }
 };

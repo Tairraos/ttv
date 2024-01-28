@@ -52,7 +52,7 @@
         </tr>
         <?php
         foreach ($rows as $row) {
-            echo '<tr><td>' . $row['id'] . '</td><td>' . $row['lesson'] . '</td><td>' . $row['type'] . '</td><td>' . $row['voice'] . '</td><td>' . $row['chinese'] . '</td><td>' . $row['english'] . '</td><td class="phonetic">' . $row['phonetic'] . '</td></tr>';
+            echo '<tr><td>' . $row['id'] . '</td><td>' . $row['book_en'] . '</td><td>' . $row['type'] . '</td><td>' . $row['voice'] . '</td><td>' . $row['chinese'] . '</td><td>' . $row['english'] . '</td><td class="phonetic">' . $row['phonetic'] . '</td></tr>';
         }
         ?>
     </table>
@@ -78,7 +78,7 @@
 <script>
     let lines = <?= json_encode($rows, JSON_UNESCAPED_UNICODE); ?>;
     conf.files = <?= json_encode($files, JSON_UNESCAPED_UNICODE); ?>;
-    conf.info.language = lines[0].lesson ? "chinese" : "english";
+    conf.info.language = lines[0].book_en ? "chinese" : "english";
     conf.rules = conf.programRules.listen;
     conf.info.dist = "<?= $theme ?>";
     conf.info.id = <?= $id ?>;

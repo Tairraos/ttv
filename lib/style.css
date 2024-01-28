@@ -6,6 +6,8 @@ body {
     width: 350px;
     position: fixed;
     text-align: center;
+    height: 100%;
+    overflow-y: scroll;
     display: flex;
     border-right: 1px solid #888;
     flex-direction: column;
@@ -82,7 +84,12 @@ body {
     background: #d2baff;
     border-style: dotted;
 }
-
+.menu{
+    margin: 0 10px;
+}
+.menu.radio {
+    font-size: 13px;
+}
 .menu select {
     width: 140px;
     text-align: center;
@@ -95,21 +102,29 @@ body {
     font-size: 14px;
 }
 
-#projectid {
+#newid {
     width: 50px;
     text-align: center;
     padding: 3px 10px;
     margin: 5px 10px 0 0;
     vertical-align: top;
 }
-
-#createProject {
-    line-height: 0;
-    padding: 0 10px;
-    height: 26px;
-    margin: 5px 0 5px 2px;
-    font-size: 14px;
+#modifytheme{
+    display: inline-flex;
+    flex-direction: column;
+    vertical-align: middle;
+    margin-left: 3px;
 }
+
+#modifytheme button{
+    font-size: 13px;
+    width: 20px;
+    height: 13px;
+    line-height: 0;
+    padding: 0;
+    margin: 0;
+}
+
 
 .menu button {
     font: 16px/16px bold;
@@ -132,7 +147,7 @@ body {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    justify-content: space-evenly;
+    justify-content: center;
 }
 .console {
     width: 300px;
@@ -303,7 +318,7 @@ body {
 }
 
 #themename {
-    width: 90px;
+    width: 45px;
     text-align: center;
     padding: 3px 3px;
     margin-left: 6px;
