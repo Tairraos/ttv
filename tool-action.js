@@ -14,9 +14,9 @@ let action = {
             let data = e.target.result;
             await io.importXlsx(data);
             conf.info.maxid = Math.max(0, ...conf.videos.map((item) => item[0].replace(/[^-]+-(\d{3})\.mp4/, "$1")));
-            util.checkMaterials(); // 检查所有语料的素材是否准备完全
-            conf.files = (await util.fetchApi("api-files.php")).files;
+            conf.files = (await util.fetchApi("api-files.php", { action: "list", book_cn: conf.info.book_cn })).files;
             conf.tasks = []; // 每次导入都清空任务列表，需要重新估算新产生任务列表
+            ui.initRangeBox();
         };
         reader.readAsBinaryString(file);
     },
@@ -205,16 +205,14 @@ let action = {
         if (ret.result === "success") {
             ui.done(log);
             ui.log(`视频实际长度：${util.fmtDuration(ret.duration)}秒`, "highlight");
-            // await util.fetchApi("api-project.php", {
-            //     action: "create",
-            //     book_en: conf.info.book_en,
-            //     book_cn: conf.lesson[conf.info.book_en].cn,
-            //     book_abbr: conf.lesson[conf.info.book_en].abbr,
-            //     program: conf.program[conf.info.program].name,
-            //     startid: conf.range.start,
-            //     endid: conf.range.end,
-            //     duration: util.fmtDuration(ret.duration)
-            // });
+            conf.videos.push([
+                `${conf.info.dist}.mp4`,
+                conf.program[conf.info.program],
+                conf.range.start,
+                conf.range.end,
+                ret.duration,
+                util.fmtDuration(ret.duration)
+            ]);
         } else {
             return ui.err(`生成作品 ${conf.info.dist}.mp4 时遇到错误`);
         }

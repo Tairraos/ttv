@@ -1,9 +1,15 @@
 /**
  * 抓图片服务
  * @param {*} args
- * @param {number} args.id          - 图片对应的数据库记录，如果id=0，内容为耳朵听力图标
- * @param {string} args.filename    - 要生成的图片名称，图片会生成在 media/material 目录下
- * @param {string} args.language    - 教学的是英语还是汉语
+ * @param {number} args.id          - id=0 为耳朵听力图标, 其他为字幕
+ * @param {array}  args.rows        - 数据
+ * @param {string} args.book_cn     - 目录名
+ * @param {string} args.filename    - slide名字
+ * @param {string} args.theme       - 背景图片
+ * @param {string} args.language    - 书本语言
+ * @param {string} args.type        - 听力，双语，单语
+ * @param {string} args.watermark   - 水印位置
+ * @param {string} args.svg         - 听力耳机图片
  * @return {JSON}
  */
 
@@ -25,7 +31,18 @@ exports.captureSlide = async function (args) {
     try {
         console.log(`抓图参数: ${JSON.stringify(args)}`);
         await page.setViewport({ width: 1920, height: 1080 });
-        await page.goto(`https://ttv.localweb.com/html-slide.php?${query}`);
+        await page.setRequestInterception(true);
+
+        page.on("request", (interceptedRequest) => {
+            var data = {
+                method: "POST",
+                postData: "paramFoo=valueBar&paramThis=valueThat"
+            };
+            interceptedRequest.continue(data);
+        });
+
+        await page.goto(`https://ttv.localweb.com/html-slide.php`);
+        // await page.goto(`https://ttv.localweb.com/html-slide.php?${query}`);
         await page.screenshot({ path: `media/material/slide/${args.filename}` });
         await browser.close();
 

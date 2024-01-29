@@ -6,12 +6,10 @@ let util = {
     async initMaterial() {
         conf.lesson = {};
         ui.initMaterialsTable();
-
         conf.info.program = "listen";
         conf.rules = conf.programRules.listen;
         conf.dict = await util.fetchApi("lib/dict.json");
         ui.log("读取到字典数据 " + Object.keys(conf.dict).length + " 条");
-
         util.ping();
     },
 
@@ -53,7 +51,7 @@ let util = {
             for (let media of medias) {
                 if (util.checkMediaStatus(line, field, media)) {
                     let filename = util.getMediaFilename(line.id, field, media),
-                        is_exist = conf.files.includes(filename);
+                        is_exist = conf.files[util.getFolder(filename)].includes(filename);
                     conf.materials[line.id][`${field}.${media}`] = is_exist ? filename : "required";
                     ui.updateCell(line.id, field, media, is_exist ? "exist" : "required");
                 } else {
@@ -62,6 +60,10 @@ let util = {
                 }
             }
         }
+    },
+
+    getFolder(filename) {
+        return filename.match(/m4a$/) ? "audio" : filename.match(/mp4$/) ? "video" : "slide";
     },
 
     /*********************/
@@ -194,6 +196,10 @@ let util = {
         let validMaterials = Object.values(conf.materials).filter((line) => line.id >= conf.range.start && line.id <= conf.range.end);
         let lines = condition ? validMaterials.filter(condition) : validMaterials;
         return size ? Array.from({ length: Math.ceil(lines.length / size) }, (_, i) => lines.slice(i * size, i * size + size)) : lines;
+    },
+
+    getPureMaterial(id) {
+        return Object.values(util.getMaterial((line) => (conf.materials[id].group === 0 ? line.id === id : line.group === conf.materials[id].group)));
     },
 
     /*********************/

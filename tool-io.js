@@ -44,14 +44,11 @@ let io = {
         worksheet = workbook.Sheets["信息"];
         range = XLSX.utils.decode_range(worksheet["!ref"]);
         log = ui.log(`导入信息`);
-
-        conf.info = {
-            book_cn: g(`A2`), //中文名
-            book_en: g(`B2`), //英文名
-            book_abbr: g(`C2`), //缩写
-            language: g(`D2`), //课程语言
-            version: g(`E2`) //数据文件版本
-        };
+        conf.info.book_cn = g(`A2`); //中文名
+        conf.info.book_en = g(`B2`); //英文名
+        conf.info.book_abbr = g(`C2`); //缩写
+        conf.info.language = g(`D2`); //课程语言
+        conf.info.version = g(`E2`); //数据文件版本
         ui.done(log);
 
         //导入视频
@@ -98,29 +95,13 @@ let io = {
     /*********************/
     // 生成xlsx
     /*********************/
-    saveXlsxBinary(book, info, video = [], ware = []) {
+    async saveXlsxBinary(book, info, video = [], ware = []) {
         let workbook = XLSX.utils.book_new(),
-            filename = `${info[0][0]}.${info[0][4]}.xlsx`,
-            genSheet = (content, config) => {
-                let sheet = XLSX.utils.aoa_to_sheet([config.name].concat(content));
-                sheet["!cols"] = config.width.map((i) => ({ wpx: i })); // 调整每一列宽度
-                Object.keys(sheet).forEach((key) => {
-                    // 调整单元格样式
-                    let is_title = key.match(/^[A-Z]1$/), //第一行
-                        is_center = is_title || key.match(config.center); // 第一行或ABCDHIJKL列
-                    if (!key.startsWith("!")) {
-                        sheet[key].s = {
-                            font: { name: "微软雅黑", sz: "11", color: { rgb: is_title ? "FFFFFF" : "000000" } }, // 字体
-                            fill: is_title ? { fgColor: { rgb: "333333" } } : undefined, // 背景颜色
-                            alignment: { horizontal: is_center ? "center" : "left", vertical: "center", wrapText: true } // 对齐方式
-                        };
-                    }
-                });
-                return sheet;
-            };
-        XLSX.utils.book_append_sheet(workbook, genSheet(book, conf.sheet.book), `课本`);
-        XLSX.utils.book_append_sheet(workbook, genSheet(info, conf.sheet.info), `信息`);
-        XLSX.utils.book_append_sheet(workbook, genSheet(video, conf.sheet.video), `视频`);
+            filename = `${info[0][0]}.${info[0][4]}.xlsx`;
+
+        XLSX.utils.book_append_sheet(workbook, io.getSheet(book, conf.sheet.book), `课本`);
+        XLSX.utils.book_append_sheet(workbook, io.getSheet(info, conf.sheet.info), `信息`);
+        XLSX.utils.book_append_sheet(workbook, io.getSheet(video, conf.sheet.video), `视频`);
 
         // 课件sheet
         let ware_sheet = XLSX.utils.aoa_to_sheet(ware);
@@ -133,6 +114,27 @@ let io = {
         });
         XLSX.utils.book_append_sheet(workbook, ware_sheet, `课件`);
 
-        return XLSX.writeFile(workbook, filename);
+        return await XLSX.writeFile(workbook, filename);
+    },
+
+    /*********************/
+    // 生成Sheet
+    /*********************/
+    getSheet(content, config) {
+        let sheet = XLSX.utils.aoa_to_sheet([config.name].concat(content));
+        sheet["!cols"] = config.width.map((i) => ({ wpx: i })); // 调整每一列宽度
+        Object.keys(sheet).forEach((key) => {
+            // 调整单元格样式
+            let is_title = key.match(/^[A-Z]1$/), //第一行
+                is_center = is_title || key.match(config.center); // 第一行或ABCDHIJKL列
+            if (!key.startsWith("!")) {
+                sheet[key].s = {
+                    font: { name: "微软雅黑", sz: "11", color: { rgb: is_title ? "FFFFFF" : "000000" } }, // 字体
+                    fill: is_title ? { fgColor: { rgb: "333333" } } : undefined, // 背景颜色
+                    alignment: { horizontal: is_center ? "center" : "left", vertical: "center", wrapText: true } // 对齐方式
+                };
+            }
+        });
+        return sheet;
     }
 };

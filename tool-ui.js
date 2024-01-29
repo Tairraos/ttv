@@ -22,6 +22,15 @@ let ui = {
         $materials.innerHTML = "<tr>" + conf.uiFields.map((item) => `<th>${item}</th>`).join("") + "</tr>";
     },
 
+    initRangeBox() {
+        conf.range.idList = Object.keys(conf.materials).map((i) => +i);
+        conf.range.min = Math.min(...conf.range.idList, 1);
+        conf.range.max = Math.max(...conf.range.idList, 1);
+        ui.putInputData("startid", conf.range.min); //填上缺省值
+        ui.putInputData("endid", conf.range.max);
+        ui.confirmRange(); // confirm一次
+    },
+
     /*********************/
     // 切换工具
     /*********************/
@@ -179,9 +188,17 @@ let ui = {
         } else if (target.match(/^slide/)) {
             action.genSlidePiece(id, target.replace(/slide-/, ""), conf.materials[id].theme, true); // force=true,覆盖生成
         } else if (target === "action-page") {
-            window.open(`html-slide?id=${id}&language=${conf.info.language}`, "preview");
+            ui.openPostPage(`html-slide.php`, {
+                language: conf.info.language,
+                book_cn: conf.info.book_cn,
+                rows: JSON.stringify(util.getPureMaterial(id))
+            });
         } else if (target === "action-preview") {
-            window.open(`html-overview.php?id=${id}`, "preview");
+            ui.openPostPage(`html-overview.php`, {
+                language: conf.info.language,
+                book_cn: conf.info.book_cn,
+                rows: JSON.stringify(util.getPureMaterial(id))
+            });
         }
         if (field === "id" && conf.range.selected && event.shiftKey) {
             ui.putInputData("endid", id);
@@ -189,6 +206,17 @@ let ui = {
         } else if (conf.range.selected) {
             ui.resetRange();
         }
+    },
+
+    async openPostPage(url, params) {
+        var newWin = window.open("about:blank", "preview");
+        var formStr = `<form style="visibility:hidden;" method="POST" action="${location.origin}/${url}">`;
+        for (var key in params) {
+            formStr += "<input type='text' name='" + key + "' value='" + params[key] + "' style='display: none'>";
+        }
+        formStr += "</form>";
+        newWin.document.body.innerHTML = formStr;
+        newWin.document.forms[0].submit();
     },
 
     /*********************/
@@ -334,6 +362,8 @@ document.getElementById("saveTheme").addEventListener("click", ui.saveTheme, fal
 document.getElementById("confirmRange").addEventListener("click", ui.confirmRange, false);
 document.getElementById("resetRange").addEventListener("click", ui.resetRange, false);
 document.querySelectorAll(".radio [name='program']").forEach((item) => item.addEventListener("click", ui.onProgramChange, false));
+document.getElementById("downloadTemplate").addEventListener("click", action.downloadTemplate, false); // 下载模板
+document.getElementById("downloadContent").addEventListener("click", action.downloadContent, false); // 下载数据
 
 /*********************/
 // 绑UI拖放事件
@@ -353,8 +383,6 @@ document.getElementById("doGenSlide").addEventListener("click", action.doGenSlid
 document.getElementById("doGenVideo").addEventListener("click", action.doGenVideo, false); // 5.视频素材
 document.getElementById("doEstimate").addEventListener("click", action.doEstimate, false); // 6.工程估算
 document.getElementById("doBuild").addEventListener("click", action.doBuild, false); // 7.生成作品
-document.getElementById("downloadTemplate").addEventListener("click", action.downloadTemplate, false); // 8.存档数据
-document.getElementById("downloadContent").addEventListener("click", action.downloadContent, false); // 8.存档数据
 
 /*********************/
 // 绑表格点击事件

@@ -5,10 +5,14 @@
     <meta charset="UTF-8">
     <title>Moore's Language</title>
     <link rel="stylesheet" href="lib/page.css">
-    <?php require("api-data.php"); ?>
+    <?php
+    $book_cn = $_REQUEST['book_cn'];
+    $language = $_REQUEST['language'];
+    $rows = json_decode($_REQUEST['rows'], JSON_UNESCAPED_UNICODE);
+    ?>
     <style>
         .backimg {
-            background-image: url('media/material/<?= $rows[0]['theme'] ?? 'default' ?>.png');
+            background-image: url('media/<?= $book_cn ?>/theme/<?= $rows[0]['theme'] ?? 'default' ?>.png');
             background-size: 100% 100%;
         }
 
@@ -38,11 +42,9 @@
             } else if (!isset($_REQUEST['language'])) {
                 echo '缺少参数 language';
             } else {
-                $language = $_REQUEST['language'];
                 //$rows的长度
                 $vol = count($rows); // 字幕行数
                 foreach ($rows as $index => $row) {
-                    $id = $row['id'];
                     $sid = $row['sid']; //真正的内容id，有些slide是标题，不算内容成份
                     $type = $row['type'];
                     $english = $row['english'];

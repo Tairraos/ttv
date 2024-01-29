@@ -35,6 +35,15 @@ if ($action == "create") {
     }
     echo json_encode(['result' => 'success', 'files' => $files], JSON_UNESCAPED_UNICODE);
 
+} else if ($action == "move") {
+    $file = $_REQUEST['file'];
+    if (file_exists("D:/Downloads/" . $file)) {
+        rename("D:/Downloads/" . $file, $root . "/book/" . $file);
+        echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
+    } else {
+        echo json_encode(['result' => 'failed', 'reason' => "文件不存在"], JSON_UNESCAPED_UNICODE);
+    }
+
 
 } else {
     echo json_encode(['result' => 'failed', 'reason' => "传入了未知的 action"], JSON_UNESCAPED_UNICODE);
