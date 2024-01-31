@@ -1,4 +1,4 @@
-/* global conf, util, io, ui, pinyinPro */
+/* global conf, util, io, ui, net, pinyinPro */
 
 let action = {
     /*********************/
@@ -14,7 +14,8 @@ let action = {
             let data = e.target.result;
             await io.importXlsx(data);
             conf.info.maxid = Math.max(0, ...conf.videos.map((item) => item[0].replace(/[^-]+-(\d{3})\.mp4/, "$1")));
-            conf.files = (await util.fetchApi("api-files.php", { action: "list", book_cn: conf.info.book_cn })).files;
+            conf.info.newBookName = `${conf.info.book_abbr}-${(conf.info.maxid + 1).toString().padStart(3, "0")}.mp4`;
+            conf.files = (await net.filesList()).files;
             conf.tasks = []; // 每次导入都清空任务列表，需要重新估算新产生任务列表
             ui.initRangeBox();
         };
@@ -38,7 +39,7 @@ let action = {
         // 所有目标语言为空白的字段，跳过英语课的词汇，英语词汇用查字典翻译，带词性和多个意思
         for (let bundle of util.getMaterial((line) => !line[to] && !(util.isBookEnglish() && line.type === "word"), 10)) {
             ui.log(`开始翻译 id=${bundle[0].id} 开始的一批数据`);
-            let ret = await util.fetchApi("api-translate.php", { to: to === "english" ? "en" : "zh", text: bundle.map((line) => line[from]).join("\n") });
+            let ret = await net.translate(bundle, from, to);
             if (ret.result === "success") {
                 let translated = ret.data.split("\n");
                 for (let item of bundle) {
@@ -102,9 +103,9 @@ let action = {
             let basename = `${id}.${field.replace(/media_/, "")}`;
             let log = ui.log(`使用${model}生成语音：${text} -> ${basename}.m4a`),
                 rate = language == "chinese" && conf.info.language == "chinese" ? -20 : 0, // 中文课的中文语料，语速减速20%
-                ret = await util.fetchApi("api/tts", { basename, text, model, rate });
+                ret = await net.tts(basename, text, model, rate);
             if (ret.result === "success") {
-                await util.updateMaterial(id, `${basename}.m4a`, "mediafile");
+                await util.updateMaterial(id, `${basename}.m4a`, "audio");
                 ui.done(log);
             } else {
                 ui.err(`发生错误 ${JSON.stringify(ret)}`);
@@ -120,19 +121,18 @@ let action = {
             return ui.serverError(); // 服务不可用则退出生成
         }
         for (let line of util.getMaterial()) {
-            await action.genSlidePiece(line.id, "listen", line.theme);
-            await action.genSlidePiece(line.id, "text", line.theme);
+            await action.genSlidePiece(line.id, "listen");
+            await action.genSlidePiece(line.id, "text");
         }
         ui.log(`4.字幕素材处理完成`, "pass");
     },
 
-    async genSlidePiece(id, type, theme, force = false) {
-        if (force || conf.materials[id][`slide.slide-${type}`] === `required`) {
-            let watermark = ((id / 16) | 0) % 4, // 每16行语料，水印换一个位置
-                filename = `${id}.${type}.png`;
+    async genSlidePiece(id, style, force = false) {
+        if (force || conf.materials[id][`slide.slide-${style}`] === `required`) {
+            let filename = `${id}.${style}.png`;
             let log = ui.log(`生成slide：${filename}`);
-            await util.fetchApi("api/slide", { id, filename, theme, language: conf.info.language, type, watermark, svg: +new Date() % 4 });
-            await util.updateMaterial(id, filename, "mediafile");
+            await net.slide(id, style, filename);
+            await util.updateMaterial(id, filename, "slide");
             ui.done(log);
         }
     },
@@ -160,10 +160,10 @@ let action = {
                 audioname = target === "video-ding" ? "DING" : conf.materials[id][`${field}.audio`],
                 slidename = conf.materials[id][`slide.slide-${target === "video-text" ? "text" : "listen"}`],
                 log = ui.log(`生成视频片段：${filename}`),
-                ret = await util.fetchApi("api/ffmpeg", { action: "piece", filename, slidename, audioname });
+                ret = await net.ffmpegPiece(filename, slidename, audioname);
             if (ret.result === "success") {
                 conf.durations[filename] = ret.duration;
-                await util.updateMaterial(id, filename, "mediafile");
+                await util.updateMaterial(id, filename, "video");
                 ui.done(log);
             }
         }
@@ -184,7 +184,7 @@ let action = {
         conf.info.duration = +conf.tasks.reduce((target, file) => target + conf.durations[file], 0).toFixed(3);
 
         ui.log(`6.工程估算完成`, "pass");
-        ui.log(`目标视频名字：${conf.info.dist}.mp4`);
+        ui.log(`目标视频名字：${conf.info.newBookName}`);
         ui.log(`视频长度预计：${util.fmtDuration(conf.info.duration)}秒`);
         ui.log(`视频片段计数：${conf.tasks.length}`);
     },
@@ -200,34 +200,81 @@ let action = {
             return ui.log(`先进行工程估算，确认视频长度。`, "error");
         }
 
-        let log = ui.log(`生成作品：${conf.info.dist}.mp4`, "highlight");
-        let ret = await util.fetchApi("api/ffmpeg", { action: "concat", filename: `${conf.info.dist}.mp4`, videolist: conf.tasks.join("|") });
+        let log = ui.log(`生成作品：${conf.info.newBookName}`, "highlight");
+        let ret = await net.ffmpegContact();
         if (ret.result === "success") {
             ui.done(log);
             ui.log(`视频实际长度：${util.fmtDuration(ret.duration)}秒`, "highlight");
             conf.videos.push([
-                `${conf.info.dist}.mp4`,
+                `${conf.info.newBookName}`,
                 conf.program[conf.info.program],
                 conf.range.start,
                 conf.range.end,
                 ret.duration,
                 util.fmtDuration(ret.duration)
             ]);
+            conf.info.maxid++;
         } else {
-            return ui.err(`生成作品 ${conf.info.dist}.mp4 时遇到错误`);
+            return ui.err(`生成作品 ${conf.info.newBookName} 时遇到错误`);
         }
         ui.log(`7.作品已经生成`, "pass");
-        window.open(`media/material/dist/${util.getNewBookName()}.mp4`, "preview");
+        window.open(`media/material/dist/${conf.info.newBookName}`, "preview");
     },
 
     /*********************/
-    // 下载Xlsx
+    // ping
     /*********************/
-    downloadContent() {
-        io.exportData("Content");
+    doPing() {
+        net.ping();
     },
 
-    downloadTemplate() {
-        io.exportData("Template");
+    /*********************/
+    // 文件操作
+    /*********************/
+
+    doDownContent() {
+        io.exportData();
+    },
+
+    doNewBook() {
+        let book_cn = ui.getInputData("book_cn"),
+            book_en = ui.getInputData("book_en"),
+            book_abbr = ui.getInputData("book_abbr"),
+            book = Array.from(Array(50), (v, k) => k + 1).map((i) => [i, "auto", "", "", "", "", "", "", "", ""]);
+        io.saveXlsxBinary(book, [[book_cn, book_en, book_abbr, book_en.match(/english/) ? "english" : "chinese", 1]]);
+        net.filesCreate(book_cn);
+        ui.log(`图书目录已创建: ${book_cn}`, "highlight");
+    },
+
+    doMoveFile() {
+        let filename = `${conf.info.book_cn}.${conf.info.version}.xlsx`;
+        net.filesMove(filename, conf.info.book_cn);
+    },
+
+    doMoveTemplate() {
+        let book_cn = ui.getInputData("book_cn"),
+            filename = `${book_cn}.1.xlsx`;
+        net.filesMove(filename, book_cn);
+    },
+
+    /*********************/
+    // 生成命令
+    /*********************/
+    doGenTranasCmd() {
+        let intro = ui.getInputData("video_intro");
+
+        navigator.clipboard.writeText(
+            [
+                `ffmpeg -i "${intro}" -hwaccel cuda`,
+                `-c:a aac -b:a 128k -ar 44100 -ac 2`,
+                `-c:v h264_nvenc -pix_fmt yuv420p`,
+                `-v quiet -y "formated.${intro}"`
+            ].join("")
+        );
+    },
+    doGenMergeCmd() {
+        let intro = ui.getInputData("video_intro"),
+            dist = ui.getSelectData("video_dist");
+        navigator.clipboard.writeText(`ffmpeg -f concat -safe 0 -i "${intro}" -i "${dist}" -c copy -async 1000 -v quiet -y "merged.${dist}"`);
     }
 };

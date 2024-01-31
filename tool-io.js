@@ -18,7 +18,7 @@ let io = {
             group = 0,
             last_group = 0,
             counter = 0;
-        log = ui.log(`导入课本...`);
+        log = ui.log(`导入课本内容...`);
         for (let row = 2; row <= range.e.r + 1; row++) {
             // 跳过第一行title
             if (g(`A${row}`) !== "") {
@@ -43,7 +43,7 @@ let io = {
         //导入信息
         worksheet = workbook.Sheets["信息"];
         range = XLSX.utils.decode_range(worksheet["!ref"]);
-        log = ui.log(`导入信息`);
+        log = ui.log(`导入课本信息...`);
         conf.info.book_cn = g(`A2`); //中文名
         conf.info.book_en = g(`B2`); //英文名
         conf.info.book_abbr = g(`C2`); //缩写
@@ -54,7 +54,7 @@ let io = {
         //导入视频
         worksheet = workbook.Sheets["视频"];
         range = XLSX.utils.decode_range(worksheet["!ref"]);
-        log = ui.log(`导入视频`);
+        log = ui.log(`导入视频信息...`);
         for (let row = 2; row <= range.e.r + 1; row++) {
             //[文件名, 类型, 起始课本ID, 结束课本ID, 视频长度, 生成时间]
             if (g(`A${row}`) !== "") {
@@ -63,7 +63,7 @@ let io = {
         }
         ui.done(log);
 
-        ui.log(`0.导入完成`, "pass");
+        ui.log(`0.导入已经完成`, "pass");
         ui.log(`共有${Object.keys(conf.materials).length}条语料`, "highlight");
         ui.log(`已经生成${conf.videos.length}个视频`, "highlight");
     },
@@ -71,25 +71,20 @@ let io = {
     /*********************/
     // 生成导出数据包
     /*********************/
-    exportData(type) {
-        if (type === "Template") {
-            let book = Array.from(Array(50), (v, k) => k + 1).map((i) => [i, "auto", "", "", "", "", "", "", "", ""]);
-            io.saveXlsxBinary(book, [["示例", "Example", "EX", "chinese", 1]]);
-        } else if (type === "Content") {
-            conf.info.version++;
-            let materials = Object.values(conf.materials),
-                book = materials.map((line) => conf.dataFields.map((field) => (line[field] !== 0 ? line[field] : ""))),
-                info = [[conf.info.book_cn, conf.info.book_en, conf.info.book_abbr, conf.info.language, conf.info.version]],
-                video = conf.videos,
-                ware = [];
-            for (let line of materials) {
-                let id = line.sid ? line.sid.toString() : "";
-                util.isBookEnglish()
-                    ? ware.push([id], [line.english + line.phonetic], [line.chinese], [""])
-                    : ware.push(["", line.phonetic], [id, line.chinese], ["", line.english], [""]);
-            }
-            io.saveXlsxBinary(book, info, video, ware);
+    exportData() {
+        conf.info.version++;
+        let materials = Object.values(conf.materials),
+            book = materials.map((line) => conf.dataFields.map((field) => (line[field] !== 0 ? line[field] : ""))),
+            info = [[conf.info.book_cn, conf.info.book_en, conf.info.book_abbr, conf.info.language, conf.info.version]],
+            video = conf.videos,
+            ware = [];
+        for (let line of materials) {
+            let id = line.sid ? line.sid.toString() : "";
+            util.isBookEnglish()
+                ? ware.push([id], [line.english + line.phonetic], [line.chinese], [""])
+                : ware.push(["", line.phonetic], [id, line.chinese], ["", line.english], [""]);
         }
+        io.saveXlsxBinary(book, info, video, ware);
     },
 
     /*********************/

@@ -32,6 +32,7 @@ exports.videoGenerator = async function (args) {
 
     console.log(`视频生成参数: ${JSON.stringify(args)}`);
 
+    
     if (action === "piece") {
         /********************************/
         // 为每一组slide和audio生成一个video片段
@@ -52,6 +53,8 @@ exports.videoGenerator = async function (args) {
         let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${audioname}`);
         process.chdir(base_path);
         return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
+
+
     } else if (action === "concat") {
         /********************************/
         // 把所有的video片段合并成一个大的video
@@ -67,6 +70,8 @@ exports.videoGenerator = async function (args) {
         let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "dist/${filename}"`);
         process.chdir(base_path);
         return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
+
+
     } else if (action === "encode") {
         /********************************/
         // 把所有的video片段合并成一个大的video
@@ -84,6 +89,8 @@ exports.videoGenerator = async function (args) {
         let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "dist/${filename}"`);
         process.chdir(base_path);
         return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
+
+
     } else if (action === "duration") {
         /********************************/
         // 返回给定media文件的长度
@@ -93,6 +100,8 @@ exports.videoGenerator = async function (args) {
             duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${media_path}/${filename}"`);
         process.chdir(base_path);
         return { result: "success", duration: +(+duration).toFixed(3) };
+
+
     } else {
         return { result: "failed", action, reason: "未指定 action" };
     }

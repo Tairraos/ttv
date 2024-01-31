@@ -25,7 +25,7 @@ exports.captureSlide = async function (args) {
             .join("&");
 
     let saveLog = async function (text) {
-        await fs.appendFileSync(path.join(base_path, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
+        await fs.appendFileSync(path.join(base_path, `media/${args.book_cn}/process_log.txt`), `${new Date().toISOString()} - ${text}\n`, "utf8");
     };
 
     try {
@@ -33,20 +33,24 @@ exports.captureSlide = async function (args) {
         await page.setViewport({ width: 1920, height: 1080 });
         await page.setRequestInterception(true);
 
-        page.on("request", (interceptedRequest) => {
+        page.once("request", (request) => {
             var data = {
                 method: "POST",
-                postData: "paramFoo=valueBar&paramThis=valueThat"
+                postData: query,
+                headers: {
+                    ...request.headers(),
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
             };
-            interceptedRequest.continue(data);
+            request.continue(data);
+            page.setRequestInterception(false);
         });
 
         await page.goto(`https://ttv.localweb.com/html-slide.php`);
-        // await page.goto(`https://ttv.localweb.com/html-slide.php?${query}`);
-        await page.screenshot({ path: `media/material/slide/${args.filename}` });
+        await page.screenshot({ path: `media/${args.book_cn}/slide/${args.filename}` });
         await browser.close();
 
-        saveLog(`生成slide: https://ttv.localweb.com/html-slide.php?${query} => media/material/slide/${args.filename}`);
+        saveLog(`生成slide: media/${args.book_cn}/slide/${args.filename}`);
         return { result: "success", filename: args.filename, id: args.id };
     } catch (error) {
         return { result: "failed", reason: "遇到错误" };

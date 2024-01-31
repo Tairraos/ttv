@@ -11,7 +11,8 @@ let $basket = document.getElementById("basket"),
 
 let $tool_a = document.getElementById("tool_a"),
     $tool_b = document.getElementById("tool_b"),
-    $rangeconfig = document.querySelector(".rangeconfig");
+    $show_tool_a = document.getElementById("show_tool_a"),
+    $show_tool_b = document.getElementById("show_tool_b");
 
 let ui = {
     /*********************/
@@ -31,18 +32,29 @@ let ui = {
         ui.confirmRange(); // confirm一次
     },
 
+    initVideoSelector() {
+        let $videoSelector = document.getElementById("video_dist");
+        $videoSelector.innerHTML = conf.videos.length ? "" : `<option value="none" selected>生成的视频</option>`;
+        for (let line of conf.videos) {
+            $videoSelector.innerHTML += `<option value="${line[0]}"${line === conf.videos.slice(-1)[0] ? " selected" : ""}>${line[0]}</option>`;
+        }
+    },
+
     /*********************/
     // 切换工具
     /*********************/
     switchTool(e) {
         if (e.target.id === "show_tool_a") {
             $tool_a.style.display = "flex";
-            $rangeconfig.style.display = "block";
             $tool_b.style.display = "none";
+            $show_tool_a.className = "selected";
+            $show_tool_b.className = "unselected";
         } else {
             $tool_a.style.display = "none";
-            $rangeconfig.style.display = "none";
             $tool_b.style.display = "block";
+            ui.initVideoSelector();
+            $show_tool_b.className = "selected";
+            $show_tool_a.className = "unselected";
         }
     },
     /*********************/
@@ -59,44 +71,47 @@ let ui = {
     // 听力和阅读选择
     /*********************/
     onProgramChange() {
-        let program = document.querySelector("input[name='program']:checked").value;
+        let program = ui.getSelectData("program");
         conf.info.program = program;
         conf.rules = conf.programRules[program];
         util.checkMaterials(); // 检查所有语料的素材是否准备完全
         conf.tasks = []; // 风格变化后，要重新估算生成task
-        ui.log(`视频风格选择：${conf.program[program].name}`, "highlight");
+        ui.log(`视频风格选择：${conf.program[program]}`, "highlight");
     },
 
     /*********************/
     // 确认设置范围
     /*********************/
     confirmRange() {
-        conf.range.start = Math.max(+ui.getInputData("startid"), conf.range.min) || 0;
-        conf.range.end = Math.min(ui.getInputData("endid"), conf.range.max) || 0;
-        ui.putInputData("startid", conf.range.start);
-        ui.putInputData("endid", conf.range.end);
-        conf.range.rangeList = [...Array.from({ length: conf.range.end - conf.range.start + 1 }, (_, i) => i + conf.range.start)];
-        conf.tasks = []; // 范围变化后，要重新估算生成task
-        conf.range.idList.forEach((id) => (document.getElementById(`material-${id}`).className = id >= conf.range.start && id <= conf.range.end ? "" : "skip"));
-        conf.range.selected = false; // 选择重置
-        ui.log(`素材范围：${conf.range.start} 到 ${conf.range.end}，共 ${conf.range.end - (conf.range.start || 1) + 1} 条素材`, "highlight");
-        util.checkMaterials(); // 检查语料
-    },
+        let start = Math.max(+ui.getInputData("startid"), conf.range.min) || 0,
+            end = Math.min(ui.getInputData("endid"), conf.range.max) || 0;
 
-    /*********************/
-    // 重置范围，第一次恢复已经确认的范围，再点一次恢复到全部
-    /*********************/
-    resetRange() {
-        if (conf.range.selected) {
-            ui.putInputData("startid", conf.range.start);
-            ui.putInputData("endid", conf.range.end);
-            delete conf.range.selected;
-            document.querySelectorAll(`#material tr`).forEach((line) => line.classList.remove("selecting"));
-            ui.log(`素材范围恢复，未做修改`, "highlight");
+        if (start === 0 || end === 0) {
+            // 删除start或者end，则reset
+            if (conf.range.selected) {
+                ui.putInputData("startid", conf.range.start);
+                ui.putInputData("endid", conf.range.end);
+                delete conf.range.selected;
+                document.querySelectorAll(`#material tr`).forEach((line) => line.classList.remove("selecting"));
+                ui.log(`素材范围恢复，未做修改`, "highlight");
+            } else {
+                ui.putInputData("startid", conf.range.min);
+                ui.putInputData("endid", conf.range.max);
+                ui.confirmRange();
+            }
         } else {
-            ui.putInputData("startid", conf.range.min);
-            ui.putInputData("endid", conf.range.max);
-            ui.confirmRange();
+            conf.range.start = start;
+            conf.range.end = end;
+            ui.putInputData("startid", start);
+            ui.putInputData("endid", end);
+            conf.range.rangeList = [...Array.from({ length: conf.range.end - conf.range.start + 1 }, (_, i) => i + conf.range.start)];
+            conf.tasks = []; // 范围变化后，要重新估算生成task
+            conf.range.idList.forEach(
+                (id) => (document.getElementById(`material-${id}`).className = id >= conf.range.start && id <= conf.range.end ? "" : "skip")
+            );
+            conf.range.selected = false; // 选择重置
+            ui.log(`素材范围：${conf.range.start} 到 ${conf.range.end}，共 ${conf.range.end - (conf.range.start || 1) + 1} 条素材`, "highlight");
+            util.checkMaterials(); // 检查语料
         }
     },
 
@@ -186,7 +201,7 @@ let ui = {
         } else if (target.match(/^video/)) {
             action.genVideoPiece(id, field, target, true); // force=true,覆盖生成
         } else if (target.match(/^slide/)) {
-            action.genSlidePiece(id, target.replace(/slide-/, ""), conf.materials[id].theme, true); // force=true,覆盖生成
+            action.genSlidePiece(id, target.replace(/slide-/, ""), true); // force=true,覆盖生成
         } else if (target === "action-page") {
             ui.openPostPage(`html-slide.php`, {
                 language: conf.info.language,
@@ -212,7 +227,7 @@ let ui = {
         var newWin = window.open("about:blank", "preview");
         var formStr = `<form style="visibility:hidden;" method="POST" action="${location.origin}/${url}">`;
         for (var key in params) {
-            formStr += "<input type='text' name='" + key + "' value='" + params[key] + "' style='display: none'>";
+            formStr += "<input type='text' name='" + key + "' value='" + params[key].replace(/'/g, "&#39;") + "' style='display: none'>";
         }
         formStr += "</form>";
         newWin.document.body.innerHTML = formStr;
@@ -316,6 +331,14 @@ let ui = {
         $doEditRestore.style.display = conf.editTool.locker ? "block" : "none";
     },
 
+    incraceTheme() {
+        let [base, index] = ui.getInputData("themename").split("-");
+        ui.putInputData("themename", `${base}-${((+index||0) + 1).toString().padStart(3, "0")}`);
+    },
+    decraceTheme() {
+        let [base, index] = ui.getInputData("themename").split("-");
+        ui.putInputData("themename", `${base}-${Math.max((+index||1) - 1, 1).toString().padStart(3, "0")}`);
+    },
     saveTheme() {
         util.updateMaterial(ui.getInputData("themefrom"), ui.getInputData("themename"), "theme", ui.getInputData("themeto"));
     },
@@ -346,24 +369,19 @@ let ui = {
     serverError() {
         ui.log("摩耳视频助手服务不可用，请检查。", "error");
         return "error";
-    },
-
-    doPing() {
-        util.ping();
     }
 };
 
 /*********************/
 // 工程配置
 /*********************/
-document.getElementById("resetRange").addEventListener("click", ui.resetRange, false);
-document.getElementById("resetRange").addEventListener("click", ui.resetRange, false);
-document.getElementById("saveTheme").addEventListener("click", ui.saveTheme, false);
-document.getElementById("confirmRange").addEventListener("click", ui.confirmRange, false);
-document.getElementById("resetRange").addEventListener("click", ui.resetRange, false);
-document.querySelectorAll(".radio [name='program']").forEach((item) => item.addEventListener("click", ui.onProgramChange, false));
-document.getElementById("downloadTemplate").addEventListener("click", action.downloadTemplate, false); // 下载模板
-document.getElementById("downloadContent").addEventListener("click", action.downloadContent, false); // 下载数据
+document.getElementById("icon-plus").addEventListener("click", ui.incraceTheme, false);
+document.getElementById("icon-minus").addEventListener("click", ui.decraceTheme, false);
+document.getElementById("icon-save").addEventListener("click", ui.saveTheme, false);
+document.getElementById("icon-confirm").addEventListener("click", ui.confirmRange, false);
+document.getElementById("program").addEventListener("change", ui.onProgramChange, false);
+document.getElementById("doDownContent").addEventListener("click", action.doDownContent, false); // 下载数据
+document.getElementById("doMoveFile").addEventListener("click", action.doMoveFile, false); // 下载数据
 
 /*********************/
 // 绑UI拖放事件
@@ -402,8 +420,12 @@ $doEditDone.addEventListener("click", ui.doEditDone, false);
 $doEditRestore.addEventListener("click", ui.doEditRestore, false);
 
 /*********************/
-// 绑编辑工具
+// 管理工具
 /*********************/
 document.getElementById("doPing").addEventListener("click", ui.doPing, false);
 document.getElementById("show_tool_a").addEventListener("click", ui.switchTool, false);
 document.getElementById("show_tool_b").addEventListener("click", ui.switchTool, false);
+document.getElementById("doNewBook").addEventListener("click", action.doNewBook, false);
+document.getElementById("doMoveTemplate").addEventListener("click", action.doMoveTemplate, false);
+document.getElementById("doGenTranasCmd").addEventListener("click", action.doGenTranasCmd, false);
+document.getElementById("doGenMergeCmd").addEventListener("click", action.doGenMergeCmd, false);

@@ -18,7 +18,7 @@ $root = "media/" . $book_cn;
 
 
 if ($action == "create") {
-    foreach (["", "audio", "video", "slide", "book", "cover", "theme", "dist"] as $name) {
+    foreach (["", "audio", "video", "slide", "cover", "theme", "dist"] as $name) {
         $path = $root . "/" . $name;
         !file_exists($path) && mkdir($path);
     }
@@ -26,7 +26,7 @@ if ($action == "create") {
 
 } else if ($action == "list") {
     $files = [];
-    foreach (["", "audio", "video", "slide", "book", "cover", "theme", "dist"] as $name) {
+    foreach (["", "audio", "video", "slide", "cover", "theme", "dist"] as $name) {
         $path = $root . "/" . $name;
         !file_exists($path) && mkdir($path);
         $list = scandir($path);
@@ -36,9 +36,9 @@ if ($action == "create") {
     echo json_encode(['result' => 'success', 'files' => $files], JSON_UNESCAPED_UNICODE);
 
 } else if ($action == "move") {
-    $file = $_REQUEST['file'];
+    $file = $_REQUEST['filename'];
     if (file_exists("D:/Downloads/" . $file)) {
-        rename("D:/Downloads/" . $file, $root . "/book/" . $file);
+        rename("D:/Downloads/" . $file, $root . "/" . $file);
         echo json_encode(['result' => 'success'], JSON_UNESCAPED_UNICODE);
     } else {
         echo json_encode(['result' => 'failed', 'reason' => "文件不存在"], JSON_UNESCAPED_UNICODE);

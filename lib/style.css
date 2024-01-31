@@ -6,12 +6,9 @@ body {
     width: 350px;
     position: fixed;
     text-align: center;
-    height: 100%;
     overflow-y: scroll;
-    display: flex;
     border-right: 1px solid #888;
-    flex-direction: column;
-    align-content: center;
+    height: 100%;
 }
 
 #nav h1 {
@@ -20,6 +17,7 @@ body {
 
 #nav h3 {
     margin: 10px 0 0;
+    font-family: fangsong;
 }
 
 #nav li {
@@ -33,6 +31,13 @@ body {
 
 #content {
     margin-left: 360px;
+}
+
+#left-panel{
+    width: 170px;
+}
+#right-panel{
+    width: 125px;
 }
 
 #material {
@@ -70,6 +75,7 @@ body {
 
 #basket {
     width: 144px;
+    line-height: 85px;
     padding: 15px 0;
     transition: background-color 1s, height 0s;
     border: 2px dashed #333;
@@ -77,21 +83,19 @@ body {
     font-size: 19px;
     text-align: center;
     color: #68c;
-    margin: 5px 0 4px;
+    margin: 5px auto 4px;
 }
 
 #basket.dragover {
     background: #d2baff;
     border-style: dotted;
 }
-.menu{
-    margin: 0 10px;
-}
+
 .menu.radio {
     font-size: 13px;
 }
 .menu select {
-    width: 140px;
+    width: 100px;
     text-align: center;
     margin: 5px 0 2px;
     padding: 4px 0;
@@ -102,6 +106,12 @@ body {
     font-size: 14px;
 }
 
+.menu.files button {
+    font: 12px/12px system;
+    padding: 4px 8px;
+    margin: 5px 2px;
+}
+
 #newid {
     width: 50px;
     text-align: center;
@@ -109,25 +119,9 @@ body {
     margin: 5px 10px 0 0;
     vertical-align: top;
 }
-#modifytheme{
-    display: inline-flex;
-    flex-direction: column;
-    vertical-align: middle;
-    margin-left: 3px;
-}
-
-#modifytheme button{
-    font-size: 13px;
-    width: 20px;
-    height: 13px;
-    line-height: 0;
-    padding: 0;
-    margin: 0;
-}
-
 
 .menu button {
-    font: 16px/16px bold;
+    font: 16px/16px system;
     padding: 7px 10px;
     margin: 5px 0;
     cursor: pointer;
@@ -318,61 +312,56 @@ body {
 }
 
 #themename {
-    width: 45px;
+    width: 80px;
     text-align: center;
-    padding: 3px 3px;
-    margin-left: 6px;
+    padding: 3px;
     vertical-align: middle;
 }
 #themefrom,
 #themeto {
-    width: 30px;
+    width: 35px;
     text-align: center;
     padding: 3px 2px;
     margin: 5px 0;
 }
-.settheme {
+.subsetting {
     font-size: 14px;
-}
-#saveTheme {
-    vertical-align: middle;
-    cursor: pointer;
-}
-#startid,
-#endid {
-    width: 30px;
-    text-align: center;
-    padding: 3px 2px;
-    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 14px;
 }
 
-.rangeconfig {
-    font-size: 14px;
-    border: 2px dashed #333;
-    margin: 5px auto;
-    width: 280px;
-    border-radius: 10px;
-}
-
-#confirmRange,
-#resetRange {
+#icon-plus,
+#icon-minus,
+#icon-save,
+#icon-confirm{
     height: 24px;
     width: 24px;
     vertical-align: middle;
     fill: #333;
+       vertical-align: middle;
     cursor: pointer;
 }
-
-#confirmRange {
-    margin-left: 10px;
+#startid,
+#endid {
+    width: 35px;
+    text-align: center;
+    padding: 3px 2px;
+    margin: 5px 0;
 }
 
-#confirmRange:hover {
+#icon-plus:hover,
+#icon-minus:hover,
+#icon-save:hover,
+#icon-confirm:hover {
     fill: #2a2;
 }
 
-#resetRange:hover {
-    fill: #a22;
+.subtitle{
+    font-family: 汉仪正圆;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 .unselectable {
@@ -405,17 +394,75 @@ body {
 /***********************************************************/
 /*    管理工具    */
 /***********************************************************/
-.switcher button{
-    margin: 10px 10px 0 10px;
+.selected {
+    background: #ccc;
 }
-#tool_b button{
-    width: 80px;
-    margin: 0 10px 10px;
+.unselected {
+    background: #fff;
+    color: #aaa;
 }
 
-#tool_b select{
-    width: 220px;
+.controls,
+.assistant {
+    border: 2px solid #ccc;
+    width: 300px;
+    border-radius: 10px 10px 0 0;
+    margin: 0 auto;
+    border-bottom: none;
+    height: 360px;
+    padding-top: 10px;
+}
+
+.switcher button {
+    margin: 10px 10px 0 10px;
+    font: 14px/20px system;
+    border: 1px solid #ccc;
+    border-radius: 6px 6px 0 0;
+    border-bottom: none;
+}
+
+#tool_b select,
+#tool_b button,
+#tool_b input {
     padding: 5px;
-    margin: 10px 0;
+    margin-top: 10px;
+}
+
+#video_dist {
+    width: 250px;
     border-radius: 4px;
+}
+
+#book_cn {
+    width: 95px;
+    margin-right: 10px;
+}
+
+#book_en {
+    width: 140px;
+}
+
+#book_abbr,
+#doGenTranasCmd {
+    width: 95px;
+    margin-right: 10px;
+    margin-bottom: 15px;
+}
+
+#doGenMergeCmd {
+    width: 95px;
+}
+
+#doNewBook,
+#doMoveTemplate {
+    width: 74px;
+    font: 13px/13px system;
+}
+
+#doNewBook {
+    margin-right: 5px;
+}
+
+#video_intro {
+    width: 235px;
 }

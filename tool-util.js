@@ -1,16 +1,15 @@
-/* global conf, ui */
+/* global conf, ui, net */
 let util = {
     /*********************/
     // 初始化UI
     /*********************/
     async initMaterial() {
-        conf.lesson = {};
         ui.initMaterialsTable();
         conf.info.program = "listen";
         conf.rules = conf.programRules.listen;
-        conf.dict = await util.fetchApi("lib/dict.json");
+        conf.dict = await net.importDict();
         ui.log("读取到字典数据 " + Object.keys(conf.dict).length + " 条");
-        util.ping();
+        net.ping();
     },
 
     /*********************/
@@ -23,8 +22,8 @@ let util = {
             for (let i = +id; i <= toid; i++) {
                 ui.getCell(i, field).innerText = data;
             }
-        } else if (field === "mediafile") {
-            conf.files.push(data);
+        } else if (["slide","audio","video"].includes(field)) {
+            conf.files[field].push(data);
             util.checkMaterials(); // 检查所有语料的素材是否准备完全
         }
     },
@@ -146,7 +145,7 @@ let util = {
             for (let item of Object.keys(line).filter((item) => item.match(/video-/) && line[item])) {
                 let filename = line[item];
                 if (!conf.durations[filename]) {
-                    let ret = await util.fetchApi("api/ffmpeg", { action: "duration", filename }),
+                    let ret = await net.ffmpegDuration(filename),
                         log = ui.log(`检查视频长度：${filename}`);
                     if (ret.result === "success") {
                         conf.durations[filename] = ret.duration;
@@ -156,37 +155,6 @@ let util = {
             }
         }
         ui.done(log);
-    },
-
-    /*********************/
-    // 调用api获取返回
-    /*********************/
-    async fetchApi(apiUrl, args = {}) {
-        if (conf.pause) {
-            return ui.log("服务器暂停使用", "highlight");
-        }
-        let header = new Headers(),
-            params = new URLSearchParams();
-        header.append("Content-Type", "application/x-www-form-urlencoded");
-        for (let [key, value] of Object.entries(args)) {
-            params.append(key, value);
-        }
-        let response = await fetch(apiUrl, { method: "POST", headers: header, body: params });
-        if (apiUrl.match(/api\//)) {
-            ui.updateServerStatus(response.ok);
-        }
-        return response.ok ? await response.json() : { result: "error", reason: "server error" };
-    },
-
-    /*********************/
-    //ping node服务，检查服务状态
-    /*********************/
-    async ping() {
-        let log = ui.log(`Ping助手服务器...`),
-            ret = await util.fetchApi("api/ping");
-        if (ret.result === "success") {
-            ui.done(log);
-        }
     },
 
     /*********************/
@@ -210,7 +178,7 @@ let util = {
     /*********************/
     // 当前课程是否英语课程
     /*********************/
-    isBookEnglish: () => !conf.info.book_en.match(/chinese/i),
+    isBookEnglish: () => !conf.info.language === "english",
 
     /*********************/
     // 格式化视频时长
@@ -236,12 +204,6 @@ let util = {
         let line = conf.materials[id],
             abbr = language === "chinese" ? "cn" : "en";
         return line.voice !== "" ? [`media_${abbr}1`] : [`media_${abbr}1`, `media_${abbr}2`];
-    },
-
-    /*********************/
-    // 获取下一本书的ID，没有容错，dist目录不能有除生成视频外的其它文件
-    /*********************/
-    getNewBookName() {
-        return `${conf.info.book_abbr}-${(conf.info.maxid + 1).toString().padStart(3, "0")}`;
     }
+
 };

@@ -9,6 +9,7 @@
     $book_cn = $_REQUEST['book_cn'];
     $language = $_REQUEST['language'];
     $rows = json_decode($_REQUEST['rows'], JSON_UNESCAPED_UNICODE);
+    var_dump($rows);
     ?>
     <style>
         .backimg {
@@ -31,7 +32,7 @@
     <div class="container">
         <div class="subcontainer">
             <?php
-            if (($_REQUEST['type'] ?? "") == "listen") {
+            if (($_REQUEST['style'] ?? "") == "listen") {
                 ?>
                 <div class="listen-container">
                     <object type="image/svg+xml" data="lib/listen<?= $_REQUEST['svg'] ?? 0 ?>.svg"

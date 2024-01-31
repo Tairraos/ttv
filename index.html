@@ -11,38 +11,60 @@
         <nav id="nav">
             <h1>摩耳视频生成助手</h1>
             <div class="info">助手服务状态：<span id="server" class="error"></span><button id="doPing">刷新</button></div>
-            <div class="switcher"><button id="show_tool_a">生成工具</button><button id="show_tool_b">管理工具</button></div>
+            <div class="switcher"><button id="show_tool_a" class="selected">生成工具</button><button id="show_tool_b" class="unselected">管理工具</button></div>
             <div class="controls" id="tool_a">
                 <div>
-                    <h3>素材准备</h3>
-                    <ul id="bigbasket">
+                    <ul id="left-panel">
+                        <li class="menu subtitle">素材准备</li>
                         <li class="menu">
                             <div id="basket">
                                 <div>拖放导入数据</div>
-                                <div><a id="downloadTemplate">下载模板</a></div>
-                                <div><a id="downloadContent">导出数据</a></div>
                             </div>
                         </li>
-                        <li class="menu"><hr /></li>
-                        <li class="menu radio">
-                            <input type="radio" id="listen" name="program" value="listen" checked/><label name="program" for="listen">听力</label>
-                            <input type="radio" id="read" name="program" value="read" /><label name="program" for="read">双语</label>
-                            <input type="radio" id="pure" name="program" value="pure" /><label name="program" for="pure">单语</label>
+                        <li class="menu files">
+                            <button id="doDownContent">导出数据</button>
+                            <button id="doMoveFile">移动目录</button>
                         </li>
-                        <li class="menu"><div id="info"></div></li>
                         <li class="menu"><hr /></li>
-                        <li class="menu settheme">设置背景<input type="text" id="themename" value="bg-000" /><span id="modifytheme"><button id="plus">+</button><button id="minus">-</button></span></li>
-                        <li class="menu settheme">
+                        <li class="menu subtitle">设置背景</li>
+                        <li class="menu subsetting">
+                            <input type="text" id="themename" value="theme-001" />
+                            <svg id="icon-plus" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m3 11h-2v2a1 1 0 0 1-2 0v-2H9a1 1 0 0 1 0-2h2V9a1 1 0 0 1 2 0v2h2a1 1 0 0 1 0 2"
+                                />
+                            </svg><svg id="icon-minus" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m3 11H9a1 1 0 0 1 0-2h6a1 1 0 0 1 0 2" />
+                            </svg>
+                        </li>
+                        <li class="menu subsetting">
                             <input type="text" id="themefrom" value="1" /> 到 <input type="text" id="themeto" value="1" />
-                            <svg id="saveTheme" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M5 21h14a2 2 0 0 0 2-2V8l-5-5H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2M7 5h4v2h2V5h2v4H7zm0 8h10v6H7z" />
+                            <svg id="icon-save" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path d="M5 21h14a2 2 0 0 0 2-2V8l-5-5H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2M7 5h4v2h2V5h2v4H7zm0 8h10v6H7z" />
+                            </svg>
+                        </li>
+                        <li class="menu"><hr /></li>
+                        <li class="menu subtitle">操作范围</li>
+                        <li class="menu subsetting">
+                            <input type="text" id="startid" /> 到 <input type="text" id="endid" />
+                            <svg id="icon-confirm" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m3.88-11.71L10 14.17l-1.88-1.88a.996.996 0 1 0-1.41 1.41l2.59 2.59c.39.39 1.02.39 1.41 0L17.3 9.7a.996.996 0 0 0 0-1.41c-.39-.39-1.03-.39-1.42 0"
+                                />
                             </svg>
                         </li>
                     </ul>
                 </div>
                 <div>
-                    <h3>开始生成</h3>
-                    <ul>
+                    <ul id="right-panel">
+                        <li class="menu subtitle">开始生成</li>
+                        <li class="menu radio">
+                            <select id="program" name="program">
+                                <option value="listen" selected>听力视频</option>
+                                <option value="read">双语视频</option>
+                                <option value="pure">单语视频</option>
+                            </select>
+                        </li>
                         <li class="menu"><button id="doTranslate">1.素材翻译</button></li>
                         <li class="menu"><button id="doGenPhonetic">2.拼音音标</button></li>
                         <li class="menu"><button id="doGenAudio">3.音频素材</button></li>
@@ -54,28 +76,18 @@
                 </div>
             </div>
             <div class="assistant" id="tool_b" style="display: none">
-                <h3>项目信息</h3>
-                <div id="bookinfo"></div>
-                <div id="distinfo"></div>
-                <h3>项目工具</h3>
-                <div><input id="introName" type="text" /><button id="doMergeIntro">合并片头</button></div>
-                <div><input id="newbook" type="text" /><button id="doNewBook">新建项目</button></div>
-            </div>
-
-            <div class="rangeconfig">
-                操作范围： <input type="text" id="startid" /> 到 <input type="text" id="endid" />
-                <svg id="confirmRange" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-                    <title>确定</title>
-                    <path
-                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m3.88-11.71L10 14.17l-1.88-1.88a.996.996 0 1 0-1.41 1.41l2.59 2.59c.39.39 1.02.39 1.41 0L17.3 9.7a.996.996 0 0 0 0-1.41c-.39-.39-1.03-.39-1.42 0"
-                    />
-                </svg>
-                <svg id="resetRange" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-                    <title>重置</title>
-                    <path
-                        d="M13.25 3a9.003 9.003 0 0 0-9.26 9H2.2c-.45 0-.67.54-.35.85l2.79 2.8c.2.2.51.2.71 0l2.79-2.8c.32-.31.09-.85-.35-.85h-1.8c0-3.9 3.18-7.05 7.1-7c3.72.05 6.85 3.18 6.9 6.9c.05 3.91-3.1 7.1-7 7.1c-1.61 0-3.1-.55-4.28-1.48a.994.994 0 0 0-1.32.08c-.42.43-.39 1.13.08 1.5a8.931 8.931 0 0 0 5.52 1.9c5.05 0 9.14-4.17 9-9.26c-.13-4.69-4.05-8.61-8.74-8.74m-.51 5c-.41 0-.75.34-.75.75v3.68c0 .35.19.68.49.86l3.12 1.85c.36.21.82.09 1.03-.26c.21-.36.09-.82-.26-1.03l-2.88-1.71v-3.4c0-.4-.33-.74-.75-.74"
-                    />
-                </svg>
+                <div class="subtitle">新建项目</div>
+                <div><input id="book_cn" type="text" placeholder="中文书名" /><input id="book_en" type="text" placeholder="英文书名" /></div>
+                <div>
+                    <input id="book_abbr" type="text" placeholder="书名缩写" /><button id="doNewBook">新建书本</button
+                    ><button id="doMoveTemplate">移动模板</button>
+                </div>
+                <div class="subtitle">生成合并命令</div>
+                <div><input id="video_intro" type="text" placeholder="片头文件名" /></div>
+                <div>
+                    <select id="video_dist" type="text"></select>
+                </div>
+                <div><button id="doGenTranasCmd">片头转码命令</button><button id="doGenMergeCmd">合并视频命令</button></div>
             </div>
 
             <div class="console"><div id="log"></div></div>
@@ -91,6 +103,7 @@
     <script src="lib/xlsx.bundle.js"></script>
     <script src="tool-conf.js"></script>
     <script src="tool-util.js"></script>
+    <script src="tool-net.js"></script>
     <script src="tool-action.js"></script>
     <script src="tool-io.js"></script>
     <script src="tool-ui.js"></script>
