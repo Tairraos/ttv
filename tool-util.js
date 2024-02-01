@@ -19,10 +19,12 @@ let util = {
         conf.materials[id][field] = data;
         if (conf.dataFields.includes(field)) {
             toid = +toid < +id ? +id : +toid;
-            for (let i = +id; i <= toid; i++) {
-                ui.getCell(i, field).innerText = data;
-            }
-        } else if (["slide","audio","video"].includes(field)) {
+            setTimeout(() => {
+                for (let i = +id; i <= toid; i++) {
+                    ui.getCell(i, field).innerText = data;
+                }
+            }, 0);
+        } else if (["slide", "audio", "video"].includes(field)) {
             conf.files[field].push(data);
             util.checkMaterials(); // 检查所有语料的素材是否准备完全
         }
@@ -205,5 +207,4 @@ let util = {
             abbr = language === "chinese" ? "cn" : "en";
         return line.voice !== "" ? [`media_${abbr}1`] : [`media_${abbr}1`, `media_${abbr}2`];
     }
-
 };

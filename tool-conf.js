@@ -26,8 +26,7 @@ conf.videos = [
 conf.editTool = {
     id: 0,
     dom: null,
-    locker: false,
-    language: ""
+    locker: false
 };
 
 // 实际导入导出需要的data字段
@@ -99,7 +98,7 @@ conf.programRules = {
             story: ["cn1.text", "en1.text"],
             title: ["cn1.text", "en1.text"],
             sentence: ["ding", "cn1.listen", "cn2.listen", "en1.text", "cn1.text", "cn2.text"],
-            word: ["cn1.text", "en1.text", "cn2.text"]
+            word: ["ding", "cn1.listen", "cn2.listen", "en1.text", "cn1.text", "cn2.text"]
         },
         english: {
             story: ["en1.text", "cn1.text"],

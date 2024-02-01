@@ -141,11 +141,13 @@ let ui = {
         let row = $materials.insertRow();
         row.id = "material-" + data.id;
         row.dataset.id = +data.id;
-        conf.uiFields.forEach((item, index) => {
-            let cell = row.insertCell(-1);
-            cell.className = conf.uiFields[index];
-            cell.innerHTML = data[item] || ui.getInitMedia(data.id, item);
-        });
+        setTimeout(() => {
+            conf.uiFields.forEach((item, index) => {
+                let cell = row.insertCell(-1);
+                cell.className = conf.uiFields[index];
+                cell.innerHTML = data[item] || ui.getInitMedia(data.id, item);
+            });
+        }, 0);
         conf.materials[data.id] = data;
     },
 
@@ -333,11 +335,16 @@ let ui = {
 
     incraceTheme() {
         let [base, index] = ui.getInputData("themename").split("-");
-        ui.putInputData("themename", `${base}-${((+index||0) + 1).toString().padStart(3, "0")}`);
+        ui.putInputData("themename", `${base}-${((+index || 0) + 1).toString().padStart(3, "0")}`);
     },
     decraceTheme() {
         let [base, index] = ui.getInputData("themename").split("-");
-        ui.putInputData("themename", `${base}-${Math.max((+index||1) - 1, 1).toString().padStart(3, "0")}`);
+        ui.putInputData(
+            "themename",
+            `${base}-${Math.max((+index || 1) - 1, 1)
+                .toString()
+                .padStart(3, "0")}`
+        );
     },
     saveTheme() {
         util.updateMaterial(ui.getInputData("themefrom"), ui.getInputData("themename"), "theme", ui.getInputData("themeto"));
@@ -348,10 +355,12 @@ let ui = {
     /*********************/
     log(text, level = "info") {
         let $newdom = document.createElement("div");
-        $newdom.className = level;
-        $newdom.innerText = text;
-        $log.appendChild($newdom);
-        $log.scrollTop = $log.scrollHeight;
+        setTimeout(() => {
+            $newdom.className = level;
+            $newdom.innerText = text;
+            $log.appendChild($newdom);
+            $log.scrollTop = $log.scrollHeight;
+        }, 0);
         return $newdom;
     },
 
