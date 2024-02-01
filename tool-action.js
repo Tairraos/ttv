@@ -240,8 +240,9 @@ let action = {
         let book_cn = ui.getInputData("book_cn"),
             book_en = ui.getInputData("book_en"),
             book_abbr = ui.getInputData("book_abbr"),
+            language = ui.getSelectData("style"),
             book = Array.from(Array(50), (v, k) => k + 1).map((i) => [i, "auto", "", "", "", "", "", "", "", ""]);
-        io.saveXlsxBinary(book, [[book_cn, book_en, book_abbr, book_en.match(/english/) ? "english" : "chinese", 1]]);
+        io.saveXlsxBinary(book, [[book_cn, book_en, book_abbr, language, 1]]);
         net.filesCreate(book_cn);
         ui.log(`图书目录已创建: ${book_cn}`, "highlight");
     },

@@ -33,10 +33,10 @@ body {
     margin-left: 360px;
 }
 
-#left-panel{
+#left-panel {
     width: 170px;
 }
-#right-panel{
+#right-panel {
     width: 125px;
 }
 
@@ -335,12 +335,12 @@ body {
 #icon-plus,
 #icon-minus,
 #icon-save,
-#icon-confirm{
+#icon-confirm {
     height: 24px;
     width: 24px;
     vertical-align: middle;
     fill: #333;
-       vertical-align: middle;
+    vertical-align: middle;
     cursor: pointer;
 }
 #startid,
@@ -358,7 +358,7 @@ body {
     fill: #2a2;
 }
 
-.subtitle{
+.subtitle {
     font-family: 汉仪正圆;
     font-size: 16px;
     font-weight: 600;
@@ -443,26 +443,22 @@ body {
 }
 
 #book_abbr,
-#doGenTranasCmd {
+#doGenTranasCmd,
+#doNewBook {
     width: 95px;
     margin-right: 10px;
-    margin-bottom: 15px;
 }
 
-#doGenMergeCmd {
-    width: 95px;
-}
-
-#doNewBook,
+#doGenMergeCmd,
 #doMoveTemplate {
-    width: 74px;
-    font: 13px/13px system;
-}
-
-#doNewBook {
-    margin-right: 5px;
+    width: 95px;
+    margin-bottom: 15px;
 }
 
 #video_intro {
     width: 235px;
+}
+#style {
+    height: 29px;
+    width: 154px;
 }
