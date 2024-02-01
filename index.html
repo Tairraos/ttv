@@ -79,7 +79,13 @@
                 <div class="subtitle">新建项目</div>
                 <div><input id="book_cn" type="text" placeholder="中文书名" /><input id="book_en" type="text" placeholder="英文书名" /></div>
                 <div>
-                    <input id="book_abbr" type="text" placeholder="书名缩写" /><button id="doNewBook">新建书本</button
+                    <input id="book_abbr" type="text" placeholder="书名缩写" /><select id="style" name="style">
+                        <option value="chinese" selected>练习中文</option>
+                        <option value="english">练习英语</option>
+                    </select>
+                </div>
+                <div>
+                    <button id="doNewBook">新建书本</button
                     ><button id="doMoveTemplate">移动模板</button>
                 </div>
                 <div class="subtitle">生成合并命令</div>
