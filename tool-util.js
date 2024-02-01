@@ -178,7 +178,7 @@ let util = {
     /*********************/
     // 当前课程是否英语课程
     /*********************/
-    isBookEnglish: () => !conf.info.language === "english",
+    isBookEnglish: () => conf.info.language === "english",
 
     /*********************/
     // 格式化视频时长

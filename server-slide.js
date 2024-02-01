@@ -26,6 +26,7 @@ exports.captureSlide = async function (args) {
 
     let saveLog = async function (text) {
         await fs.appendFileSync(path.join(base_path, `media/${args.book_cn}/process_log.txt`), `${new Date().toISOString()} - ${text}\n`, "utf8");
+        return text;
     };
 
     try {

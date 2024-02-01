@@ -2,6 +2,7 @@
  * 封装服务，把audio和png文件封装成视频
  * @param {*} args
  * @param {string} args.action      <piece | video | duration> slide 转 video | video 合并 | media 时长
+ * @param {string} args.book_cn     中文书名，也是目录名
  * @param {string} args.filename    保存的文件名
  * @param {string} args.slidename   slide 素材
  * @param {string} args.audioname   audio 素材
@@ -22,7 +23,8 @@ exports.videoGenerator = async function (args) {
         filename = args.filename;
 
     let saveLog = async function (text) {
-        await fs.appendFileSync(path.join(base_path, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
+        await fs.appendFileSync(path.join(base_path, `media/${args.book_cn}/process_log.txt`), `${new Date().toISOString()} - ${text}\n`, "utf8");
+        return text;
     };
 
     let execCommand = async function (command) {
@@ -32,7 +34,6 @@ exports.videoGenerator = async function (args) {
 
     console.log(`视频生成参数: ${JSON.stringify(args)}`);
 
-    
     if (action === "piece") {
         /********************************/
         // 为每一组slide和audio生成一个video片段
@@ -40,7 +41,7 @@ exports.videoGenerator = async function (args) {
         let slidename = `slide/${args.slidename}`,
             audioname = args.audioname === "DING" ? "../common/ding.m4a" : `audio/${args.audioname}`;
 
-        process.chdir("media/material");
+        process.chdir(`media/${args.book_cn}`);
         await execCommand(
             [
                 `ffmpeg -hwaccel cuda -loop 1 -i "${slidename}" -i "${audioname}"`,
@@ -61,7 +62,7 @@ exports.videoGenerator = async function (args) {
         /********************************/
         let videolist = args.videolist.split("|");
 
-        process.chdir("media/material");
+        process.chdir(`media/${args.book_cn}`);
         await fs.writeFileSync("filelist.txt", videolist.map((line) => `file 'video/${line}'`).join("\n")); // 生成文件列表
         saveLog(`writeFileSync: filelist.txt`);
 
@@ -89,19 +90,15 @@ exports.videoGenerator = async function (args) {
         let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "dist/${filename}"`);
         process.chdir(base_path);
         return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
-
-
     } else if (action === "duration") {
         /********************************/
         // 返回给定media文件的长度
         /********************************/
-        process.chdir("media/material");
+        process.chdir(`media/${args.book_cn}`);
         let media_path = filename.match(/.mp4$/) ? "video" : "audio",
             duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${media_path}/${filename}"`);
         process.chdir(base_path);
         return { result: "success", duration: +(+duration).toFixed(3) };
-
-
     } else {
         return { result: "failed", action, reason: "未指定 action" };
     }

@@ -2,6 +2,7 @@
  * 文本转语音服务，使用 azure cognitive speech 服务
  * Key 和 Region 写在环境中，用 setx 写入
  * @param {*} args
+ * @param {string} args.book_cn 中文书名，也是目录名
  * @param {string} args.filename 保存的文件名
  * @param {string} args.model 使用的神经模型名字
  * @param {string} args.text 要转换的文本
@@ -38,7 +39,7 @@ exports.textToSpeech = async function (args) {
         progress;
     console.log(ssml);
     let saveLog = async function (text) {
-        await fs.appendFileSync(path.join(base_path, "media/material/process_log.txt"), `${new Date().toISOString()} - ${text}\n`, "utf8");
+        await fs.appendFileSync(path.join(base_path, `media/${args.book_cn}/process_log.txt`), `${new Date().toISOString()} - ${text}\n`, "utf8");
         return text;
     };
 
@@ -75,7 +76,7 @@ exports.textToSpeech = async function (args) {
             );
         });
 
-        process.chdir("media/material/audio");
+        process.chdir(`media/${args.book_cn}/audio`);
 
         progress = saveLog(`保存文件：${args.basename}.mp3`);
         await fs.writeFileSync(`${args.basename}.mp3`, result); // 写临时文件

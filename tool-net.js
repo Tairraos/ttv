@@ -46,10 +46,12 @@ let net = {
     },
 
     async filesList() {
-        return await net.fetchApi("api-files.php", { action: "list", book_cn: conf.info.book_cn });
+        let book_cn = conf.info.book_cn;
+        return await net.fetchApi("api-files.php", { action: "list", book_cn });
     },
 
     async filesMove(filename, book_cn) {
+        // 这里的book_cn有可能不是conf里的，是input里填的
         return await net.fetchApi("api-files.php", { action: "move", book_cn, filename });
     },
 
@@ -57,15 +59,18 @@ let net = {
     //FFMPEG
     /*********************/
     async ffmpegDuration(filename) {
-        return await net.fetchApi("api/ffmpeg", { action: "duration", filename });
+        let book_cn = conf.info.book_cn;
+        return await net.fetchApi("api/ffmpeg", { action: "duration", book_cn, filename });
     },
 
     async ffmpegContact() {
-        return await net.fetchApi("api/ffmpeg", { action: "concat", filename: `${conf.info.newBookName}`, videolist: conf.tasks.join("|") });
+        let book_cn = conf.info.book_cn;
+        return await net.fetchApi("api/ffmpeg", { action: "concat", book_cn, filename: `${conf.info.book_new}`, videolist: conf.tasks.join("|") });
     },
 
     async ffmpegPiece(filename, slidename, audioname) {
-        return await net.fetchApi("api/ffmpeg", { action: "piece", filename, slidename, audioname });
+        let book_cn = conf.info.book_cn;
+        return await net.fetchApi("api/ffmpeg", { action: "piece", book_cn, filename, slidename, audioname });
     },
 
     /*********************/
@@ -83,13 +88,14 @@ let net = {
             svg = +new Date() % 4,
             book_cn = conf.info.book_cn,
             language = conf.info.language;
-        return await net.fetchApi("api/slide", { id, filename, book_cn, language, style, watermark, svg, rows: JSON.stringify(util.getPureMaterial(id)) });
+        return await net.fetchApi("api/slide", { id, book_cn, filename, language, style, watermark, svg, rows: JSON.stringify(util.getPureMaterial(id)) });
     },
 
     /*********************/
     //tts
     /*********************/
     async tts(basename, text, model, rate) {
-        return await net.fetchApi("api/tts", { basename, text, model, rate });
+        let book_cn = conf.info.book_cn;
+        return await net.fetchApi("api/tts", { book_cn, basename, text, model, rate });
     }
 };
