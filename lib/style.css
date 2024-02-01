@@ -73,17 +73,28 @@ body {
     box-shadow: inset 0px 0px 3px #3250f0;
 }
 
-#basket {
-    width: 144px;
-    line-height: 85px;
-    padding: 15px 0;
-    transition: background-color 1s, height 0s;
+#basket,
+#info {
+    width: 145px;
+    height: 115px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
     border: 2px dashed #333;
     border-radius: 10px;
-    font-size: 19px;
-    text-align: center;
-    color: #68c;
     margin: 5px auto 4px;
+    color: #600;
+}
+
+#basket {
+    transition: background-color 1s, height 0s;
+    font-size: 19px;
+}
+
+#info {
+    font-size: 14px;
+    line-height: 20px;
 }
 
 #basket.dragover {

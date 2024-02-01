@@ -1,5 +1,6 @@
 /* global conf, util, action */
 let $basket = document.getElementById("basket"),
+    $info = document.getElementById("info"),
     $content = document.getElementById("content"),
     $materials = document.getElementById("material"),
     $log = document.getElementById("log"),
@@ -50,13 +51,20 @@ let ui = {
             $show_tool_a.className = "selected";
             $show_tool_b.className = "unselected";
         } else {
+            ui.initVideoSelector();
             $tool_a.style.display = "none";
             $tool_b.style.display = "block";
-            ui.initVideoSelector();
             $show_tool_b.className = "selected";
             $show_tool_a.className = "unselected";
         }
     },
+
+    switchBasket(info) {
+        $basket.style.display = "none";
+        $info.style.display = "flex";
+        $info.innerHTML = info.map((item) => `<div>${item}</div>`).join("");
+    },
+
     /*********************/
     // 读写页面中的DOM
     /*********************/
