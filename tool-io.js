@@ -7,7 +7,7 @@ let io = {
         let workbook = XLSX.read(data, { type: "binary" }),
             worksheet = {},
             g = (r) => (worksheet[r] ? worksheet[r].v : ""), // 读出单元格r的value，如果没有就返回空
-            t = (s) => s.replace(/单词/, "word").replace(/句子/, "sentence").replace(/故事/, "story").replace(/标题/, "title") || "sentence",
+            t = (s) => s.replace(/单词|词汇/, "word").replace(/句子/, "sentence").replace(/故事/, "story").replace(/标题/, "title") || "sentence",
             range,
             log;
 

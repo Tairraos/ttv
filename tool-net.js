@@ -42,7 +42,7 @@ let net = {
     //文件操作
     /*********************/
     async filesCreate(bookname) {
-        return await net.fetchApi("api-files.php", { action: "create", book_cn: bookname });
+        await net.fetchApi("api-files.php", { action: "create", book_cn: bookname });
     },
 
     async filesList() {
@@ -52,7 +52,8 @@ let net = {
 
     async filesMove(filename, book_cn) {
         // 这里的book_cn有可能不是conf里的，是input里填的
-        return await net.fetchApi("api-files.php", { action: "move", book_cn, filename });
+        await net.fetchApi("api-files.php", { action: "move", book_cn, filename });
+        await net.openBookFolder(book_cn);
     },
 
     /*********************/
@@ -97,5 +98,13 @@ let net = {
     async tts(basename, text, model, rate) {
         let book_cn = conf.info.book_cn;
         return await net.fetchApi("api/tts", { book_cn, basename, text, model, rate });
+    },
+
+    /*********************/
+    //os
+    /*********************/
+    async openBookFolder(book_cn) {
+        // 这里的book_cn有可能不是conf里的，是input里填的
+        return await net.fetchApi("api/os", { action: "open", book_cn });
     }
 };

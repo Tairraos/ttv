@@ -2,6 +2,3 @@
 /media/**
 !/media/common
 !/media/common/**
-/ttv-data.db
-/ttv-data.*.db
-/test

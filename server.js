@@ -1,11 +1,11 @@
 let plugins = {
-        "/ping": ()=>({ result: "success" }),
+        "/ping": () => ({ result: "success" }),
         "/tts": require("./server-tts.js").textToSpeech,
         "/slide": require("./server-slide.js").captureSlide,
-        "/ffmpeg": require("./server-ffmpeg.js").videoGenerator
+        "/ffmpeg": require("./server-ffmpeg.js").videoGenerator,
+        "/os": require("./server-os.js").osOperation
     },
     entries = Object.keys(plugins);
-
 
 let server = require("http").createServer(async (req, res) => {
     let postBody = "";
@@ -25,7 +25,6 @@ let server = require("http").createServer(async (req, res) => {
         res.end(JSON.stringify(await plugins[req.url](params)));
     });
 });
-
 
 console.log(`摩耳视频生成助手即将启动中...`);
 console.log(`如果端口绑定出错，用管理员cmd执行命令：`);
