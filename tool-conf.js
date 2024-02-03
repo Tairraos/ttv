@@ -81,12 +81,12 @@ conf.voice = {
     },
     english: {
         child: "Ana",
-        man: "Guy",
-        woman: "Aria",
-        man2: "Jason",
-        woman2: "Jenny",
-        man3: "Tony",
-        woman3: "Sara",
+        man: "Andrew",
+        woman: "Emma",
+        man2: "Brain",
+        woman2: "Jane",
+        man3: "Steffan",
+        woman3: "Jenny",
         elder: "Davis"
     }
 };
