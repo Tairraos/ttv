@@ -80,7 +80,7 @@ exports.videoGenerator = async function (args) {
         let inputvideo = args.inputvideo;
         await execCommand(
             [
-                `ffmpeg -i "${inputvideo}" -hwaccel cuda`,
+                `ffmpeg -hwaccel cuda -i "${inputvideo}"`,
                 `-c:a aac -b:a 128k -ar 44100 -ac 2`,
                 `-c:v h264_nvenc -pix_fmt yuv420p`,
                 `-v quiet -y "dist/${filename}"`
