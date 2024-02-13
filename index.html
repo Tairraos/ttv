@@ -17,11 +17,8 @@
                     <ul id="left-panel">
                         <li class="menu subtitle">素材准备</li>
                         <li class="menu">
-                            <div id="basket" style="display: flex;">
-                                <div>拖放导入数据</div>
-                            </div>
-                            <div id="info" style="display: none;">
-                            </div>
+                            <div id="basket" style="display: flex;"><div>拖放导入数据</div></div>
+                            <div id="info" style="display: none;"></div>
                         </li>
                         <li class="menu files">
                             <button id="doDownContent">导出数据</button>
@@ -32,9 +29,7 @@
                         <li class="menu subsetting">
                             <input type="text" id="themename" value="theme-001" />
                             <svg id="icon-plus" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m3 11h-2v2a1 1 0 0 1-2 0v-2H9a1 1 0 0 1 0-2h2V9a1 1 0 0 1 2 0v2h2a1 1 0 0 1 0 2"
-                                />
+                                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m3 11h-2v2a1 1 0 0 1-2 0v-2H9a1 1 0 0 1 0-2h2V9a1 1 0 0 1 2 0v2h2a1 1 0 0 1 0 2" />
                             </svg><svg id="icon-minus" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m3 11H9a1 1 0 0 1 0-2h6a1 1 0 0 1 0 2" />
                             </svg>
@@ -50,9 +45,7 @@
                         <li class="menu subsetting">
                             <input type="text" id="startid" /> 到 <input type="text" id="endid" />
                             <svg id="icon-confirm" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m3.88-11.71L10 14.17l-1.88-1.88a.996.996 0 1 0-1.41 1.41l2.59 2.59c.39.39 1.02.39 1.41 0L17.3 9.7a.996.996 0 0 0 0-1.41c-.39-.39-1.03-.39-1.42 0"
-                                />
+                                <path d="M12 23c6.075 0 11-4.925 11-11S18.075 1 12 1S1 5.925 1 12s4.925 11 11 11M7.5 10.586l3 3l6-6L17.914 9L10.5 16.414L6.086 12z"/>
                             </svg>
                         </li>
                     </ul>
@@ -105,6 +98,24 @@
             <button id="doEditCell">Edit</button>
             <button id="doEditDone">Done</button>
             <button id="doEditRestore">Restore</button>
+        </div>
+        <div id="sd-container">
+            <div id="sd-info">造句框</div>
+            <div id="sd-dialog">
+                <div class="sd-text">候选句子</div>
+                <div id="sd-candidate">
+                    <ul id="sd-dict"></ul>
+                    <div id="sd-custom"><input type="text" id="sd-input" placeholder="自造句" /><button id="sd-custom-input">添加</button></div>
+                </div>
+                <div class="sd-text">选中句子</div>
+                <div id="sd-selected">
+                    <ul id="sd-materials"></ul>
+                </div>
+                <div id="sd-action">
+                    <button id="doSentenceConfirm">插入</button>
+                    <button id="doSentenceCancel">取消</button>
+                </div>
+            </div>
         </div>
     </body>
     <script src="lib/pinyin.js"></script>

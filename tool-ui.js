@@ -1,4 +1,4 @@
-/* global conf, util, action */
+/* global conf, util, action, net */
 let $basket = document.getElementById("basket"),
     $info = document.getElementById("info"),
     $content = document.getElementById("content"),
@@ -8,7 +8,12 @@ let $basket = document.getElementById("basket"),
     $server = document.getElementById("server"),
     $doEditCell = document.getElementById("doEditCell"),
     $doEditDone = document.getElementById("doEditDone"),
-    $doEditRestore = document.getElementById("doEditRestore");
+    $doEditRestore = document.getElementById("doEditRestore"),
+    $sdContainer = document.getElementById("sd-container"),
+    $sdInfo = document.getElementById("sd-info"),
+    $sdDict = document.getElementById("sd-dict"),
+    $sdMaterials = document.getElementById("sd-materials"),
+    $sdInput = document.getElementById("sd-input");
 
 let $tool_a = document.getElementById("tool_a"),
     $tool_b = document.getElementById("tool_b"),
@@ -149,13 +154,11 @@ let ui = {
         let row = $materials.insertRow();
         row.id = "material-" + data.id;
         row.dataset.id = +data.id;
-        setTimeout(() => {
-            conf.uiFields.forEach((item, index) => {
-                let cell = row.insertCell(-1);
-                cell.className = conf.uiFields[index];
-                cell.innerHTML = data[item] || ui.getInitMedia(data.id, item);
-            });
-        }, 0);
+        conf.uiFields.forEach((item, index) => {
+            let cell = row.insertCell(-1);
+            cell.className = conf.uiFields[index];
+            cell.innerHTML = data[item] || ui.getInitMedia(data.id, item);
+        });
         conf.materials[data.id] = data;
     },
 
@@ -195,10 +198,17 @@ let ui = {
         dom.classList.add(css);
     },
 
+    deleteMaterial(id) {
+        let material = conf.materials[id];
+        document.getElementById(`material-${id}`).remove();
+        delete conf.materials[id];
+        return material;
+    },
+
     /*********************/
     // 点击表格内容预览
     /*********************/
-    async doPreviewMaterials(event) {
+    async doCellClick(event) {
         if (!["SPAN", "TD"].includes(event.target.tagName)) {
             return; // 保护错误的事件触发
         }
@@ -206,7 +216,11 @@ let ui = {
             id = +dom.closest("tr").dataset.id,
             field = dom.closest("td").className,
             target = dom.className.replace(/svg|required|exist| /g, "");
-        if (target === "audio") {
+        if (target === "type") {
+            if (conf.materials[id].type === "word") {
+                ui.doShowSentenceDialog(id);
+            }
+        } else if (target === "audio") {
             await action.genAudioPiece(id, field, true); //force=true,覆盖生成
         } else if (target.match(/^video/)) {
             action.genVideoPiece(id, field, target, true); // force=true,覆盖生成
@@ -242,6 +256,60 @@ let ui = {
         formStr += "</form>";
         newWin.document.body.innerHTML = formStr;
         newWin.document.forms[0].submit();
+    },
+
+    /*********************/
+    // 造句对话框
+    /*********************/
+    async doShowSentenceDialog(id) {
+        let chinese = conf.materials[id].chinese.replace(/（[^）]+）/, ""),
+            ret = await net.getSentence(chinese);
+        for (let text of ret.sentence) {
+            ui.addLi($sdDict, text, ui.doAddSelectd);
+        }
+        $sdContainer.style.display = "flex";
+        $sdInfo.dataset["id"] = id;
+        $sdInfo.innerText = `id: ${id}, "${conf.materials[id].chinese}" 造句`;
+    },
+
+    addLi(target, text, event) {
+        let li = document.createElement("li");
+        li.innerHTML = `${text}`;
+        li.addEventListener("click", event);
+        target.appendChild(li);
+    },
+
+    doRemoveSelected(e) {
+        e.target.remove();
+    },
+
+    doAddSelectd(e) {
+        let text = e.target.innerText;
+        ui.addLi($sdMaterials, text, ui.doRemoveSelected);
+    },
+    doAddInput() {
+        let text = $sdInput.value;
+        if (text.length) {
+            ui.addLi($sdMaterials, text, ui.doRemoveSelected);
+        }
+        $sdInput.value = "";
+    },
+    doSentenceConfirm() {
+        let id = +$sdInfo.dataset["id"],
+            materials = Array.from($sdMaterials.querySelectorAll("li")).map((i) => i.innerText);
+        if (materials.length) {
+            util.insertMaterial(id, materials);
+        }
+        ui.doSentenceClose();
+    },
+
+    doSentenceClose() {
+        $sdContainer.style.display = "none";
+        $sdInfo.dataset["id"] = null;
+        $sdInfo.innerHTML = "";
+        $sdDict.innerHTML = "";
+        $sdInput.value = "";
+        $sdMaterials.innerHTML = "";
     },
 
     /*********************/
@@ -285,7 +353,7 @@ let ui = {
             return;
         }
         if (!conf.editTool.locker) {
-            if (event.target.className.match(/type|group|voice|chinese|english|comment|theme/)) {
+            if (event.target.className.match(/group|voice|chinese|english|comment|theme/)) {
                 ui.showEditTool({ target: event.target, isfromtd: true });
             } else {
                 ui.hideEditTool();
@@ -322,7 +390,7 @@ let ui = {
         conf.editTool.dom.contentEditable = "false";
         conf.editTool.locker = false;
         ui.switchEditTool();
-        if (conf.editTool.field.match(/type|group|voice|comment|theme/)) {
+        if (conf.editTool.field.match(/group|voice|comment|theme/)) {
             conf.materials[conf.editTool.id][conf.editTool.field] = conf.editTool.dom.innerText;
             await util.updateMaterial(conf.editTool.id, conf.editTool.dom.innerText, conf.editTool.field);
         }
@@ -363,12 +431,10 @@ let ui = {
     /*********************/
     log(text, level = "info") {
         let $newdom = document.createElement("div");
-        setTimeout(() => {
-            $newdom.className = level;
-            $newdom.innerText = text;
-            $log.appendChild($newdom);
-            $log.scrollTop = $log.scrollHeight;
-        }, 0);
+        $newdom.className = level;
+        $newdom.innerText = text;
+        $log.appendChild($newdom);
+        $log.scrollTop = $log.scrollHeight;
         return $newdom;
     },
 
@@ -422,7 +488,7 @@ document.getElementById("doBuild").addEventListener("click", action.doBuild, fal
 /*********************/
 // 绑表格点击事件
 /*********************/
-$content.addEventListener("click", ui.doPreviewMaterials, false);
+$content.addEventListener("click", ui.doCellClick, false);
 $content.addEventListener("mouseover", ui.onMouseOverCell, false);
 $content.addEventListener("mouseleave", ui.hideEditTool, false);
 $content.addEventListener("mousedown", ui.doSelectStart, false);
@@ -446,3 +512,10 @@ document.getElementById("doNewBook").addEventListener("click", action.doNewBook,
 document.getElementById("doMoveTemplate").addEventListener("click", action.doMoveTemplate, false);
 document.getElementById("doGenTranasCmd").addEventListener("click", action.doGenTranasCmd, false);
 document.getElementById("doGenMergeCmd").addEventListener("click", action.doGenMergeCmd, false);
+
+/*********************/
+// 造句工具
+/*********************/
+document.getElementById("sd-custom-input").addEventListener("click", ui.doAddInput, false);
+document.getElementById("doSentenceConfirm").addEventListener("click", ui.doSentenceConfirm, false);
+document.getElementById("doSentenceCancel").addEventListener("click", ui.doSentenceClose, false);

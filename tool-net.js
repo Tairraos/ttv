@@ -39,6 +39,13 @@ let net = {
     },
 
     /*********************/
+    //查询造句字典
+    /*********************/
+    async getSentence(key) {
+        return await net.fetchApi("api-sentence.php", { key });
+    },
+
+    /*********************/
     //文件操作
     /*********************/
     async filesCreate(bookname) {

@@ -13,21 +13,42 @@ let util = {
     },
 
     /*********************/
-    // 修改数据，会同时修改界面，内存
+    // 修改单元格数据，会同时修改界面，内存
     /*********************/
     async updateMaterial(id, data, field, toid = 0) {
         conf.materials[id][field] = data;
         if (conf.dataFields.includes(field)) {
             toid = +toid < +id ? +id : +toid;
-            setTimeout(() => {
-                for (let i = +id; i <= toid; i++) {
-                    ui.getCell(i, field).innerText = data;
-                }
-            }, 0);
+            for (let i = +id; i <= toid; i++) {
+                ui.getCell(i, field).innerText = data;
+            }
         } else if (["slide", "audio", "video"].includes(field)) {
             conf.files[field].push(data);
-            util.checkMaterials(); // 检查所有语料的素材是否准备完全
         }
+    },
+
+    /*********************/
+    // 插入造句的素材
+    /*********************/
+    insertMaterial(id, materials) {
+        let theme = conf.materials[id].theme,
+            oldMaterials = [],
+            len = Object.keys(conf.materials).length;
+
+        // 比id大的数据从ui上删除，从conf.materials移到oldMaterials
+        for (let i = id + 1; i <= len; i++) {
+            oldMaterials.push(ui.deleteMaterial(i));
+        }
+        // 插入造句的句子
+        for (let line of materials) {
+            ui.loadMaterial({ id: ++id, sid: 0, type: "sentence", group: 0, voice: "", chinese: line, english: "", phonetic: "", comment: "", theme });
+        }
+        // 插入oldMaterials
+        for (let line of oldMaterials) {
+            line.id = ++id;
+            ui.loadMaterial({ ...line });
+        }
+        ui.initRangeBox();
     },
 
     /*********************/

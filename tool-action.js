@@ -1,5 +1,4 @@
 /* global conf, util, io, ui, net, pinyinPro */
-
 let action = {
     /*********************/
     // 拖放导入数据
@@ -19,11 +18,11 @@ let action = {
             conf.tasks = []; // 每次导入都清空任务列表，需要重新估算新产生任务列表
             ui.initRangeBox();
             ui.switchBasket([
-                `${conf.info.book_cn}`,
+                `名称：${conf.info.book_cn}`,
                 `缩写：${conf.info.book_abbr}`,
-                `练习目标：${conf.info.language}`,
-                `当前版本：${conf.info.version}`,
-                `已生成视频：${conf.videos.length}个`
+                `目标：${conf.info.language}`,
+                `版本：${conf.info.version}`,
+                `视频：${conf.videos.length}个`
             ]);
         };
         reader.readAsBinaryString(file);
