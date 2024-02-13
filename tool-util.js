@@ -48,6 +48,7 @@ let util = {
             line.id = ++id;
             ui.loadMaterial({ ...line });
         }
+        ui.log(`已经添加造句数据 ${materials.length} 条`, "pass");
         ui.initRangeBox();
     },
 

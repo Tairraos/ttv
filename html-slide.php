@@ -9,7 +9,6 @@
     $book_cn = $_REQUEST['book_cn'];
     $language = $_REQUEST['language'];
     $rows = json_decode($_REQUEST['rows'], JSON_UNESCAPED_UNICODE);
-    var_dump($rows);
     ?>
     <style>
         .backimg {
