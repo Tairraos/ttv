@@ -39,11 +39,13 @@ conf.sheet = {
         width: [50, 50, 70, 50, 70, 350, 350, 350, 150, 80],
         center: /^[ABCDEIJKL]\d+$/
     },
+
     info: {
         name: ["中文名", "英文名", "缩写码", "教学目标", "版本"],
         width: [250, 250, 80, 100, 80],
         center: /^[ABCDE]\d+$/
     },
+
     video: {
         name: ["文件名", "类型", "起始课本ID", "结束课本ID", "视频长度", "生成时间"],
         width: [120, 70, 70, 70, 70, 120],
@@ -79,6 +81,7 @@ conf.voice = {
         woman3: "Xiaomo",
         elder: "Xiaorui"
     },
+
     english: {
         child: "Ana",
         man: "Andrew",
@@ -100,6 +103,7 @@ conf.programRules = {
             sentence: ["ding", "cn1.listen", "cn2.listen", "en1.text", "cn1.text", "cn2.text"],
             word: ["ding", "cn1.listen", "cn2.listen", "en1.text", "cn1.text", "cn2.text"]
         },
+
         english: {
             story: ["en1.text", "cn1.text"],
             title: ["en1.text", "cn1.text"],
@@ -107,6 +111,7 @@ conf.programRules = {
             word: ["en1.text", "cn1.text", "en2.text"]
         }
     },
+
     pure: {
         chinese: {
             story: ["cn1.text"],
@@ -114,6 +119,7 @@ conf.programRules = {
             sentence: ["cn1.text", "cn2.text"],
             word: ["cn1.text", "cn2.text"]
         },
+
         english: {
             story: ["en1.text"],
             title: ["en1.text"],
@@ -121,6 +127,7 @@ conf.programRules = {
             word: ["en1.text", "en2.text"]
         }
     },
+
     read: {
         chinese: {
             story: ["cn1.text", "en1.text"],
@@ -128,6 +135,7 @@ conf.programRules = {
             sentence: ["cn1.text", "cn2.text", "en1.text"],
             word: ["cn1.text", "cn2.text", "en1.text"]
         },
+
         english: {
             story: ["en1.text", "cn1.text"],
             title: ["en1.text", "cn1.text"],

@@ -13,7 +13,6 @@ let action = {
             let data = e.target.result;
             await io.importXlsx(data);
             conf.info.maxid = Math.max(0, ...conf.videos.map((item) => item[0].replace(/[^-]+-(\d{3})\.mp4/, "$1")));
-            conf.info.book_new = `${conf.info.book_abbr}-${(conf.info.maxid + 1).toString().padStart(3, "0")}.mp4`;
             conf.files = (await net.filesList()).files;
             conf.tasks = []; // 每次导入都清空任务列表，需要重新估算新产生任务列表
             ui.initRangeBox();
@@ -193,7 +192,7 @@ let action = {
         conf.info.duration = +conf.tasks.reduce((target, file) => target + conf.durations[file], 0).toFixed(3);
 
         ui.log(`6.工程估算完成`, "pass");
-        ui.log(`目标视频名字：${conf.info.book_new}`);
+        ui.log(`目标视频名字：${util.getNewBookName()}`);
         ui.log(`视频长度预计：${util.fmtDuration(conf.info.duration)}秒`);
         ui.log(`视频片段计数：${conf.tasks.length}`);
     },
@@ -209,25 +208,26 @@ let action = {
             return ui.log(`先进行工程估算，确认视频长度。`, "error");
         }
 
-        let log = ui.log(`生成作品：${conf.info.book_new}`, "highlight");
-        let ret = await net.ffmpegContact();
+        let videoName = util.getNewBookName(),
+            log = ui.log(`生成作品：${videoName}`, "highlight"),
+            ret = await net.ffmpegContact();
         if (ret.result === "success") {
             ui.done(log);
             ui.log(`视频实际长度：${util.fmtDuration(ret.duration)}秒`, "highlight");
             conf.videos.push([
-                conf.info.book_new,
+                videoName,
                 conf.program[conf.info.program],
                 conf.range.start,
                 conf.range.end,
                 ret.duration,
                 util.fmtDuration(ret.duration)
             ]);
+            ui.log(`7.作品已经生成`, "pass");
+            window.open(`media/${conf.info.book_cn}/dist/${videoName}`, "preview");
             conf.info.maxid++;
         } else {
-            return ui.err(`生成作品 ${conf.info.book_new} 时遇到错误`);
+            ui.err(`生成作品 ${videoName} 时遇到错误`);
         }
-        ui.log(`7.作品已经生成`, "pass");
-        window.open(`media/${conf.info.book_cn}/dist/${conf.info.book_new}`, "preview");
     },
 
     /*********************/
@@ -240,7 +240,6 @@ let action = {
     /*********************/
     // 文件操作
     /*********************/
-
     doExportData() {
         io.exportData();
     },
@@ -282,6 +281,7 @@ let action = {
             ].join("")
         );
     },
+
     doGenMergeCmd() {
         let intro = ui.getInputData("video_intro"),
             dist = ui.getSelectData("video_dist");

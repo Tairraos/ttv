@@ -126,6 +126,13 @@ let util = {
     },
 
     /*********************/
+    // 从字段名和媒体列表获取素材文件名
+    /*********************/
+    getNewBookName() {
+        return `${conf.info.book_abbr}-${conf.info.program}-${(conf.info.maxid + 1).toString().padStart(3, "0")}.mp4`;
+    },
+
+    /*********************/
     // 从voice和basename获取素材文件名
     /*********************/
     getTaskFilename(id, voice, basename) {

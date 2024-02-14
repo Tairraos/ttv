@@ -19,7 +19,7 @@ vhost文件里添加有ProxyPassMatch，完整的虚拟主机配置为：
     SSLCertificateKeyFile "D:/Apps/Xampp/apache/conf/server.key"
     ErrorLog "D:/Apps/Xampp/apache/logs/ttv-error.ssl.log"
     CustomLog "D:/Apps/Xampp/apache/logs/ttv-access.ssl.log" common
-</VirtualHost>                       
+</VirtualHost>
 <Directory "D:/Workspace/ttv">
     Options FollowSymLinks Multiviews Indexes
     MultiviewsMatch Any

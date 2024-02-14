@@ -287,6 +287,7 @@ let ui = {
         let text = e.target.innerText;
         ui.addLi($sdMaterials, text, ui.doRemoveSelected);
     },
+
     doAddInput() {
         let text = $sdInput.value;
         if (text.length) {
@@ -294,6 +295,7 @@ let ui = {
         }
         $sdInput.value = "";
     },
+
     doSentenceConfirm() {
         let id = +$sdInfo.dataset["id"],
             materials = Array.from($sdMaterials.querySelectorAll("li")).map((i) => i.innerText);
@@ -430,6 +432,7 @@ let ui = {
         let [base, index] = ui.getInputData("themename").split("-");
         ui.putInputData("themename", `${base}-${((+index || 0) + 1).toString().padStart(3, "0")}`);
     },
+
     themeIdDecrease() {
         let [base, index] = ui.getInputData("themename").split("-");
         ui.putInputData(
@@ -439,6 +442,7 @@ let ui = {
                 .padStart(3, "0")}`
         );
     },
+
     themeIdSave() {
         util.updateMaterial(ui.getInputData("themefrom"), ui.getInputData("themename"), "theme", ui.getInputData("themeto"));
     },
