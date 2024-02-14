@@ -64,11 +64,15 @@ exports.videoGenerator = async function (args) {
 
         process.chdir(`media/${args.book_cn}`);
         await fs.writeFileSync("filelist.txt", videolist.map((line) => `file 'video/${line}'`).join("\n")); // 生成文件列表
-        saveLog(`writeFileSync: filelist.txt`);
+        saveLog(`生成文件列表: filelist.txt`);
 
         await execCommand(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -async 1000 -v quiet -y "dist/${filename}"`); // 合并
-
         let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "dist/${filename}"`);
+
+        //删除文件 filelist.txt
+        await fs.unlinkSync("filelist.txt");
+        saveLog(`删除文件列表: filelist.txt`);
+
         process.chdir(base_path);
         return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
 
