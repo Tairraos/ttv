@@ -138,6 +138,17 @@ let ui = {
     },
 
     /*********************/
+    // 重置范围，第一次恢复已经确认的范围，再点一次恢复到全部
+    /*********************/
+    rangeReset() {
+        ui.putInputData("startid", conf.range.start);
+        ui.putInputData("endid", conf.range.end);
+        delete conf.range.selected;
+        document.querySelectorAll(`#material tr`).forEach((line) => line.classList.remove("selecting"));
+        ui.log(`素材范围恢复，未做修改`, "highlight");
+    },
+
+    /*********************/
     // 拖放事件处理
     /*********************/
     dragLeave: () => $basket.classList.remove("dragover"),
@@ -229,6 +240,8 @@ let ui = {
             if (conf.materials[id].type === "word") {
                 ui.doShowSentenceDialog(id);
             }
+        } else if (target === "theme") {
+            ui.putInputData("themename", dom.innerText);
         } else if (target === "audio") {
             await action.genAudioPiece(id, field, true); //force=true,覆盖生成
         } else if (target.match(/^video/)) {
@@ -253,7 +266,7 @@ let ui = {
             ui.putInputData("endid", id);
             ui.updateSelecting(conf.range.selected, id);
         } else if (conf.range.selected) {
-            ui.resetRange();
+            ui.rangeReset();
         }
     },
 
@@ -366,7 +379,7 @@ let ui = {
             return;
         }
         if (!e.locker) {
-            if (event.target.className.match(/group|voice|chinese|english|comment|theme/)) {
+            if (event.target.className.match(/group|voice|chinese|english|comment/)) {
                 ui.showEditTool({ target: event.target, isfromtd: true });
             } else {
                 ui.hideEditTool();
@@ -410,7 +423,7 @@ let ui = {
         e.dom.contentEditable = "false";
         e.locker = false;
         ui.switchEditTool();
-        if (e.field.match(/group|voice|comment|theme/)) {
+        if (e.field.match(/group|voice|comment/)) {
             conf.materials[e.id][e.field] = e.dom.innerText;
             await util.updateMaterial(e.id, e.dom.innerText, e.field);
         }

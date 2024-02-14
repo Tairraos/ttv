@@ -74,7 +74,7 @@ let net = {
 
     async ffmpegContact() {
         let book_cn = conf.info.book_cn;
-        return await net.fetchApi("api/ffmpeg", { action: "concat", book_cn, filename: `${util.getNewBookName()}`, videolist: conf.tasks.join("|") });
+        return await net.fetchApi("api/ffmpeg", { action: "concat", book_cn, filename: `${util.getNewVideoName()}`, videolist: conf.tasks.join("|") });
     },
 
     async ffmpegPiece(filename, slidename, audioname) {

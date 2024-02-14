@@ -185,7 +185,7 @@ let action = {
         conf.info.duration = +conf.tasks.reduce((target, file) => target + conf.durations[file], 0).toFixed(3);
 
         ui.log(`6.工程估算完成`, "pass");
-        ui.log(`目标视频名字：${util.getNewBookName()}`);
+        ui.log(`目标视频名字：${util.getNewVideoName()}`);
         ui.log(`视频长度预计：${util.fmtDuration(conf.info.duration)}秒`);
         ui.log(`视频片段计数：${conf.tasks.length}`);
     },
@@ -201,7 +201,7 @@ let action = {
             return ui.log(`先进行工程估算，确认视频长度。`, "error");
         }
 
-        let videoName = util.getNewBookName(),
+        let videoName = util.getNewVideoName(),
             log = ui.log(`生成作品：${videoName}`, "highlight"),
             ret = await net.ffmpegContact();
         if (ret.result === "success") {
