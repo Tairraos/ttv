@@ -17,8 +17,8 @@ let $basket = document.getElementById("basket"),
 
 let $tool_a = document.getElementById("tool_a"),
     $tool_b = document.getElementById("tool_b"),
-    $show_tool_a = document.getElementById("show_tool_a"),
-    $show_tool_b = document.getElementById("show_tool_b");
+    $panel1 = document.getElementById("panel1"),
+    $panel2 = document.getElementById("panel2");
 
 let ui = {
     /*********************/
@@ -35,7 +35,7 @@ let ui = {
         conf.range.max = Math.max(...conf.range.idList, 1);
         ui.putInputData("startid", conf.range.min); //填上缺省值
         ui.putInputData("endid", conf.range.max);
-        ui.confirmRange(); // confirm一次
+        ui.rangeConfirm(); // confirm一次
     },
 
     initVideoSelector() {
@@ -49,18 +49,18 @@ let ui = {
     /*********************/
     // 切换工具
     /*********************/
-    switchTool(e) {
-        if (e.target.id === "show_tool_a") {
+    switchPanel(e) {
+        if (e.target.id === "panel1") {
             $tool_a.style.display = "flex";
             $tool_b.style.display = "none";
-            $show_tool_a.className = "selected";
-            $show_tool_b.className = "unselected";
+            $panel1.className = "selected";
+            $panel2.className = "unselected";
         } else {
             ui.initVideoSelector();
             $tool_a.style.display = "none";
             $tool_b.style.display = "block";
-            $show_tool_b.className = "selected";
-            $show_tool_a.className = "unselected";
+            $panel2.className = "selected";
+            $panel1.className = "unselected";
         }
     },
 
@@ -95,7 +95,7 @@ let ui = {
     /*********************/
     // 确认设置范围
     /*********************/
-    confirmRange() {
+    rangeConfirm() {
         let start = Math.max(+ui.getInputData("startid"), conf.range.min) || 0,
             end = Math.min(ui.getInputData("endid"), conf.range.max) || 0;
 
@@ -110,7 +110,7 @@ let ui = {
             } else {
                 ui.putInputData("startid", conf.range.min);
                 ui.putInputData("endid", conf.range.max);
-                ui.confirmRange();
+                ui.rangeConfirm();
             }
         } else {
             conf.range.start = start;
@@ -315,14 +315,14 @@ let ui = {
     /*********************/
     // 在表格里选择范围
     /*********************/
-    doSelectStart(event) {
+    cellSelectStart(event) {
         if (event.target.tagName === "TD" && event.target.className === "id") {
             $materials.classList.add("unselectable");
             conf.onselect = +event.target.innerText;
         }
     },
 
-    doSelectEnd() {
+    cellSelectEnd() {
         if (conf.onselect) {
             $materials.classList.remove("unselectable");
             delete conf.onselect;
@@ -342,9 +342,10 @@ let ui = {
     // hover 单元格的处理，可能是选择范围，也可能是显示editTool工具
     /*********************/
     onMouseOverCell(event) {
+        let e = conf.editTool;
+        let id = +event.target.closest("tr").dataset.id;
         if (event.target.tagName === "TD" && conf.onselect) {
-            let id = +event.target.closest("tr").dataset.id,
-                start = Math.min(conf.onselect, id),
+            let start = Math.min(conf.onselect, id),
                 end = Math.max(conf.onselect, id);
             ui.putInputData("startid", start); //填上缺省值
             ui.putInputData("endid", end);
@@ -352,11 +353,15 @@ let ui = {
             ui.updateSelecting(start, end);
             return;
         }
-        if (!conf.editTool.locker) {
+        if (!e.locker) {
             if (event.target.className.match(/group|voice|chinese|english|comment|theme/)) {
                 ui.showEditTool({ target: event.target, isfromtd: true });
             } else {
                 ui.hideEditTool();
+            }
+        } else {
+            if (event.target.className === e.field && id === e.id) {
+                ui.showEditTool({ target: event.target, isfromtd: true });
             }
         }
     },
@@ -365,11 +370,12 @@ let ui = {
     // 文本上的浮动菜单
     /*********************/
     showEditTool(event) {
+        let e = conf.editTool;
         if (event.isfromtd) {
             let rect = event.target.getBoundingClientRect();
-            conf.editTool.dom = event.target;
-            conf.editTool.id = +event.target.closest("tr").dataset.id;
-            conf.editTool.field = event.target.className;
+            e.dom = event.target;
+            e.id = +event.target.closest("tr").dataset.id;
+            e.field = event.target.className;
             $edittool.style.left = rect.left + "px";
             $edittool.style.top = rect.top - 20 + "px";
         }
@@ -380,40 +386,51 @@ let ui = {
         $edittool.style.display = "none";
     },
 
-    doEditCell() {
-        conf.editTool.dom.contentEditable = "true";
-        conf.editTool.locker = true;
+    cellEditStart() {
+        let e = conf.editTool;
+        e.dom.contentEditable = "true";
+        e.locker = true;
         ui.switchEditTool();
     },
 
-    async doEditDone() {
-        conf.editTool.dom.contentEditable = "false";
-        conf.editTool.locker = false;
+    async cellEditDone() {
+        let e = conf.editTool;
+        e.dom.contentEditable = "false";
+        e.locker = false;
         ui.switchEditTool();
-        if (conf.editTool.field.match(/group|voice|comment|theme/)) {
-            conf.materials[conf.editTool.id][conf.editTool.field] = conf.editTool.dom.innerText;
-            await util.updateMaterial(conf.editTool.id, conf.editTool.dom.innerText, conf.editTool.field);
+        if (e.field.match(/group|voice|comment|theme/)) {
+            conf.materials[e.id][e.field] = e.dom.innerText;
+            await util.updateMaterial(e.id, e.dom.innerText, e.field);
         }
+        if (e.field.match(/chinese|english/) && e.dom.innerText[0] === "!") {
+            e.dom.innerText = e.dom.innerText.slice(1);
+            conf.materials[e.id][e.field] = e.dom.innerText;
+            await util.updateMaterial(e.id, e.dom.innerText, e.field);
+        }
+        e.dom.style.background = e.dom.innerText !== conf.materials[e.id][e.field] ? "#fcc" : "";
     },
 
-    doEditRestore() {
-        conf.editTool.dom.innerText = conf.materials[conf.editTool.id][conf.editTool.field];
-        conf.editTool.dom.contentEditable = "false";
-        conf.editTool.locker = false;
+    cellEditRestore() {
+        let e = conf.editTool;
+        e.dom.innerText = conf.materials[e.id][e.field];
+        e.dom.contentEditable = "false";
+        e.locker = false;
+        e.dom.style.background = "";
         ui.switchEditTool();
     },
 
     switchEditTool() {
-        $doEditCell.style.display = conf.editTool.locker ? "none" : "block";
-        $doEditDone.style.display = conf.editTool.locker ? "block" : "none";
-        $doEditRestore.style.display = conf.editTool.locker ? "block" : "none";
+        let e = conf.editTool;
+        $doEditCell.style.display = e.locker ? "none" : "block";
+        $doEditDone.style.display = e.locker ? "block" : "none";
+        $doEditRestore.style.display = e.locker ? "block" : "none";
     },
 
-    incraceTheme() {
+    themeIdIncrease() {
         let [base, index] = ui.getInputData("themename").split("-");
         ui.putInputData("themename", `${base}-${((+index || 0) + 1).toString().padStart(3, "0")}`);
     },
-    decraceTheme() {
+    themeIdDecrease() {
         let [base, index] = ui.getInputData("themename").split("-");
         ui.putInputData(
             "themename",
@@ -422,7 +439,7 @@ let ui = {
                 .padStart(3, "0")}`
         );
     },
-    saveTheme() {
+    themeIdSave() {
         util.updateMaterial(ui.getInputData("themefrom"), ui.getInputData("themename"), "theme", ui.getInputData("themeto"));
     },
 
@@ -458,13 +475,13 @@ let ui = {
 /*********************/
 // 工程配置
 /*********************/
-document.getElementById("icon-plus").addEventListener("click", ui.incraceTheme, false);
-document.getElementById("icon-minus").addEventListener("click", ui.decraceTheme, false);
-document.getElementById("icon-save").addEventListener("click", ui.saveTheme, false);
-document.getElementById("icon-confirm").addEventListener("click", ui.confirmRange, false);
+document.getElementById("icon-plus").addEventListener("click", ui.themeIdIncrease, false);
+document.getElementById("icon-minus").addEventListener("click", ui.themeIdDecrease, false);
+document.getElementById("icon-save").addEventListener("click", ui.themeIdSave, false);
+document.getElementById("icon-confirm").addEventListener("click", ui.rangeConfirm, false);
 document.getElementById("program").addEventListener("change", ui.onProgramChange, false);
-document.getElementById("doDownContent").addEventListener("click", action.doDownContent, false); // 下载数据
-document.getElementById("doMoveFile").addEventListener("click", action.doMoveFile, false); // 下载数据
+document.getElementById("doExportData").addEventListener("click", action.doExportData, false); // 下载数据
+document.getElementById("doMoveDataFile").addEventListener("click", action.doMoveDataFile, false); // 下载数据
 
 /*********************/
 // 绑UI拖放事件
@@ -490,24 +507,24 @@ document.getElementById("doBuild").addEventListener("click", action.doBuild, fal
 /*********************/
 $content.addEventListener("click", ui.doCellClick, false);
 $content.addEventListener("mouseover", ui.onMouseOverCell, false);
-$content.addEventListener("mouseleave", ui.hideEditTool, false);
-$content.addEventListener("mousedown", ui.doSelectStart, false);
-document.body.addEventListener("mouseup", ui.doSelectEnd, false);
 $edittool.addEventListener("mouseover", ui.showEditTool, false);
+$content.addEventListener("mouseleave", ui.hideEditTool, false);
 
 /*********************/
 // 绑编辑工具
 /*********************/
-$doEditCell.addEventListener("click", ui.doEditCell, false);
-$doEditDone.addEventListener("click", ui.doEditDone, false);
-$doEditRestore.addEventListener("click", ui.doEditRestore, false);
+$content.addEventListener("mousedown", ui.cellSelectStart, false);
+document.body.addEventListener("mouseup", ui.cellSelectEnd, false);
+$doEditCell.addEventListener("click", ui.cellEditStart, false);
+$doEditDone.addEventListener("click", ui.cellEditDone, false);
+$doEditRestore.addEventListener("click", ui.cellEditRestore, false);
 
 /*********************/
 // 管理工具
 /*********************/
-document.getElementById("doPing").addEventListener("click", ui.doPing, false);
-document.getElementById("show_tool_a").addEventListener("click", ui.switchTool, false);
-document.getElementById("show_tool_b").addEventListener("click", ui.switchTool, false);
+document.getElementById("doPing").addEventListener("click", action.doPing, false);
+document.getElementById("panel1").addEventListener("click", ui.switchPanel, false);
+document.getElementById("panel2").addEventListener("click", ui.switchPanel, false);
 document.getElementById("doNewBook").addEventListener("click", action.doNewBook, false);
 document.getElementById("doMoveTemplate").addEventListener("click", action.doMoveTemplate, false);
 document.getElementById("doGenTranasCmd").addEventListener("click", action.doGenTranasCmd, false);
