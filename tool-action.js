@@ -112,6 +112,7 @@ let action = {
                 ret = await net.tts(basename, text, model, rate);
             if (ret.result === "success") {
                 await util.updateMaterial(id, `${basename}.m4a`, "audio");
+                util.checkMaterials(id);
                 ui.done(log);
             } else {
                 ui.err(`发生错误 ${JSON.stringify(ret)}`);
@@ -139,6 +140,7 @@ let action = {
             let log = ui.log(`生成slide：${filename}`);
             await net.slide(id, style, filename);
             await util.updateMaterial(id, filename, "slide");
+            util.checkMaterials(id);
             ui.done(log);
         }
     },
@@ -170,6 +172,7 @@ let action = {
             if (ret.result === "success") {
                 conf.durations[filename] = ret.duration;
                 await util.updateMaterial(id, filename, "video");
+                util.checkMaterials(id);
                 ui.done(log);
             }
         }
@@ -238,7 +241,7 @@ let action = {
     // 文件操作
     /*********************/
 
-    doDownContent() {
+    doExportData() {
         io.exportData();
     },
 
@@ -253,7 +256,7 @@ let action = {
         ui.log(`图书目录已创建: ${book_cn}`, "highlight");
     },
 
-    doMoveFile() {
+    doMoveDataFile() {
         let filename = `${conf.info.book_cn}.${conf.info.version}.xlsx`;
         net.filesMove(filename, conf.info.book_cn);
     },
