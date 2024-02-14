@@ -57,6 +57,14 @@ ul {
     cursor: pointer;
 }
 
+#material .skip td {
+    background: #ff31;
+}
+
+#material .skip .svg {
+    opacity: .3;
+}
+
 #material tr:nth-child(odd) {
     background: #eee;
 }
@@ -285,7 +293,7 @@ ul {
 }
 
 #material .skip {
-    opacity: 0.25;
+    color: #03c;
 }
 
 #material .chinese,
