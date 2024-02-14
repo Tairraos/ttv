@@ -88,21 +88,15 @@
         id="watermark" />
 </body>
 <script>
-    if (style != "listen" && language == "chinese" && vol == 1) {
+    if (style !== "listen" && language === "chinese" && vol === 1) {
         let chars = document.querySelectorAll(".char"),
-            leftRef = chars[0].offsetLeft;
-        for (let line of document.querySelectorAll(".char")) {
-            if (line.offsetLeft === leftRef && line.innerText.match(/[，。！]/)) {
-                for (let line of document.styleSheets) {
-                    if (String(line.href).match(/page\.css/)) {
-                        for (let rule of line.cssRules) {
-                            if (String(rule.selectorText).match(/\.subtitle\.vol-\d \.book-chinese \.cn/)) {
-                                rule.style["font-size"] = +rule.style["font-size"].replace(/px/, "") - 3 + "px";
-                            }
-                        }
-                    }
-                }
-            }
+            leftRef = chars[0].offsetLeft,
+            issueChars = Array.from(document.querySelectorAll(".char")).filter(line => line.offsetLeft === leftRef && line.innerText.match(/[，。！]/));
+        if (issueChars.length) {
+            Array.from(document.styleSheets).filter(line => String(line.href).match(/page\.css/)).forEach(
+                sheets => Array.from(sheets.cssRules).filter(rule => String(rule.selectorText).match(/\.subtitle\.vol-\d \.book-chinese \.cn/))
+                    .forEach(rule => rule.style["font-size"] = +rule.style["font-size"].replace(/px/, "") - 3 + "px")
+            );
         }
     }
 </script>
