@@ -423,14 +423,14 @@ let ui = {
         e.dom.contentEditable = "false";
         e.locker = false;
         ui.switchEditTool();
-        if (e.field.match(/group|voice|comment/)) {
-            conf.materials[e.id][e.field] = e.dom.innerText;
-            await util.updateMaterial(e.id, e.dom.innerText, e.field);
-        }
-        if (e.field.match(/chinese|english/) && e.dom.innerText[0] === "!") {
-            e.dom.innerText = e.dom.innerText.slice(1);
-            conf.materials[e.id][e.field] = e.dom.innerText;
-            await util.updateMaterial(e.id, e.dom.innerText, e.field);
+        if (e.field.match(/group|voice|chinese|english|comment/)) {
+            // 感叹号开头，则只留在UI里，临时使用不更新内存，以免被导出
+            if (e.dom.innerText[0] === "!") { 
+                e.dom.innerText = e.dom.innerText.slice(1);
+            } else {
+                conf.materials[e.id][e.field] = e.dom.innerText;
+                await util.updateMaterial(e.id, e.dom.innerText, e.field);
+            }
         }
         e.dom.style.background = e.dom.innerText !== conf.materials[e.id][e.field] ? "#fcc" : "";
     },

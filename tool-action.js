@@ -90,7 +90,7 @@ let action = {
         }
     },
 
-    // 生成单个音频
+    // 生成单个音频, 生成音频用的字符串是从UI里取的，不是从conf.materials里取。这样可以临时修改ui里的数据，可以手动跳过一些括号里的内容被朗读。
     async genAudioPiece(id, field, force = false) {
         let language = field.match(/_cn/) ? "chinese" : "english",
             text = ui.getCell(id, language).innerText,
