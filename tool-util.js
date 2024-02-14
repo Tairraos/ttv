@@ -16,11 +16,11 @@ let util = {
     // 修改单元格数据，会同时修改界面，内存
     /*********************/
     async updateMaterial(id, data, field, toid = 0) {
-        conf.materials[id][field] = data;
         if (conf.dataFields.includes(field)) {
             toid = +toid < +id ? +id : +toid;
             for (let i = +id; i <= toid; i++) {
                 ui.getCell(i, field).innerText = data;
+                conf.materials[i][field] = data;
             }
         } else if (["slide", "audio", "video"].includes(field)) {
             conf.files[field].push(data);
@@ -55,9 +55,10 @@ let util = {
     /*********************/
     // 检查所有语料的素材是否准备完全
     /*********************/
-    checkMaterials() {
-        let answer = true;
-        for (let line of util.getMaterial()) {
+    checkMaterials(id) {
+        let answer = true,
+            materials = id ? [conf.materials[id]] : util.getMaterial();
+        for (let line of materials) {
             util.checkMedias(line, ["media_cn1", "media_cn2", "media_en1", "media_en2"], ["audio", "video-text", "video-listen"]);
             util.checkMedias(line, ["slide"], ["slide-text", "slide-listen", "video-ding"]);
             let line_ready = util.checkIsReady(line.id);
