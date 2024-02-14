@@ -7,9 +7,15 @@
     <link rel="stylesheet" href="lib/page.css">
     <?php
     $book_cn = $_REQUEST['book_cn'];
-    $language = $_REQUEST['language'];
     $rows = json_decode($_REQUEST['rows'], JSON_UNESCAPED_UNICODE);
+    $style = $_REQUEST['style'] ?? "";
+    $language = $_REQUEST['language'] ?? "";
     ?>
+    <script>
+        let style = "<?= $style ?>",
+            language = "<?= $language ?>",
+            vol = <?= count($rows) ?>;
+    </script>
     <style>
         .backimg {
             background-image: url('media/<?= $book_cn ?>/theme/<?= $rows[0]['theme'] ?? 'default' ?>.png');
@@ -31,7 +37,7 @@
     <div class="container">
         <div class="subcontainer">
             <?php
-            if (($_REQUEST['style'] ?? "") == "listen") {
+            if ($style == "listen") {
                 ?>
                 <div class="listen-container">
                     <object type="image/svg+xml" data="lib/listen<?= $_REQUEST['svg'] ?? 0 ?>.svg"
@@ -39,10 +45,9 @@
                     <object type="image/svg+xml" data="lib/listen-text.svg" class="listen-svg"></object>
                 </div>
                 <?php
-            } else if (!isset($_REQUEST['language'])) {
+            } else if ($language == '') {
                 echo '缺少参数 language';
             } else {
-                //$rows的长度
                 $vol = count($rows); // 字幕行数
                 foreach ($rows as $index => $row) {
                     $sid = $row['sid']; //真正的内容id，有些slide是标题，不算内容成份
@@ -82,5 +87,24 @@
     <img src="lib/watermark-<?= preg_match("/chinese/i", $_REQUEST['language']) ? 'chinese' : 'english' ?>.svg"
         id="watermark" />
 </body>
+<script>
+    if (style != "listen" && language == "chinese" && vol == 1) {
+        let chars = document.querySelectorAll(".char"),
+            leftRef = chars[0].offsetLeft;
+        for (let line of document.querySelectorAll(".char")) {
+            if (line.offsetLeft === leftRef && line.innerText.match(/[，。！]/)) {
+                for (let line of document.styleSheets) {
+                    if (String(line.href).match(/page\.css/)) {
+                        for (let rule of line.cssRules) {
+                            if (String(rule.selectorText).match(/\.subtitle\.vol-\d \.book-chinese \.cn/)) {
+                                rule.style["font-size"] = +rule.style["font-size"].replace(/px/, "") - 3 + "px";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+</script>
 
 </html>
