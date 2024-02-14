@@ -62,7 +62,7 @@ ul {
 }
 
 #material .skip .svg {
-    opacity: .3;
+    opacity: 0.3;
 }
 
 #material tr:nth-child(odd) {
@@ -129,11 +129,15 @@ ul {
     font-size: 14px;
 }
 
-.menu.files button {
+.menu hr {
+    margin: 5px 10px;
+}
+#doExportData {
     font: 12px/12px system;
     padding: 4px 8px;
-    margin: 5px 2px;
     cursor: pointer;
+    width: 150px;
+    height: 36px;
 }
 
 #newid {
@@ -405,6 +409,7 @@ ul {
     font-family: 汉仪正圆;
     font-size: 16px;
     font-weight: 600;
+    margin-top: 10p;
 }
 
 .unselectable {

@@ -1,5 +1,6 @@
 /* global conf, util, action, net */
 let $basket = document.getElementById("basket"),
+    $export = document.getElementById("doExportData"),
     $info = document.getElementById("info"),
     $content = document.getElementById("content"),
     $materials = document.getElementById("material"),
@@ -64,10 +65,18 @@ let ui = {
         }
     },
 
-    switchBasket(info) {
+    updateBasket() {
+        let info = [
+            `名称：${conf.info.book_cn}`,
+            `缩写：${conf.info.book_abbr}`,
+            `目标：${conf.info.language}`,
+            `版本：${conf.info.version}`,
+            `视频：${conf.videos.length}个`
+        ];
         $basket.style.display = "none";
         $info.style.display = "flex";
         $info.innerHTML = info.map((item) => `<div>${item}</div>`).join("");
+        $export.innerText = `导出 ${conf.info.book_cn}.${conf.info.version + 1}`;
     },
 
     /*********************/
@@ -230,6 +239,7 @@ let ui = {
             ui.openPostPage(`html-slide.php`, {
                 language: conf.info.language,
                 book_cn: conf.info.book_cn,
+                style: "text",
                 rows: JSON.stringify(util.getPureMaterial(id))
             });
         } else if (target === "action-preview") {
@@ -484,8 +494,6 @@ document.getElementById("icon-minus").addEventListener("click", ui.themeIdDecrea
 document.getElementById("icon-save").addEventListener("click", ui.themeIdSave, false);
 document.getElementById("icon-confirm").addEventListener("click", ui.rangeConfirm, false);
 document.getElementById("program").addEventListener("change", ui.onProgramChange, false);
-document.getElementById("doExportData").addEventListener("click", action.doExportData, false); // 下载数据
-document.getElementById("doMoveDataFile").addEventListener("click", action.doMoveDataFile, false); // 下载数据
 
 /*********************/
 // 绑UI拖放事件
@@ -494,6 +502,7 @@ $basket.addEventListener("dragenter", ui.dragEnter, false);
 $basket.addEventListener("dragover", ui.dragEnter, false);
 $basket.addEventListener("dragleave", ui.dragLeave, false);
 $basket.addEventListener("drop", ui.dropHandler, false);
+$export.addEventListener("click", action.doExportData, false); // 下载数据
 
 /*********************/
 // 菜单动作

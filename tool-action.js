@@ -12,17 +12,10 @@ let action = {
         reader.onload = async function (e) {
             let data = e.target.result;
             await io.importXlsx(data);
-            conf.info.maxid = Math.max(0, ...conf.videos.map((item) => item[0].replace(/[^-]+-(\d{3})\.mp4/, "$1")));
             conf.files = (await net.filesList()).files;
             conf.tasks = []; // 每次导入都清空任务列表，需要重新估算新产生任务列表
             ui.initRangeBox();
-            ui.switchBasket([
-                `名称：${conf.info.book_cn}`,
-                `缩写：${conf.info.book_abbr}`,
-                `目标：${conf.info.language}`,
-                `版本：${conf.info.version}`,
-                `视频：${conf.videos.length}个`
-            ]);
+            ui.updateBasket();
         };
         reader.readAsBinaryString(file);
     },
@@ -214,17 +207,10 @@ let action = {
         if (ret.result === "success") {
             ui.done(log);
             ui.log(`视频实际长度：${util.fmtDuration(ret.duration)}秒`, "highlight");
-            conf.videos.push([
-                videoName,
-                conf.program[conf.info.program],
-                conf.range.start,
-                conf.range.end,
-                ret.duration,
-                util.fmtDuration(ret.duration)
-            ]);
+            conf.videos.push([videoName, conf.program[conf.info.program], conf.range.start, conf.range.end, ret.duration, util.fmtDuration(ret.duration)]);
             ui.log(`7.作品已经生成`, "pass");
             window.open(`media/${conf.info.book_cn}/dist/${videoName}`, "preview");
-            conf.info.maxid++;
+            action.doExportData(); //立刻导出新版xls
         } else {
             ui.err(`生成作品 ${videoName} 时遇到错误`);
         }
@@ -242,6 +228,11 @@ let action = {
     /*********************/
     doExportData() {
         io.exportData();
+        window.setTimeout(() => {
+            let filename = `${conf.info.book_cn}.${conf.info.version}.xlsx`;
+            net.filesMove(filename, conf.info.book_cn);
+        }, 2000);
+        ui.updateBasket();
     },
 
     doNewBook() {
@@ -253,11 +244,6 @@ let action = {
         io.saveXlsxBinary(book, [[book_cn, book_en, book_abbr, language, 1]]);
         net.filesCreate(book_cn);
         ui.log(`图书目录已创建: ${book_cn}`, "highlight");
-    },
-
-    doMoveDataFile() {
-        let filename = `${conf.info.book_cn}.${conf.info.version}.xlsx`;
-        net.filesMove(filename, conf.info.book_cn);
     },
 
     doMoveTemplate() {

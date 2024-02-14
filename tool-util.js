@@ -129,7 +129,8 @@ let util = {
     // 从字段名和媒体列表获取素材文件名
     /*********************/
     getNewBookName() {
-        return `${conf.info.book_abbr}-${conf.info.program}-${(conf.info.maxid + 1).toString().padStart(3, "0")}.mp4`;
+        let getPadStr = (num) => String(num).padStart(4, "0");
+        return `${conf.info.book_abbr}-${conf.info.program}-${getPadStr(conf.range.start)}-${getPadStr(conf.range.end)}.mp4`;
     },
 
     /*********************/

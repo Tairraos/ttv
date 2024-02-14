@@ -13,8 +13,7 @@ conf.info = {
     book_en: "", //英文名
     book_abbr: "", //缩写
     language: "", //课程语言
-    version: "", //数据文件版本
-    maxid: 0 //最大视频编号
+    version: "" //数据文件版本
 };
 
 //已经生成的video

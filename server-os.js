@@ -17,6 +17,8 @@ exports.osOperation = async function (args) {
     console.log(`OS接口调用参数: ${JSON.stringify(args)}`);
 
     if (action === "open") {
-        thread.exec(`explorer "${base_path}\\media\\${book_cn}"`);
+        thread.exec(`explorer "${base_path}\\media\\${book_cn}"`); // 打开目标文件夹
     }
+
+    return { result: "success" };
 };
