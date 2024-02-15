@@ -97,7 +97,7 @@ let net = {
             svg = +new Date() % 4,
             book_cn = conf.info.book_cn,
             language = conf.info.language;
-        return await net.fetchApi("api/slide", { id, book_cn, filename, language, style, watermark, svg, rows: JSON.stringify(util.getPureMaterial(id)) });
+        return await net.fetchApi("api/slide", { id, book_cn, filename, language, style, watermark, svg, rows: JSON.stringify(util.getMaterialByGroup(id)) });
     },
 
     /*********************/

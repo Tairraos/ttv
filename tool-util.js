@@ -33,6 +33,7 @@ let util = {
     insertMaterial(id, materials) {
         let theme = conf.materials[id].theme,
             oldMaterials = [],
+            ids = [],
             len = Object.keys(conf.materials).length;
 
         // 比id大的数据从ui上删除，从conf.materials移到oldMaterials
@@ -42,6 +43,7 @@ let util = {
         // 插入造句的句子
         for (let line of materials) {
             ui.loadMaterial({ id: ++id, sid: 0, type: "sentence", group: 0, voice: "", chinese: line, english: "", phonetic: "", comment: "", theme });
+            ids.push(id);
         }
         // 插入oldMaterials
         for (let line of oldMaterials) {
@@ -50,6 +52,8 @@ let util = {
         }
         ui.log(`已经添加造句数据 ${materials.length} 条`, "pass");
         ui.initRangeBox();
+        
+        return ids;
     },
 
     /*********************/
@@ -86,9 +90,7 @@ let util = {
         }
     },
 
-    getFolder(filename) {
-        return filename.match(/m4a$/) ? "audio" : filename.match(/mp4$/) ? "video" : "slide";
-    },
+    getFolder: (filename) => (filename.match(/m4a$/) ? "audio" : filename.match(/mp4$/) ? "video" : "slide"),
 
     /*********************/
     // 检查medias某一个文件是否需要生成
@@ -128,25 +130,20 @@ let util = {
     /*********************/
     // 从字段名和媒体列表获取素材文件名
     /*********************/
-    getNewVideoName() {
-        let getPadStr = (num) => String(num).padStart(4, "0");
-        return `${conf.info.book_abbr}-${conf.info.program}-${getPadStr(conf.range.start)}-${getPadStr(conf.range.end)}.mp4`;
-    },
+    getPadStr: (num) => String(num).padStart(4, "0"),
+    getNewVideoName: () => `${conf.info.book_abbr}-${conf.info.program}-${util.getPadStr(conf.range.start)}-${util.getPadStr(conf.range.end)}.mp4`,
 
     /*********************/
-    // 从voice和basename获取素材文件名
+    // 从voice和basename获取素材文件名，如果指定了voice，则仅生成了第1套音频，把2换成1，用第1套代替
     /*********************/
-    getTaskFilename(id, voice, basename) {
-        // 如果voide不为空，则第2套音频不存在，把2换成1，用第1套代替
-        return `${id}.${voice !== "" ? basename.replace(/2/, "1") : basename}.mp4`;
-    },
+    getTaskFilename: (id, voice, basename) => `${id}.${voice !== "" ? basename.replace(/2/, "1") : basename}.mp4`,
 
     /*********************/
     // 根据规则生成作品编译需要的Task列表
     /*********************/
     getTasksList() {
         let result = [],
-            blocks = util.getMaterialByGroup(util.getMaterial()),
+            blocks = util.bundleMaterialByGroup(util.getMaterial()),
             rule = conf.rules[conf.info.language];
 
         for (let block of blocks) {
@@ -164,9 +161,7 @@ let util = {
     /*********************/
     // 检查当前行是否所有素材都准备好了, media或slide有一个是required就说明没准备好
     /*********************/
-    checkIsReady(id) {
-        return !Object.entries(conf.materials[id]).filter((item) => item[0].match(/^(media|slide)/) && item[1] === "required").length;
-    },
+    checkIsReady: (id) => !Object.entries(conf.materials[id]).filter((item) => item[0].match(/^(media|slide)/) && item[1] === "required").length,
 
     /*********************/
     // 检查素材时长
@@ -193,15 +188,32 @@ let util = {
     /*********************/
     // 根据条件从所有记录中过滤，并按指定size打包（size打包用于批量翻译，节约时间）
     /*********************/
-    getMaterial(condition, size) {
+    getMaterial(condition) {
         let validMaterials = Object.values(conf.materials).filter((line) => line.id >= conf.range.start && line.id <= conf.range.end);
-        let lines = condition ? validMaterials.filter(condition) : validMaterials;
-        return size ? Array.from({ length: Math.ceil(lines.length / size) }, (_, i) => lines.slice(i * size, i * size + size)) : lines;
+        return condition ? validMaterials.filter(condition) : validMaterials;
     },
 
-    getPureMaterial(id) {
-        return Object.values(util.getMaterial((line) => (conf.materials[id].group === 0 ? line.id === id : line.group === conf.materials[id].group)));
+    /*********************/
+    // 按line.group打包放进新数组
+    /*********************/
+    getMaterialByGroup: (id) => util.getMaterial((line) => (conf.materials[id].group === 0 ? line.id === id : line.group === conf.materials[id].group)),
+
+    /*********************/
+    // 按line.group打包放进新数组
+    /*********************/
+    bundleMaterialByGroup(materials) {
+        let result = {};
+        for (let line of materials) {
+            let group = line.group || line.id;
+            result[group] = group === 0 ? [line] : (result[group] = result[group] ? [...result[group], line] : [line]);
+        }
+        return Object.values(result);
     },
+
+    /*********************/
+    // 数组按size打包成二维数组
+    /*********************/
+    bundleDataBySize: (data, size) => Array.from({ length: Math.ceil(data.length / size) }, (_, i) => data.slice(i * size, i * size + size)),
 
     /*********************/
     // 获取azure语音模型名字
@@ -211,24 +223,12 @@ let util = {
     /*********************/
     // 当前课程是否英语课程
     /*********************/
-    isBookEnglish: () => conf.info.language === "english",
+    isLearnEnglish: () => conf.info.language === "english",
 
     /*********************/
     // 格式化视频时长
     /*********************/
     fmtDuration: (s) => ("0" + Math.floor(s / 60)).slice(-2) + ":" + ("0" + Math.floor(s % 60)).slice(-2) + (s % 1).toFixed(1).slice(1),
-
-    /*********************/
-    // 按line.group打包放进新数组
-    /*********************/
-    getMaterialByGroup(materials) {
-        let result = {};
-        for (let line of materials) {
-            let group = line.group || line.id;
-            result[group] = group === 0 ? [line] : (result[group] = result[group] ? [...result[group], line] : [line]);
-        }
-        return Object.values(result);
-    },
 
     /*********************/
     // 生成音频配置

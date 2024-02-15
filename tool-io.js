@@ -80,7 +80,7 @@ let io = {
             ware = [];
         for (let line of materials) {
             let id = line.sid ? line.sid.toString() : "";
-            util.isBookEnglish()
+            util.isLearnEnglish()
                 ? ware.push([id], [line.english + line.phonetic], [line.chinese], [""])
                 : ware.push(["", line.phonetic], [id, line.chinese], ["", line.english], [""]);
         }

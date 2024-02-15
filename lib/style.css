@@ -57,14 +57,6 @@ ul {
     cursor: pointer;
 }
 
-#material .skip td {
-    background: #ff31;
-}
-
-#material .skip .svg {
-    opacity: 0.3;
-}
-
 #material tr:nth-child(odd) {
     background: #eee;
 }
@@ -102,7 +94,7 @@ ul {
 }
 
 #info {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 20px;
     text-indent: 10px;
     align-items: flex-start;
@@ -231,26 +223,19 @@ ul {
 }
 
 #edittool {
-    display: none;
-    flex-direction: column;
+    /* display: none; */
     position: fixed;
-    flex-direction: row;
-    box-shadow: inset 0px 0px 6px #3250f0;
-    padding: 4px 2px 0 2px;
+    background: #35f4;
+    padding: 2px;
     border-radius: 5px 5px 0 0;
 }
 
 #edittool button {
-    font-size: 9px;
-    margin: 0 3px;
+    font-size: 11px;
     cursor: pointer;
-    width: 42px;
+    width: 35px;
     padding: 1px 0;
-}
-
-#doEditDone,
-#doEditRestore {
-    display: none;
+    margin: 0 2px;
 }
 
 #material svg {
@@ -297,7 +282,7 @@ ul {
 }
 
 #material .skip {
-    color: #03c;
+    opacity: 0.3;
 }
 
 #material .chinese,

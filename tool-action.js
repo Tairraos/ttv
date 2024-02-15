@@ -24,18 +24,28 @@ let action = {
     // 1.素材翻译
     /*********************/
     async doTranslate() {
-        await action.fetchTranslation("chinese", "english"); // 通过翻译api, 中译英，会跳过英语课的词汇
-        await action.fetchTranslation("english", "chinese"); // 通过翻译api，英译中
-        // 英语词汇，查字典，带词性和多个意思
-        for (let line of util.getMaterial((line) => util.isBookEnglish() && line.type === "word" && line.english && !line.chinese)) {
+        // 用api翻译, 中译英，英文词汇如果仅有中文，也需要译成英文
+        await action.fetchTranslationBundle(
+            util.getMaterial((line) => line.chinese && !line.english),
+            "chinese",
+            "english"
+        );
+        // 用api翻译, 英译中，如果是英文课，跳过词汇不用翻译
+        await action.fetchTranslationBundle(
+            util.getMaterial((line) => line.english && !line.chinese && !(util.isLearnEnglish() && line.type === "word")),
+            "english",
+            "chinese"
+        );
+        // 英文课词汇查字典翻译，带词性和多个意思
+        for (let line of util.getMaterial((line) => util.isLearnEnglish() && line.type === "word" && line.english && !line.chinese)) {
             await util.updateMaterial(line.id, conf.dict[line.english.toLowerCase()].mean, "chinese");
         }
         ui.log(`1.素材翻译完成`, "pass");
     },
 
-    async fetchTranslation(from, to) {
-        // 所有目标语言为空白的字段，跳过英语课的词汇，英语词汇用查字典翻译，带词性和多个意思
-        for (let bundle of util.getMaterial((line) => !line[to] && !(util.isBookEnglish() && line.type === "word"), 10)) {
+    async fetchTranslationBundle(ids, from, to, force = false) {
+        let bundles = util.bundleDataBySize(typeof ids[0] === "number" ? util.getMaterial((line) => ids.includes(line.id) && (force || !line[to])) : ids, 10);
+        for (let bundle of bundles) {
             ui.log(`开始翻译 id=${bundle[0].id} 开始的一批数据`);
             let ret = await net.translate(bundle, from, to);
             if (ret.result === "success") {
@@ -55,20 +65,27 @@ let action = {
     // 2.拼音音标
     /*********************/
     async doGenPhonetic() {
-        let log;
-        // 中文课，所有中文使用pinyin接口获得读音
-        for (let line of util.getMaterial((line) => line.chinese && !util.isBookEnglish() && !line.phonetic)) {
+        // 尝试给所有phonetic没有值的字段标注册拼音或音标
+        for (let line of util.getMaterial()) {
+            action.genPhoneticPiece(line.id);
+        }
+        ui.log(`2.素材标注${util.isLearnEnglish() ? "音标" : "拼音"}完成`, "pass");
+    },
+
+    async genPhoneticPiece(id, force = false) {
+        let line = conf.materials[id],
+            log;
+        if (line.chinese && !util.isLearnEnglish() && (force || !line.phonetic)) {
+            // 中文课，存在中文，即把中文用pinyin接口获得读音
             log = ui.log(`标注拼音：${line.chinese}`);
             await util.updateMaterial(line.id, pinyinPro.pinyin(line.chinese.replace(/0|1|2|3|4|5|6|7|8|9/g, (n) => "零一二三四五六七八九"[+n])), "phonetic");
             ui.done(log);
-        }
-        // 英文课，词汇，查字典获得音标，英文句子不需要拼音或音标
-        for (let line of util.getMaterial((line) => line.english && util.isBookEnglish() && line.type === "word" && !line.phonetic)) {
+        } else if (line.english && util.isLearnEnglish() && line.type === "word" && !line.phonetic) {
+            // 英文课，词汇查字典获得音标，句子的 Phonetic 字段留空，不需要拼音或音标
             log = ui.log(`标注音标：${line.english}`);
             await util.updateMaterial(line.id, conf.dict[line.english.toLowerCase()].accent, "phonetic");
             ui.done(log);
         }
-        ui.log(`2.素材标注${conf.info.language === "chinese" ? "拼音" : "音标"}完成`, "pass");
     },
 
     /*********************/

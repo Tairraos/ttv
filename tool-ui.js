@@ -7,9 +7,13 @@ let $basket = document.getElementById("basket"),
     $log = document.getElementById("log"),
     $edittool = document.getElementById("edittool"),
     $server = document.getElementById("server"),
-    $doEditCell = document.getElementById("doEditCell"),
+    $doCellEdit = document.getElementById("doCellEdit"),
+    $doCellTranslate = document.getElementById("doCellTranslate"),
+    $doCellPinyin = document.getElementById("doCellPinyin"),
     $doEditDone = document.getElementById("doEditDone"),
     $doEditRestore = document.getElementById("doEditRestore"),
+    $unlocked = document.getElementById("edittool-unlocked"),
+    $locked = document.getElementById("edittool-locked"),
     $sdContainer = document.getElementById("sd-container"),
     $sdInfo = document.getElementById("sd-info"),
     $sdDict = document.getElementById("sd-dict"),
@@ -128,9 +132,10 @@ let ui = {
             ui.putInputData("endid", end);
             conf.range.rangeList = [...Array.from({ length: conf.range.end - conf.range.start + 1 }, (_, i) => i + conf.range.start)];
             conf.tasks = []; // 范围变化后，要重新估算生成task
-            conf.range.idList.forEach(
-                (id) => (document.getElementById(`material-${id}`).className = id >= conf.range.start && id <= conf.range.end ? "" : "skip")
-            );
+            conf.range.idList.forEach((id) => {
+                let dom = document.getElementById(`material-${id}`);
+                id >= conf.range.start && id <= conf.range.end ? dom.classList.remove("skip") : dom.classList.add("skip");
+            });
             conf.range.selected = false; // 选择重置
             ui.log(`素材范围：${conf.range.start} 到 ${conf.range.end}，共 ${conf.range.end - (conf.range.start || 1) + 1} 条素材`, "highlight");
             util.checkMaterials(); // 检查语料
@@ -173,6 +178,7 @@ let ui = {
     loadMaterial(data) {
         let row = $materials.insertRow();
         row.id = "material-" + data.id;
+        row.className = "type-" + data.type;
         row.dataset.id = +data.id;
         conf.uiFields.forEach((item, index) => {
             let cell = row.insertCell(-1);
@@ -253,13 +259,13 @@ let ui = {
                 language: conf.info.language,
                 book_cn: conf.info.book_cn,
                 style: "text",
-                rows: JSON.stringify(util.getPureMaterial(id))
+                rows: JSON.stringify(util.getMaterialByGroup(id))
             });
         } else if (target === "action-preview") {
             ui.openPostPage(`html-overview.php`, {
                 language: conf.info.language,
                 book_cn: conf.info.book_cn,
-                rows: JSON.stringify(util.getPureMaterial(id))
+                rows: JSON.stringify(util.getMaterialByGroup(id))
             });
         }
         if (field === "id" && conf.range.selected && event.shiftKey) {
@@ -319,11 +325,13 @@ let ui = {
         $sdInput.value = "";
     },
 
-    doSentenceConfirm() {
+    async doSentenceConfirm() {
         let id = +$sdInfo.dataset["id"],
             materials = Array.from($sdMaterials.querySelectorAll("li")).map((i) => i.innerText);
         if (materials.length) {
-            util.insertMaterial(id, materials);
+            let ids = util.insertMaterial(id, materials);
+            await action.fetchTranslationBundle(ids, "chinese", "english", true);
+            ids.forEach((id) => action.genPhoneticPiece(id, true));
         }
         ui.doSentenceClose();
     },
@@ -379,14 +387,17 @@ let ui = {
             return;
         }
         if (!e.locker) {
+            // 这些字段可以编辑
             if (event.target.className.match(/group|voice|chinese|english|comment/)) {
-                ui.showEditTool({ target: event.target, isfromtd: true });
+                ui.showEditTool({ target: event.target, isInCell: true });
+                $doCellTranslate.style.display = event.target.className.match(/chinese|english/) ? "inline-block" : "none";
+                $doCellPinyin.style.display = event.target.className.match(/chinese/) ? "inline-block" : "none";
             } else {
                 ui.hideEditTool();
             }
         } else {
             if (event.target.className === e.field && id === e.id) {
-                ui.showEditTool({ target: event.target, isfromtd: true });
+                ui.showEditTool({ target: event.target, isInCell: true });
             }
         }
     },
@@ -396,15 +407,16 @@ let ui = {
     /*********************/
     showEditTool(event) {
         let e = conf.editTool;
-        if (event.isfromtd) {
+        if (event.isInCell) {
+            // 如果在edit tool里面，也要show，但是不需要重新定位
             let rect = event.target.getBoundingClientRect();
             e.dom = event.target;
             e.id = +event.target.closest("tr").dataset.id;
             e.field = event.target.className;
             $edittool.style.left = rect.left + "px";
-            $edittool.style.top = rect.top - 20 + "px";
+            $edittool.style.top = rect.top - 26 + "px";
         }
-        $edittool.style.display = "flex";
+        $edittool.style.display = "block";
     },
 
     hideEditTool() {
@@ -418,17 +430,42 @@ let ui = {
         ui.switchEditTool();
     },
 
+    async doCellTranslate() {
+        let e = conf.editTool;
+        if (e.field.match(/chinese/)) {
+            await action.fetchTranslationBundle([e.id], "chinese", "english", true);
+        } else if (e.field.match(/english/)) {
+            await action.fetchTranslationBundle([e.id], "english", "chinese", true);
+            await action.genPhoneticPiece(e.id, true);
+        }
+    },
+
+    async doCellPinyin() {
+        let e = conf.editTool;
+        await action.genPhoneticPiece(e.id, true);
+    },
+
     async cellEditDone() {
         let e = conf.editTool;
         e.dom.contentEditable = "false";
         e.locker = false;
         ui.switchEditTool();
-        // 感叹号开头，则只留在UI里，临时使用不更新内存，以免被导出
-        if (e.field.match(/chinese|english/) && e.dom.innerText[0] === "!") {
-            e.dom.innerText = e.dom.innerText.slice(1);
-        } else {
-            conf.materials[e.id][e.field] = e.dom.innerText;
-            await util.updateMaterial(e.id, e.dom.innerText, e.field);
+        if (conf.materials[e.id][e.field] !== e.dom.innerText) {
+            if (e.field.match(/chinese|english/) && e.dom.innerText[0] === "!") {
+                // 如果修改的是中英，感叹号开头，则只留在UI里，临时使用不更新内存，以免被导出。audio生成会读ui字串而不是内存字串
+                e.dom.innerText = e.dom.innerText.slice(1);
+            } else {
+                conf.materials[e.id][e.field] = e.dom.innerText;
+                await util.updateMaterial(e.id, e.dom.innerText, e.field);
+                //如果编辑的是中文或英文，自动重新翻译和生成拼音
+                if (e.field.match(/chinese/)) {
+                    await action.fetchTranslationBundle([e.id], "chinese", "english");
+                    await action.genPhoneticPiece(e.id);
+                } else if (e.field.match(/english/)) {
+                    await action.fetchTranslationBundle([e.id], "english", "chinese");
+                    await action.genPhoneticPiece(e.id);
+                }
+            }
         }
         e.dom.style.background = e.dom.innerText !== conf.materials[e.id][e.field] ? "#fcc" : "";
     },
@@ -444,9 +481,8 @@ let ui = {
 
     switchEditTool() {
         let e = conf.editTool;
-        $doEditCell.style.display = e.locker ? "none" : "block";
-        $doEditDone.style.display = e.locker ? "block" : "none";
-        $doEditRestore.style.display = e.locker ? "block" : "none";
+        $unlocked.style.display = e.locker ? "none" : "block";
+        $locked.style.display = e.locker ? "block" : "none";
     },
 
     themeIdIncrease() {
@@ -539,9 +575,11 @@ $content.addEventListener("mouseleave", ui.hideEditTool, false);
 /*********************/
 $content.addEventListener("mousedown", ui.cellSelectStart, false);
 document.body.addEventListener("mouseup", ui.cellSelectEnd, false);
-$doEditCell.addEventListener("click", ui.cellEditStart, false);
+$doCellEdit.addEventListener("click", ui.cellEditStart, false);
 $doEditDone.addEventListener("click", ui.cellEditDone, false);
 $doEditRestore.addEventListener("click", ui.cellEditRestore, false);
+$doCellTranslate.addEventListener("click", ui.doCellTranslate, false);
+$doCellPinyin.addEventListener("click", ui.doCellPinyin, false);
 
 /*********************/
 // 管理工具

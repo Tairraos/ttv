@@ -56,7 +56,7 @@
                     $chinese = $row['chinese'];
                     $phonetic = $row['phonetic'];
                     $cnarr = preg_split('//u', $row['chinese'], -1, PREG_SPLIT_NO_EMPTY);
-                    $pyarr = array_map(fn($item) => mb_ereg_replace('[、，。？！：.,:?!]', ' ', $item), explode(' ', $row['phonetic']));
+                    $pyarr = array_map(fn($item) => mb_ereg_replace('[、，。？！：.,:?!“”]', ' ', $item), explode(' ', $row['phonetic']));
 
                     echo '<div class="subtitle vol-' . $vol . '">';
                     echo '<div class="subtitle-id">' . ($sid == 0 ? '' : $sid) . '</div>';

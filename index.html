@@ -93,10 +93,13 @@
             <div class="console"><div id="log"></div></div>
         </nav>
         <div id="content"><table id="material"></table></div>
-        <div id="edittool">
-            <button id="doEditCell">Edit</button>
-            <button id="doEditDone">Done</button>
-            <button id="doEditRestore">Restore</button>
+        <div id="edittool" style="display:none;">
+            <div id="edittool-unlocked">
+                <button id="doCellEdit">编辑</button><button id="doCellTranslate">翻译</button><button id="doCellPinyin">拼音</button>
+            </div>
+            <div id="edittool-locked" style="display:none;">
+                <button id="doEditDone">完成</button><button id="doEditRestore">恢复</button>
+            </div>
         </div>
         <div id="sd-container">
             <div id="sd-info">造句框</div>
@@ -111,8 +114,10 @@
                     <ul id="sd-materials"></ul>
                 </div>
                 <div id="sd-action">
-                    <button id="doSentenceConfirm">插入</button>
-                    <button id="doSentenceCancel">取消</button>
+                    <button id="doSentenceEditable">编辑模式</button>
+                    <button id="doSentenceRemovable">删除模式</button>
+                    <button id="doSentenceConfirm">插入素材</button>
+                    <button id="doSentenceCancel">取消操作</button>
                 </div>
             </div>
         </div>
