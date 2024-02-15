@@ -58,11 +58,19 @@ ul {
 }
 
 #material tr:nth-child(odd) {
-    background: #eee;
+    background: #f0f0f0;
 }
 
 #material tr:nth-child(even) {
     background: #fff;
+}
+
+#material tr.type-word:nth-child(odd) {
+    background: #e0f0ff;
+}
+
+#material tr.type-word:nth-child(even) {
+    background: #f0ffff;
 }
 
 #material th {
@@ -521,18 +529,18 @@ ul {
     box-shadow: 1px 1px 8px #0008;
 }
 
-#sd-custom-input {
-    font: 14px/14px system;
-    padding: 4px 8px;
-    vertical-align: middle;
-    cursor: pointer;
-}
-
-#doSentenceConfirm,
-#doSentenceCancel {
+#sd-dialog button {
     font: 16px/16px system;
     padding: 7px 10px;
     margin: 0 10px;
+    cursor: pointer;
+}
+
+#sd-dialog #sd-custom-input {
+    font: 14px/14px system;
+    padding: 5px 8px;
+    margin: 0 0 0 4px;
+    vertical-align: middle;
     cursor: pointer;
 }
 

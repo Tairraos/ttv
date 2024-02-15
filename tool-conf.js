@@ -25,7 +25,8 @@ conf.videos = [
 conf.editTool = {
     id: 0,
     dom: null,
-    locker: false
+    locker: false,
+    sdmode: "edit" // 造句工具选中句子是编辑模式还是删除模式
 };
 
 // 实际导入导出需要的data字段

@@ -18,7 +18,8 @@ let $basket = document.getElementById("basket"),
     $sdInfo = document.getElementById("sd-info"),
     $sdDict = document.getElementById("sd-dict"),
     $sdMaterials = document.getElementById("sd-materials"),
-    $sdInput = document.getElementById("sd-input");
+    $sdInput = document.getElementById("sd-input"),
+    $doSentenceSwitchMode = document.getElementById("doSentenceSwitchMode");
 
 let $tool_a = document.getElementById("tool_a"),
     $tool_b = document.getElementById("tool_b"),
@@ -305,11 +306,14 @@ let ui = {
         let li = document.createElement("li");
         li.innerHTML = `${text}`;
         li.addEventListener("click", event);
+        li.contentEditable = "true";
         target.appendChild(li);
     },
 
     doRemoveSelected(e) {
-        e.target.remove();
+        if (conf.editTool.sdmode === "remove") {
+            e.target.remove();
+        }
     },
 
     doAddSelectd(e) {
@@ -323,6 +327,11 @@ let ui = {
             ui.addLi($sdMaterials, text, ui.doRemoveSelected);
         }
         $sdInput.value = "";
+    },
+
+    doSentenceSwitchMode() {
+        conf.editTool.sdmode = conf.editTool.sdmode === "edit" ? "remove" : "edit";
+        $doSentenceSwitchMode.innerText = `切换模式，当前：${conf.editTool.sdmode === "edit" ? "编辑" : "删除"}`;
     },
 
     async doSentenceConfirm() {
@@ -598,3 +607,4 @@ document.getElementById("doGenMergeCmd").addEventListener("click", action.doGenM
 document.getElementById("sd-custom-input").addEventListener("click", ui.doAddInput, false);
 document.getElementById("doSentenceConfirm").addEventListener("click", ui.doSentenceConfirm, false);
 document.getElementById("doSentenceCancel").addEventListener("click", ui.doSentenceClose, false);
+$doSentenceSwitchMode.addEventListener("click", ui.doSentenceSwitchMode, false);
