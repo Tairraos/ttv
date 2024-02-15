@@ -36,11 +36,12 @@ let ui = {
     },
 
     initRangeBox() {
-        conf.range.idList = Object.keys(conf.materials).map((i) => +i);
-        conf.range.min = Math.min(...conf.range.idList, 1);
-        conf.range.max = Math.max(...conf.range.idList, 1);
-        ui.putInputData("startid", conf.range.min); //填上缺省值
-        ui.putInputData("endid", conf.range.max);
+        let r = conf.range;
+        r.idList = Object.keys(conf.materials).map((i) => +i);
+        r.min = Math.min(...r.idList, 1);
+        r.max = Math.max(...r.idList, 1);
+        ui.putInputData("startid", r.min); //填上缺省值
+        ui.putInputData("endid", r.max);
         ui.rangeConfirm(); // confirm一次
     },
 
@@ -110,48 +111,87 @@ let ui = {
     // 确认设置范围
     /*********************/
     rangeConfirm() {
-        let start = Math.max(+ui.getInputData("startid"), conf.range.min) || 0,
-            end = Math.min(ui.getInputData("endid"), conf.range.max) || 0;
+        let r = conf.range,
+            start = Math.max(+ui.getInputData("startid"), r.min) || 0,
+            end = Math.min(ui.getInputData("endid"), r.max) || 0;
 
-        if (start === 0 || end === 0) {
-            // 删除start或者end，则reset
-            if (conf.range.selected) {
-                ui.putInputData("startid", conf.range.start);
-                ui.putInputData("endid", conf.range.end);
-                delete conf.range.selected;
-                document.querySelectorAll(`#material tr`).forEach((line) => line.classList.remove("selecting"));
-                ui.log(`素材范围恢复，未做修改`, "highlight");
-            } else {
-                ui.putInputData("startid", conf.range.min);
-                ui.putInputData("endid", conf.range.max);
-                ui.rangeConfirm();
-            }
+        if (r.start === start && r.end === end && (r.min !== start || r.max !== end)) {
+            delete r.selected;
+            ui.rangeReset();
         } else {
-            conf.range.start = start;
-            conf.range.end = end;
+            r.start = start;
+            r.end = end;
             ui.putInputData("startid", start);
             ui.putInputData("endid", end);
-            conf.range.rangeList = [...Array.from({ length: conf.range.end - conf.range.start + 1 }, (_, i) => i + conf.range.start)];
+            r.rangeList = [...Array.from({ length: r.end - r.start + 1 }, (_, i) => i + r.start)];
             conf.tasks = []; // 范围变化后，要重新估算生成task
-            conf.range.idList.forEach((id) => {
+            r.idList.forEach((id) => {
                 let dom = document.getElementById(`material-${id}`);
-                id >= conf.range.start && id <= conf.range.end ? dom.classList.remove("skip") : dom.classList.add("skip");
+                id >= r.start && id <= r.end ? dom.classList.remove("skip") : dom.classList.add("skip");
             });
-            conf.range.selected = false; // 选择重置
-            ui.log(`素材范围：${conf.range.start} 到 ${conf.range.end}，共 ${conf.range.end - (conf.range.start || 1) + 1} 条素材`, "highlight");
+            r.selected = false; // 选择重置
+            ui.log(`素材范围：${r.start} 到 ${r.end}，共 ${r.end - (r.start || 1) + 1} 条素材`, "highlight");
             util.checkMaterials(); // 检查语料
         }
+        document.querySelectorAll(`#material tr`).forEach((line) => line.classList.remove("selecting"));
     },
 
     /*********************/
     // 重置范围，第一次恢复已经确认的范围，再点一次恢复到全部
     /*********************/
     rangeReset() {
-        ui.putInputData("startid", conf.range.start);
-        ui.putInputData("endid", conf.range.end);
-        delete conf.range.selected;
-        document.querySelectorAll(`#material tr`).forEach((line) => line.classList.remove("selecting"));
-        ui.log(`素材范围恢复，未做修改`, "highlight");
+        let r = conf.range;
+        if (r.selected) {
+            ui.putInputData("startid", r.start);
+            ui.putInputData("endid", r.end);
+            delete r.selected;
+            document.querySelectorAll(`#material tr`).forEach((line) => line.classList.remove("selecting"));
+            ui.log(`素材范围恢复，未做修改`, "highlight");
+        } else {
+            ui.putInputData("startid", r.min);
+            ui.putInputData("endid", r.max);
+            ui.rangeConfirm();
+        }
+    },
+
+    /*********************/
+    // 批量检查范围内的Slide
+    /*********************/
+    rangeVerify() {
+        if (conf.range.rangeList.length > 80){
+            return ui.err("当前作用范围超过允许值：80");
+        }
+        ui.openPostPage(`html-verify.php`, {
+            book_cn: conf.info.book_cn,
+            ids: JSON.stringify(conf.range.rangeList)
+        });
+    },
+    
+    /*********************/
+    // 定位行，移到屏幕中来
+    /*********************/
+    lineLocate() {
+        let locateid = +ui.getInputData("locateid"),
+            materials = util.getMaterial();
+        for (let line of materials) {
+            if (line.sid === locateid) {
+                return document.querySelector(`#material-${line.id}`).scrollIntoView({ behavior: "smooth" });
+            }
+        }
+    },
+
+    /*********************/
+    // 为指定间隔的间做上颜色标记
+    /*********************/
+    lineMark() {
+        let marknum = +ui.getInputData("marknum"),
+            materials = util.getMaterial();
+        document.querySelectorAll(`#material tr`).forEach((line) => line.classList.remove("marked"));
+        for (let line of materials) {
+            if (line.sid % marknum === 1) {
+                document.querySelector(`#material-${line.id}`).classList.add("marked");
+            }
+        }
     },
 
     /*********************/
@@ -249,6 +289,10 @@ let ui = {
             }
         } else if (target === "theme") {
             ui.putInputData("themename", dom.innerText);
+        } else if (target === "id") {
+            ui.putInputData("startid", id);
+        } else if (target === "sid") {
+            ui.putInputData("endid", id);
         } else if (target === "audio") {
             await action.genAudioPiece(id, field, true); //force=true,覆盖生成
         } else if (target.match(/^video/)) {
@@ -496,22 +540,15 @@ let ui = {
 
     themeIdIncrease() {
         let [base, index] = ui.getInputData("themename").split("-");
-        ui.putInputData("themename", `${base}-${((+index || 0) + 1).toString().padStart(3, "0")}`);
+        ui.putInputData("themename", `${base}-${String((+index || 0) + 1).padStart(3, "0")}`);
     },
 
     themeIdDecrease() {
         let [base, index] = ui.getInputData("themename").split("-");
-        ui.putInputData(
-            "themename",
-            `${base}-${Math.max((+index || 1) - 1, 1)
-                .toString()
-                .padStart(3, "0")}`
-        );
+        ui.putInputData("themename", `${base}-${String(Math.max((+index || 1) - 1, 1)).padStart(3, "0")}`);
     },
 
-    themeIdSave() {
-        util.updateMaterial(ui.getInputData("themefrom"), ui.getInputData("themename"), "theme", ui.getInputData("themeto"));
-    },
+    themeIdSave: () => util.updateMaterial(ui.getInputData("startid"), ui.getInputData("themename"), "theme", ui.getInputData("endid")),
 
     /*********************/
     // 输出页内Log
@@ -543,15 +580,6 @@ let ui = {
 };
 
 /*********************/
-// 工程配置
-/*********************/
-document.getElementById("icon-plus").addEventListener("click", ui.themeIdIncrease, false);
-document.getElementById("icon-minus").addEventListener("click", ui.themeIdDecrease, false);
-document.getElementById("icon-save").addEventListener("click", ui.themeIdSave, false);
-document.getElementById("icon-confirm").addEventListener("click", ui.rangeConfirm, false);
-document.getElementById("program").addEventListener("change", ui.onProgramChange, false);
-
-/*********************/
 // 绑UI拖放事件
 /*********************/
 $basket.addEventListener("dragenter", ui.dragEnter, false);
@@ -580,7 +608,7 @@ $edittool.addEventListener("mouseover", ui.showEditTool, false);
 $content.addEventListener("mouseleave", ui.hideEditTool, false);
 
 /*********************/
-// 绑编辑工具
+// 编辑工具
 /*********************/
 $content.addEventListener("mousedown", ui.cellSelectStart, false);
 document.body.addEventListener("mouseup", ui.cellSelectEnd, false);
@@ -589,6 +617,18 @@ $doEditDone.addEventListener("click", ui.cellEditDone, false);
 $doEditRestore.addEventListener("click", ui.cellEditRestore, false);
 $doCellTranslate.addEventListener("click", ui.doCellTranslate, false);
 $doCellPinyin.addEventListener("click", ui.doCellPinyin, false);
+
+/*********************/
+// 素材工具
+/*********************/
+document.getElementById("icon-plus").addEventListener("click", ui.themeIdIncrease, false);
+document.getElementById("icon-minus").addEventListener("click", ui.themeIdDecrease, false);
+document.getElementById("icon-save").addEventListener("click", ui.themeIdSave, false);
+document.getElementById("icon-confirm").addEventListener("click", ui.rangeConfirm, false);
+document.getElementById("icon-verify").addEventListener("click", ui.rangeVerify, false);
+document.getElementById("icon-locate").addEventListener("click", ui.lineLocate, false);
+document.getElementById("icon-mark").addEventListener("click", ui.lineMark, false);
+document.getElementById("program").addEventListener("change", ui.onProgramChange, false);
 
 /*********************/
 // 管理工具

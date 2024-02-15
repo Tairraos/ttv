@@ -95,7 +95,7 @@
         if (issueChars.length) {
             Array.from(document.styleSheets).filter(line => String(line.href).match(/page\.css/)).forEach(
                 sheets => Array.from(sheets.cssRules).filter(rule => String(rule.selectorText).match(/\.subtitle\.vol-\d \.book-chinese \.cn/))
-                    .forEach(rule => rule.style["font-size"] = +rule.style["font-size"].replace(/px/, "") - 3 + "px")
+                    .forEach(rule => rule.style["font-size"] = +rule.style["font-size"].replace(/px/, "") - 5 + "px")
             );
         }
     }

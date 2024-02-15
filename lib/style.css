@@ -58,7 +58,7 @@ ul {
 }
 
 #material tr:nth-child(odd) {
-    background: #f0f0f0;
+    background: #fafafa;
 }
 
 #material tr:nth-child(even) {
@@ -66,11 +66,11 @@ ul {
 }
 
 #material tr.type-word:nth-child(odd) {
-    background: #e0f0ff;
+    background: #f3ffeb;
 }
 
 #material tr.type-word:nth-child(even) {
-    background: #f0ffff;
+    background: #f9fff5;
 }
 
 #material th {
@@ -231,7 +231,6 @@ ul {
 }
 
 #edittool {
-    /* display: none; */
     position: fixed;
     background: #35f4;
     padding: 2px;
@@ -290,7 +289,7 @@ ul {
 }
 
 #material .skip {
-    opacity: 0.3;
+    opacity: 0.1;
 }
 
 #material .chinese,
@@ -340,7 +339,7 @@ ul {
 }
 
 #themename {
-    width: 80px;
+    width: 70px;
     text-align: center;
     padding: 3px;
     vertical-align: middle;
@@ -356,10 +355,10 @@ ul {
 
 .subsetting {
     font-size: 14px;
-    display: flex;
+    /* display: flex; */
     justify-content: space-between;
     align-items: center;
-    padding: 0 14px;
+    padding: 0 10px;
 }
 
 .svg-icon {
@@ -374,18 +373,20 @@ ul {
 #icon-plus,
 #icon-minus,
 #icon-save,
-#icon-confirm {
-    height: 24px;
-    width: 24px;
-    vertical-align: middle;
+#icon-confirm,
+#icon-verify,
+#icon-locate,
+#icon-mark {
+    height: 20px;
+    width: 20px;
     fill: #333;
     vertical-align: middle;
     cursor: pointer;
 }
 
 #startid,
-#endid {
-    width: 35px;
+#endid,#locateid,#marknum {
+    width: 31px;
     text-align: center;
     padding: 3px 2px;
     margin: 5px 0;
@@ -394,7 +395,10 @@ ul {
 #icon-plus:hover,
 #icon-minus:hover,
 #icon-save:hover,
-#icon-confirm:hover {
+#icon-confirm:hover,
+#icon-verify:hover,
+#icon-locate:hover,
+#icon-mark:hover {
     fill: #2a2;
 }
 
@@ -407,6 +411,10 @@ ul {
 
 .unselectable {
     user-select: none;
+}
+
+.marked {
+    background: #9bd !important;
 }
 
 .selecting {
