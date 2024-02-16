@@ -223,11 +223,14 @@ let action = {
 
         let videoName = util.getNewVideoName(),
             log = ui.log(`生成作品：${videoName}`, "highlight"),
+            program = setup.program[conf.info.program],
+            duration = util.fmtDuration(ret.duration),
+            time = new Date().toISOString().replace(/T/, " ").replace(/\..*/, ""),
             ret = await net.ffmpegContact();
         if (ret.result === "success") {
             ui.done(log);
-            ui.log(`视频实际长度：${util.fmtDuration(ret.duration)}秒`, "highlight");
-            conf.videos.push([videoName, setup.program[conf.info.program], conf.range.start, conf.range.end, ret.duration, util.fmtDuration(ret.duration)]);
+            ui.log(`视频实际长度：${duration}秒`, "highlight");
+            conf.videos.push([videoName, program, conf.range.start, conf.range.end, `[${duration}]`, `[${time}]`]);
             ui.log(`7.作品已经生成`, "pass");
             window.open(`media/${conf.info.book_cn}/dist/${videoName}`, "preview");
             action.doExportData(); //立刻导出新版xls
