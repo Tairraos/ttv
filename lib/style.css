@@ -239,7 +239,7 @@ ul {
 #edittool {
     position: fixed;
     background: #35f4;
-    padding: 2px;
+    /* padding: 2px; */
     border-radius: 5px 5px 0 0;
 }
 
@@ -248,7 +248,7 @@ ul {
     cursor: pointer;
     width: 35px;
     padding: 1px 0;
-    margin: 0 2px;
+    margin: 0 1px;
 }
 
 #material svg {

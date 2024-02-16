@@ -9,6 +9,7 @@ let $basket = document.getElementById("basket"),
     $server = document.getElementById("server"),
     $doCellEdit = document.getElementById("doCellEdit"),
     $doCellTranslate = document.getElementById("doCellTranslate"),
+    $doMakeSentence = document.getElementById("doMakeSentence"),
     $doCellPinyin = document.getElementById("doCellPinyin"),
     $doEditDone = document.getElementById("doEditDone"),
     $doEditRestore = document.getElementById("doEditRestore"),
@@ -71,6 +72,9 @@ let ui = {
         }
     },
 
+    /*********************/
+    // 更新拖放框内信息
+    /*********************/
     updateBasket() {
         let info = [
             `名称：${conf.info.book_cn}`,
@@ -83,6 +87,13 @@ let ui = {
         $info.style.display = "flex";
         $info.innerHTML = info.map((item) => `<div>${item}</div>`).join("");
         $export.innerText = `导出 ${conf.info.book_cn}.${conf.info.version + 1}`;
+    },
+
+    /*********************/
+    // 如果初始化的时候，内存数据有未备份的，高亮按钮背景
+    /*********************/
+    highlightRestoreBtn() {
+        document.getElementById("doRestoreStorage").style.background = "#fcc";
     },
 
     /*********************/
@@ -278,48 +289,43 @@ let ui = {
     // 点击表格内容预览
     /*********************/
     async doCellClick(event) {
-        if (!["SPAN", "TD"].includes(event.target.tagName)) {
-            return; // 保护错误的事件触发
-        }
-        let dom = event.target,
-            id = +dom.closest("tr").dataset.id,
-            field = dom.closest("td").className,
-            target = dom.className.replace(/svg|required|exist| /g, "");
-        if (target === "type") {
-            if (conf.materials[id].type === "word") {
-                ui.doShowSentenceDialog(id);
+        let dom = event.target;
+        if (["SPAN", "TD"].includes(dom.tagName)) {
+            let id = +dom.closest("tr").dataset.id,
+                field = dom.closest("td").className,
+                target = dom.className.replace(/svg|required|exist| /g, "");
+            if (target === "id") {
+                ui.putInputData("startid", id);
+            } else if (target === "sid") {
+                ui.putInputData("endid", id);
+            } else if (target === "theme") {
+                ui.putInputData("themename", dom.innerText);
+            } else if (target === "audio") {
+                await action.genAudioPiece(id, field, true); //force=true,覆盖生成
+            } else if (target.match(/^video/)) {
+                action.genVideoPiece(id, field, target, true); // force=true,覆盖生成
+            } else if (target.match(/^slide/)) {
+                action.genSlidePiece(id, target.replace(/slide-/, ""), true); // force=true,覆盖生成
+            } else if (target === "action-page") {
+                ui.openPostPage(`html-slide.php`, {
+                    language: conf.info.language,
+                    book_cn: conf.info.book_cn,
+                    style: "text",
+                    rows: JSON.stringify(util.getMaterialByGroup(id))
+                });
+            } else if (target === "action-preview") {
+                ui.openPostPage(`html-overview.php`, {
+                    language: conf.info.language,
+                    book_cn: conf.info.book_cn,
+                    rows: JSON.stringify(util.getMaterialByGroup(id))
+                });
             }
-        } else if (target === "theme") {
-            ui.putInputData("themename", dom.innerText);
-        } else if (target === "id") {
-            ui.putInputData("startid", id);
-        } else if (target === "sid") {
-            ui.putInputData("endid", id);
-        } else if (target === "audio") {
-            await action.genAudioPiece(id, field, true); //force=true,覆盖生成
-        } else if (target.match(/^video/)) {
-            action.genVideoPiece(id, field, target, true); // force=true,覆盖生成
-        } else if (target.match(/^slide/)) {
-            action.genSlidePiece(id, target.replace(/slide-/, ""), true); // force=true,覆盖生成
-        } else if (target === "action-page") {
-            ui.openPostPage(`html-slide.php`, {
-                language: conf.info.language,
-                book_cn: conf.info.book_cn,
-                style: "text",
-                rows: JSON.stringify(util.getMaterialByGroup(id))
-            });
-        } else if (target === "action-preview") {
-            ui.openPostPage(`html-overview.php`, {
-                language: conf.info.language,
-                book_cn: conf.info.book_cn,
-                rows: JSON.stringify(util.getMaterialByGroup(id))
-            });
-        }
-        if (field === "id" && conf.range.selected && event.shiftKey) {
-            ui.putInputData("endid", id);
-            ui.updateSelecting(conf.range.selected, id);
-        } else if (conf.range.selected) {
-            ui.rangeReset();
+            if (field === "id" && conf.range.selected && event.shiftKey) {
+                ui.putInputData("endid", id);
+                ui.updateSelecting(conf.range.selected, id);
+            } else if (conf.range.selected) {
+                ui.rangeReset();
+            }
         }
     },
 
@@ -383,13 +389,14 @@ let ui = {
     async doSentenceConfirm() {
         let id = +$sdInfo.dataset["id"],
             materials = Array.from($sdMaterials.querySelectorAll("li")).map((i) => i.innerText);
+        ui.doSentenceClose();
         if (materials.length) {
             let ids = util.insertMaterial(id, materials);
             await action.fetchTranslationBundle(ids, "chinese", "english", true);
             ids.forEach((id) => action.genPhoneticPiece(id, true));
         }
+        conf.lastTouchedId = id;
         util.backupParam2Storage();
-        ui.doSentenceClose();
     },
 
     doSentenceClose() {
@@ -432,28 +439,31 @@ let ui = {
     /*********************/
     onMouseOverCell(event) {
         let e = conf.editTool,
-            uiline = event.target.closest("tr");
-        if (uiline) {
-            let id = +uiline.dataset.id;
-            if (event.target.tagName === "TD" && conf.onselect) {
+            dom = event.target;
+        if (dom.tagName === "TD") {
+            let field = dom.className,
+                id = +dom.closest("tr").dataset.id;
+            if (conf.onselect) {
                 // 拖动选择工具
                 let start = Math.min(conf.onselect, id),
                     end = Math.max(conf.onselect, id);
                 ui.putInputData("startid", start); //填上缺省值
                 ui.putInputData("endid", end);
-                conf.range.selected = conf.onselect;
                 ui.updateSelecting(start, end);
+                conf.range.selected = conf.onselect;
             } else if (!e.locker) {
                 // 这些字段可以编辑
-                if (event.target.className.match(/group|voice|chinese|english|comment/)) {
-                    ui.showEditTool({ target: event.target, isInCell: true });
-                    $doCellTranslate.style.display = event.target.className.match(/chinese|english/) ? "inline-block" : "none";
-                    $doCellPinyin.style.display = event.target.className.match(/chinese/) ? "inline-block" : "none";
+                if (field.match(/group|voice|chinese|english|comment/)) {
+                    ui.showEditTool({ target: dom, isInCell: true });
+                    $doMakeSentence.style.display = field === "chinese" && conf.materials[id].type === "word" ? "inline-block" : "none";
+                    $doCellTranslate.style.display = field.match(/chinese|english/) ? "inline-block" : "none";
+                    $doCellPinyin.style.display = field === "chinese" ? "inline-block" : "none";
                 } else {
                     ui.hideEditTool();
                 }
-            } else if (event.target.className === e.field && id === e.id) {
-                ui.showEditTool({ target: event.target, isInCell: true });
+            }
+            if (field === e.field && id === e.id) {
+                ui.showEditTool({ target: dom, isInCell: true });
             }
         }
     },
@@ -470,7 +480,7 @@ let ui = {
             e.id = +event.target.closest("tr").dataset.id;
             e.field = event.target.className;
             $edittool.style.left = rect.left + "px";
-            $edittool.style.top = rect.top - 26 + "px";
+            $edittool.style.top = rect.top - 20 + "px";
         }
         $edittool.style.display = "block";
     },
@@ -486,6 +496,11 @@ let ui = {
         ui.switchEditTool();
     },
 
+    doMakeSentence() {
+        ui.doShowSentenceDialog(conf.editTool.id);
+        window.setTimeout(() => ui.hideEditTool(), 300);
+    },
+
     async doCellTranslate() {
         let e = conf.editTool;
         if (e.field.match(/chinese/)) {
@@ -497,10 +512,7 @@ let ui = {
         util.backupParam2Storage();
     },
 
-    async doCellPinyin() {
-        let e = conf.editTool;
-        await action.genPhoneticPiece(e.id, true);
-    },
+    doCellPinyin: async () => await action.genPhoneticPiece(conf.editTool.id, true),
 
     async cellEditDone() {
         let e = conf.editTool;
@@ -584,9 +596,6 @@ let ui = {
     serverError() {
         ui.log("摩耳视频助手服务不可用，请检查。", "error");
         return "error";
-    },
-    highlightRestoreBtn() {
-        document.getElementById("doRestoreStorage").style.background = "#fcc";
     }
 };
 
@@ -627,6 +636,7 @@ document.body.addEventListener("mouseup", ui.cellSelectEnd, false);
 $doCellEdit.addEventListener("click", ui.cellEditStart, false);
 $doEditDone.addEventListener("click", ui.cellEditDone, false);
 $doEditRestore.addEventListener("click", ui.cellEditRestore, false);
+$doMakeSentence.addEventListener("click", ui.doMakeSentence, false);
 $doCellTranslate.addEventListener("click", ui.doCellTranslate, false);
 $doCellPinyin.addEventListener("click", ui.doCellPinyin, false);
 
