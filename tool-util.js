@@ -25,6 +25,9 @@ let util = {
             ui.loadMaterial(data, true); // true: 从localStorage里恢复
         }
         util.checkMaterials();
+        if (conf.lastTouchedId){
+            document.querySelector(`#material-${conf.lastTouchedId}`).scrollIntoView({ behavior: "smooth" });
+        }
         ui.updateBasket();
     },
 
