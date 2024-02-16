@@ -105,7 +105,6 @@ let ui = {
         conf.tasks = []; // 风格变化后，要重新估算生成task
         util.checkMaterials(); // 检查所有语料的素材是否准备完全
         ui.log(`视频风格选择：${conf.program[program]}`, "highlight");
-        util.backupParam2Storage();
     },
 
     /*********************/
@@ -135,7 +134,6 @@ let ui = {
             util.checkMaterials(); // 检查语料
         }
         document.querySelectorAll(`#material tr`).forEach((line) => line.classList.remove("selecting"));
-        util.backupParam2Storage();
     },
 
     /*********************/
@@ -230,7 +228,6 @@ let ui = {
         });
         if (!isLoadFromStorage) {
             conf.materials[data.id] = data;
-            util.backupParam2Storage();
         }
     },
 
@@ -391,6 +388,7 @@ let ui = {
             await action.fetchTranslationBundle(ids, "chinese", "english", true);
             ids.forEach((id) => action.genPhoneticPiece(id, true));
         }
+        util.backupParam2Storage();
         ui.doSentenceClose();
     },
 
@@ -496,6 +494,7 @@ let ui = {
             await action.fetchTranslationBundle([e.id], "english", "chinese", true);
             await action.genPhoneticPiece(e.id, true);
         }
+        util.backupParam2Storage();
     },
 
     async doCellPinyin() {
@@ -514,7 +513,6 @@ let ui = {
                 e.dom.innerText = e.dom.innerText.slice(1);
             } else {
                 conf.materials[e.id][e.field] = e.dom.innerText;
-                util.backupParam2Storage();
                 await util.updateMaterial(e.id, e.dom.innerText, e.field);
                 //如果编辑的是中文或英文，自动重新翻译和生成拼音
                 if (e.field.match(/chinese/)) {
@@ -524,6 +522,7 @@ let ui = {
                     await action.fetchTranslationBundle([e.id], "english", "chinese");
                     await action.genPhoneticPiece(e.id);
                 }
+                util.backupParam2Storage();
             }
         }
         e.dom.style.background = e.dom.innerText !== conf.materials[e.id][e.field] ? "#fcc" : "";
@@ -554,7 +553,10 @@ let ui = {
         ui.putInputData("themename", `${base}-${String(Math.max((+index || 1) - 1, 1)).padStart(3, "0")}`);
     },
 
-    themeIdSave: () => util.updateMaterial(ui.getInputData("startid"), ui.getInputData("themename"), "theme", ui.getInputData("endid")),
+    themeIdSave() {
+        util.updateMaterial(ui.getInputData("startid"), ui.getInputData("themename"), "theme", ui.getInputData("endid"));
+        util.backupParam2Storage();
+    },
 
     /*********************/
     // 输出页内Log

@@ -46,7 +46,6 @@ let util = {
         } else if (["slide", "audio", "video"].includes(field)) {
             conf.files[field].push(data);
         }
-        util.backupParam2Storage();
     },
 
     /*********************/
@@ -204,7 +203,6 @@ let util = {
                 }
             }
         }
-        util.backupParam2Storage();
         ui.done(log);
     },
 

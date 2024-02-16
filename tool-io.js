@@ -49,7 +49,6 @@ let io = {
         conf.info.book_abbr = g(`C2`); //缩写
         conf.info.language = g(`D2`); //课程语言
         conf.info.version = g(`E2`); //数据文件版本
-        util.backupParam2Storage();
         ui.done(log);
 
         //导入视频

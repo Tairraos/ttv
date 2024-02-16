@@ -41,6 +41,7 @@ let action = {
         for (let line of util.getMaterial((line) => util.isLearnEnglish() && line.type === "word" && line.english && !line.chinese)) {
             await util.updateMaterial(line.id, dict.e2c[line.english.toLowerCase()].mean, "chinese");
         }
+        util.backupParam2Storage();
         ui.log(`1.素材翻译完成`, "pass");
     },
 
@@ -70,6 +71,7 @@ let action = {
         for (let line of util.getMaterial()) {
             action.genPhoneticPiece(line.id);
         }
+        util.backupParam2Storage();
         ui.log(`2.素材标注${util.isLearnEnglish() ? "音标" : "拼音"}完成`, "pass");
     },
 
@@ -181,7 +183,6 @@ let action = {
                 ret = await net.ffmpegPiece(filename, slidename, audioname);
             if (ret.result === "success") {
                 conf.durations[filename] = ret.duration;
-                util.backupParam2Storage();
                 await util.updateMaterial(id, filename, "video");
                 util.checkMaterials(id);
                 ui.done(log);
@@ -202,7 +203,6 @@ let action = {
         await util.checkMaterialDuration(); // 预计算所有素材时长
         conf.tasks = util.getTasksList();
         conf.info.duration = +conf.tasks.reduce((target, file) => target + conf.durations[file], 0).toFixed(3);
-        util.backupParam2Storage();
 
         ui.log(`6.工程估算完成`, "pass");
         ui.log(`目标视频名字：${util.getNewVideoName()}`);
@@ -234,6 +234,7 @@ let action = {
         } else {
             ui.err(`生成作品 ${videoName} 时遇到错误`);
         }
+        util.backupParam2Storage();
     },
 
     /*********************/
