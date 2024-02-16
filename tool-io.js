@@ -1,4 +1,4 @@
-/* global conf, ui, util, XLSX */
+/* global conf, setup, ui, util, XLSX */
 let io = {
     /*********************/
     // 导入数据文件
@@ -49,6 +49,7 @@ let io = {
         conf.info.book_abbr = g(`C2`); //缩写
         conf.info.language = g(`D2`); //课程语言
         conf.info.version = g(`E2`); //数据文件版本
+        util.backupParam2Storage();
         ui.done(log);
 
         //导入视频
@@ -74,7 +75,7 @@ let io = {
     exportData() {
         conf.info.version++;
         let materials = Object.values(conf.materials),
-            book = materials.map((line) => conf.dataFields.map((field) => (line[field] !== 0 ? line[field] : ""))),
+            book = materials.map((line) => setup.dataFields.map((field) => (line[field] !== 0 ? line[field] : ""))),
             info = [[conf.info.book_cn, conf.info.book_en, conf.info.book_abbr, conf.info.language, conf.info.version]],
             video = conf.videos,
             ware = [];
@@ -94,14 +95,14 @@ let io = {
         let workbook = XLSX.utils.book_new(),
             filename = `${info[0][0]}.${info[0][4]}.xlsx`;
 
-        XLSX.utils.book_append_sheet(workbook, io.getSheet(book, conf.sheet.book), `课本`);
-        XLSX.utils.book_append_sheet(workbook, io.getSheet(info, conf.sheet.info), `信息`);
-        XLSX.utils.book_append_sheet(workbook, io.getSheet(video, conf.sheet.video), `视频`);
+        XLSX.utils.book_append_sheet(workbook, io.getSheet(book, setup.sheet.book), `课本`);
+        XLSX.utils.book_append_sheet(workbook, io.getSheet(info, setup.sheet.info), `信息`);
+        XLSX.utils.book_append_sheet(workbook, io.getSheet(video, setup.sheet.video), `视频`);
 
         // 课件sheet
         let ware_sheet = XLSX.utils.aoa_to_sheet(ware);
         ware_sheet["!cols"] = [{ wpx: 45 }, { wpx: 470 }];
-        let style = conf.exportStyle[conf.info.language];
+        let style = setup.exportStyle[conf.info.language];
         Object.keys(ware_sheet).forEach((key) => {
             if (!key.startsWith("!")) {
                 ware_sheet[key].s = style[+key.replace(/[^\d]/g, "") % style.length];

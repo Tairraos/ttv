@@ -1,4 +1,4 @@
-/* global conf, util, io, ui, net, pinyinPro */
+/* global conf, setup, dict, util, io, ui, net, pinyinPro */
 let action = {
     /*********************/
     // 拖放导入数据
@@ -14,6 +14,7 @@ let action = {
             await io.importXlsx(data);
             conf.files = (await net.filesList()).files;
             conf.tasks = []; // 每次导入都清空任务列表，需要重新估算新产生任务列表
+            util.backupParam2Storage();
             ui.initRangeBox();
             ui.updateBasket();
         };
@@ -38,7 +39,7 @@ let action = {
         );
         // 英文课词汇查字典翻译，带词性和多个意思
         for (let line of util.getMaterial((line) => util.isLearnEnglish() && line.type === "word" && line.english && !line.chinese)) {
-            await util.updateMaterial(line.id, conf.dict[line.english.toLowerCase()].mean, "chinese");
+            await util.updateMaterial(line.id, dict.e2c[line.english.toLowerCase()].mean, "chinese");
         }
         ui.log(`1.素材翻译完成`, "pass");
     },
@@ -83,7 +84,7 @@ let action = {
         } else if (line.english && util.isLearnEnglish() && line.type === "word" && !line.phonetic) {
             // 英文课，词汇查字典获得音标，句子的 Phonetic 字段留空，不需要拼音或音标
             log = ui.log(`标注音标：${line.english}`);
-            await util.updateMaterial(line.id, conf.dict[line.english.toLowerCase()].accent, "phonetic");
+            await util.updateMaterial(line.id, dict.e2c[line.english.toLowerCase()].accent, "phonetic");
             ui.done(log);
         }
     },
@@ -180,6 +181,7 @@ let action = {
                 ret = await net.ffmpegPiece(filename, slidename, audioname);
             if (ret.result === "success") {
                 conf.durations[filename] = ret.duration;
+                util.backupParam2Storage();
                 await util.updateMaterial(id, filename, "video");
                 util.checkMaterials(id);
                 ui.done(log);
@@ -200,6 +202,7 @@ let action = {
         await util.checkMaterialDuration(); // 预计算所有素材时长
         conf.tasks = util.getTasksList();
         conf.info.duration = +conf.tasks.reduce((target, file) => target + conf.durations[file], 0).toFixed(3);
+        util.backupParam2Storage();
 
         ui.log(`6.工程估算完成`, "pass");
         ui.log(`目标视频名字：${util.getNewVideoName()}`);
@@ -224,7 +227,7 @@ let action = {
         if (ret.result === "success") {
             ui.done(log);
             ui.log(`视频实际长度：${util.fmtDuration(ret.duration)}秒`, "highlight");
-            conf.videos.push([videoName, conf.program[conf.info.program], conf.range.start, conf.range.end, ret.duration, util.fmtDuration(ret.duration)]);
+            conf.videos.push([videoName, setup.program[conf.info.program], conf.range.start, conf.range.end, ret.duration, util.fmtDuration(ret.duration)]);
             ui.log(`7.作品已经生成`, "pass");
             window.open(`media/${conf.info.book_cn}/dist/${videoName}`, "preview");
             action.doExportData(); //立刻导出新版xls
@@ -250,6 +253,8 @@ let action = {
             net.filesMove(filename, conf.info.book_cn);
         }, 2000);
         ui.updateBasket();
+        conf.noExport = false;
+        util.backupParam2Storage();
     },
 
     doNewBook() {

@@ -1,22 +1,43 @@
-/* global conf, ui, net */
+/* global conf, setup, dict, ui, net */
 let util = {
     /*********************/
     // 初始化UI
     /*********************/
     async initMaterial() {
+        let backupData = JSON.parse(localStorage.getItem("conf"));
+        if (!backupData.noExport) {
+            ui.highlightRestoreBtn();
+        }
         ui.initMaterialsTable();
-        conf.info.program = "listen";
-        conf.rules = conf.programRules.listen;
-        conf.dict = await net.importDict();
-        ui.log("读取到字典数据 " + Object.keys(conf.dict).length + " 条");
+        dict.e2c = await net.importDict();
+        ui.log("读取到字典数据 " + Object.keys(dict.e2c).length + " 条");
         net.ping();
+    },
+
+    /*********************/
+    // 从localStorage里恢复Materials
+    /*********************/
+    restoreMaterials() {
+        let backupData = JSON.parse(localStorage.getItem("conf"));
+        delete backupData.serverAvailable;
+        Object.assign(conf, backupData);
+        for (let data of util.getMaterial()) {
+            ui.loadMaterial(data, true); // true: 从localStorage里恢复
+        }
+        util.checkMaterials();
+        ui.updateBasket();
+    },
+
+    backupParam2Storage() {
+        localStorage.setItem("conf", JSON.stringify(conf));
+        conf.noExport = true;
     },
 
     /*********************/
     // 修改单元格数据，会同时修改界面，内存
     /*********************/
     async updateMaterial(id, data, field, toid = 0) {
-        if (conf.dataFields.includes(field)) {
+        if (setup.dataFields.includes(field)) {
             toid = +toid < +id ? +id : +toid;
             for (let i = +id; i <= toid; i++) {
                 ui.getCell(i, field).innerText = data;
@@ -25,6 +46,7 @@ let util = {
         } else if (["slide", "audio", "video"].includes(field)) {
             conf.files[field].push(data);
         }
+        util.backupParam2Storage();
     },
 
     /*********************/
@@ -52,7 +74,7 @@ let util = {
         }
         ui.log(`已经添加造句数据 ${materials.length} 条`, "pass");
         ui.initRangeBox();
-        
+
         return ids;
     },
 
@@ -182,6 +204,7 @@ let util = {
                 }
             }
         }
+        util.backupParam2Storage();
         ui.done(log);
     },
 
@@ -218,7 +241,7 @@ let util = {
     /*********************/
     // 获取azure语音模型名字
     /*********************/
-    getModel: (language, character) => `${language === "english" ? "en-US" : "zh-CN"}-${conf.voice[language][character]}Neural`,
+    getModel: (language, character) => `${language === "english" ? "en-US" : "zh-CN"}-${setup.voice[language][character]}Neural`,
 
     /*********************/
     // 当前课程是否英语课程

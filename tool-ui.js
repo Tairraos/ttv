@@ -1,4 +1,4 @@
-/* global conf, util, action, net */
+/* global conf, setup, util, action, net */
 let $basket = document.getElementById("basket"),
     $export = document.getElementById("doExportData"),
     $info = document.getElementById("info"),
@@ -32,7 +32,7 @@ let ui = {
     /*********************/
 
     initMaterialsTable() {
-        $materials.innerHTML = "<tr>" + conf.uiFields.map((item) => `<th>${item}</th>`).join("") + "</tr>";
+        $materials.innerHTML = "<tr>" + setup.uiFields.map((item) => `<th>${item}</th>`).join("") + "</tr>";
     },
 
     initRangeBox() {
@@ -102,9 +102,10 @@ let ui = {
         let program = ui.getSelectData("program");
         conf.info.program = program;
         conf.rules = conf.programRules[program];
-        util.checkMaterials(); // 检查所有语料的素材是否准备完全
         conf.tasks = []; // 风格变化后，要重新估算生成task
+        util.checkMaterials(); // 检查所有语料的素材是否准备完全
         ui.log(`视频风格选择：${conf.program[program]}`, "highlight");
+        util.backupParam2Storage();
     },
 
     /*********************/
@@ -134,6 +135,7 @@ let ui = {
             util.checkMaterials(); // 检查语料
         }
         document.querySelectorAll(`#material tr`).forEach((line) => line.classList.remove("selecting"));
+        util.backupParam2Storage();
     },
 
     /*********************/
@@ -158,7 +160,7 @@ let ui = {
     // 批量检查范围内的Slide
     /*********************/
     rangeVerify() {
-        if (conf.range.rangeList.length > 80){
+        if (conf.range.rangeList.length > 80) {
             return ui.err("当前作用范围超过允许值：80");
         }
         ui.openPostPage(`html-verify.php`, {
@@ -166,7 +168,7 @@ let ui = {
             ids: JSON.stringify(conf.range.rangeList)
         });
     },
-    
+
     /*********************/
     // 定位行，移到屏幕中来
     /*********************/
@@ -216,17 +218,20 @@ let ui = {
     /*********************/
     // 把数据加载到UI里
     /*********************/
-    loadMaterial(data) {
+    loadMaterial(data, isLoadFromStorage = false) {
         let row = $materials.insertRow();
         row.id = "material-" + data.id;
         row.className = "type-" + data.type;
         row.dataset.id = +data.id;
-        conf.uiFields.forEach((item, index) => {
+        setup.uiFields.forEach((item, index) => {
             let cell = row.insertCell(-1);
-            cell.className = conf.uiFields[index];
+            cell.className = setup.uiFields[index];
             cell.innerHTML = data[item] || ui.getInitMedia(data.id, item);
         });
-        conf.materials[data.id] = data;
+        if (!isLoadFromStorage) {
+            conf.materials[data.id] = data;
+            util.backupParam2Storage();
+        }
     },
 
     /*********************/
@@ -428,28 +433,28 @@ let ui = {
     // hover 单元格的处理，可能是选择范围，也可能是显示editTool工具
     /*********************/
     onMouseOverCell(event) {
-        let e = conf.editTool;
-        let id = +event.target.closest("tr").dataset.id;
-        if (event.target.tagName === "TD" && conf.onselect) {
-            let start = Math.min(conf.onselect, id),
-                end = Math.max(conf.onselect, id);
-            ui.putInputData("startid", start); //填上缺省值
-            ui.putInputData("endid", end);
-            conf.range.selected = conf.onselect;
-            ui.updateSelecting(start, end);
-            return;
-        }
-        if (!e.locker) {
-            // 这些字段可以编辑
-            if (event.target.className.match(/group|voice|chinese|english|comment/)) {
-                ui.showEditTool({ target: event.target, isInCell: true });
-                $doCellTranslate.style.display = event.target.className.match(/chinese|english/) ? "inline-block" : "none";
-                $doCellPinyin.style.display = event.target.className.match(/chinese/) ? "inline-block" : "none";
-            } else {
-                ui.hideEditTool();
-            }
-        } else {
-            if (event.target.className === e.field && id === e.id) {
+        let e = conf.editTool,
+            uiline = event.target.closest("tr");
+        if (uiline) {
+            let id = +uiline.dataset.id;
+            if (event.target.tagName === "TD" && conf.onselect) {
+                // 拖动选择工具
+                let start = Math.min(conf.onselect, id),
+                    end = Math.max(conf.onselect, id);
+                ui.putInputData("startid", start); //填上缺省值
+                ui.putInputData("endid", end);
+                conf.range.selected = conf.onselect;
+                ui.updateSelecting(start, end);
+            } else if (!e.locker) {
+                // 这些字段可以编辑
+                if (event.target.className.match(/group|voice|chinese|english|comment/)) {
+                    ui.showEditTool({ target: event.target, isInCell: true });
+                    $doCellTranslate.style.display = event.target.className.match(/chinese|english/) ? "inline-block" : "none";
+                    $doCellPinyin.style.display = event.target.className.match(/chinese/) ? "inline-block" : "none";
+                } else {
+                    ui.hideEditTool();
+                }
+            } else if (event.target.className === e.field && id === e.id) {
                 ui.showEditTool({ target: event.target, isInCell: true });
             }
         }
@@ -509,6 +514,7 @@ let ui = {
                 e.dom.innerText = e.dom.innerText.slice(1);
             } else {
                 conf.materials[e.id][e.field] = e.dom.innerText;
+                util.backupParam2Storage();
                 await util.updateMaterial(e.id, e.dom.innerText, e.field);
                 //如果编辑的是中文或英文，自动重新翻译和生成拼音
                 if (e.field.match(/chinese/)) {
@@ -576,6 +582,9 @@ let ui = {
     serverError() {
         ui.log("摩耳视频助手服务不可用，请检查。", "error");
         return "error";
+    },
+    highlightRestoreBtn() {
+        document.getElementById("doRestoreStorage").style.background = "#fcc";
     }
 };
 
@@ -587,6 +596,7 @@ $basket.addEventListener("dragover", ui.dragEnter, false);
 $basket.addEventListener("dragleave", ui.dragLeave, false);
 $basket.addEventListener("drop", ui.dropHandler, false);
 $export.addEventListener("click", action.doExportData, false); // 下载数据
+document.getElementById("doRestoreStorage").addEventListener("click", util.restoreMaterials, false); // 1.素材翻译
 
 /*********************/
 // 菜单动作

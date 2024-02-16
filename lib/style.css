@@ -108,6 +108,12 @@ ul {
     align-items: flex-start;
 }
 
+#doRestoreStorage {
+    cursor: pointer;
+    font-size: 16px;
+    color: #3250f0;
+}
+
 #basket.dragover {
     background: #d2baff;
     border-style: dotted;
@@ -385,7 +391,9 @@ ul {
 }
 
 #startid,
-#endid,#locateid,#marknum {
+#endid,
+#locateid,
+#marknum {
     width: 31px;
     text-align: center;
     padding: 3px 2px;
