@@ -7,7 +7,12 @@ let io = {
         let workbook = XLSX.read(data, { type: "binary" }),
             worksheet = {},
             g = (r) => (worksheet[r] ? worksheet[r].v : ""), // 读出单元格r的value，如果没有就返回空
-            t = (s) => s.replace(/单词|词汇/, "word").replace(/句子/, "sentence").replace(/故事/, "story").replace(/标题/, "title") || "sentence",
+            t = (s) =>
+                s
+                    .replace(/单词|词汇/, "word")
+                    .replace(/句子/, "sentence")
+                    .replace(/故事/, "story")
+                    .replace(/标题/, "title") || "sentence",
             range,
             log;
 
@@ -51,6 +56,29 @@ let io = {
         conf.info.version = g(`E2`); //数据文件版本
         ui.done(log);
 
+        //导入素材时长
+        worksheet = workbook.Sheets["素材时长"];
+        range = XLSX.utils.decode_range(worksheet["!ref"]);
+        log = ui.log(`导入素材时长信息...`);
+        let loadDuration = (id, row, name) => {
+            if (row !== "") {
+                conf.durations[`${id}.${name}.mp4`] = row;
+            }
+        };
+        for (let row = 2; row <= range.e.r + 1; row++) {
+            if (g(`A${row}`) !== "") {
+                loadDuration(g(`A${row}`), g(`B${row}`), "cn1.listen");
+                loadDuration(g(`A${row}`), g(`C${row}`), "cn1.text");
+                loadDuration(g(`A${row}`), g(`D${row}`), "cn2.listen");
+                loadDuration(g(`A${row}`), g(`E${row}`), "cn2.text");
+                loadDuration(g(`A${row}`), g(`F${row}`), "en1.listen");
+                loadDuration(g(`A${row}`), g(`G${row}`), "en1.text");
+                loadDuration(g(`A${row}`), g(`H${row}`), "en2.listen");
+                loadDuration(g(`A${row}`), g(`I${row}`), "en2.text");
+                loadDuration(g(`A${row}`), g(`J${row}`), "ding");
+            }
+        }
+
         //导入视频
         worksheet = workbook.Sheets["视频"];
         range = XLSX.utils.decode_range(worksheet["!ref"]);
@@ -76,26 +104,33 @@ let io = {
         let materials = Object.values(conf.materials),
             book = materials.map((line) => setup.dataFields.map((field) => (line[field] !== 0 ? line[field] : ""))),
             info = [[conf.info.book_cn, conf.info.book_en, conf.info.book_abbr, conf.info.language, conf.info.version]],
+            duration = [],
             video = conf.videos,
             ware = [];
+        // 生成duration内容
+        for (let id of Object.keys(conf.materials)) {
+            duration.push(setup.sheet.duration.name.map((item) => (item === "ID" ? id : conf.durations[`${id}.${item}.mp4`] || "")));
+        }
+        // 生成课件内容
         for (let line of materials) {
             let id = line.sid ? line.sid.toString() : "";
             util.isLearnEnglish()
                 ? ware.push([id], [line.english + line.phonetic], [line.chinese], [""])
                 : ware.push(["", line.phonetic], [id, line.chinese], ["", line.english], [""]);
         }
-        io.saveXlsxBinary(book, info, video, ware);
+        io.saveXlsxBinary(book, info, duration, video, ware);
     },
 
     /*********************/
     // 生成xlsx
     /*********************/
-    async saveXlsxBinary(book, info, video = [], ware = []) {
+    async saveXlsxBinary(book, info, duration = [], video = [], ware = []) {
         let workbook = XLSX.utils.book_new(),
             filename = `${info[0][0]}.${info[0][4]}.xlsx`;
 
         XLSX.utils.book_append_sheet(workbook, io.getSheet(book, setup.sheet.book), `课本`);
         XLSX.utils.book_append_sheet(workbook, io.getSheet(info, setup.sheet.info), `信息`);
+        XLSX.utils.book_append_sheet(workbook, io.getSheet(duration, setup.sheet.duration), `素材时长`);
         XLSX.utils.book_append_sheet(workbook, io.getSheet(video, setup.sheet.video), `视频`);
 
         // 课件sheet

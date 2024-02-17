@@ -56,6 +56,12 @@ let setup = {
             name: ["文件名", "类型", "起始课本ID", "结束课本ID", "视频长度", "生成时间"],
             width: [220, 70, 70, 70, 80, 140],
             center: /^[ABCDEF]\d+$/
+        },
+
+        duration: {
+            name: ["ID", "cn1.listen", "cn1.text", "cn2.listen", "cn2.text", "en1.listen", "en1.text", "en2.listen", "en2.text", "ding"],
+            width: [50, 70, 70, 70, 70, 70, 70, 70, 70, 70],
+            center: /^[A]\d+$/
         }
     },
 
