@@ -68,8 +68,11 @@ let action = {
     /*********************/
     async doGenPhonetic() {
         // 尝试给所有phonetic没有值的字段标注册拼音或音标
-        for (let line of util.getMaterial()) {
-            action.genPhoneticPiece(line.id);
+        let rangeMaterials = util.getMaterial(),
+            force = rangeMaterials.length >= 50 && !util.isLearnEnglish() ? true : false; //如果处理量小于50，学习的是中文，重新标注拼音
+
+        for (let line of rangeMaterials) {
+            action.genPhoneticPiece(line.id, force);
         }
         util.backupParam2Storage();
         ui.log(`2.素材标注${util.isLearnEnglish() ? "音标" : "拼音"}完成`, "pass");
@@ -79,12 +82,12 @@ let action = {
         let line = conf.materials[id],
             log;
         if (line.chinese && !util.isLearnEnglish() && (force || !line.phonetic)) {
-            // 中文课，存在中文，即把中文用pinyin接口获得读音
+            // 把中文用pinyin接口获得读音, 中文课，拼音即使存在也更新拼音
             log = ui.log(`标注拼音：${line.chinese}`);
             await util.updateMaterial(line.id, pinyinPro.pinyin(line.chinese.replace(/0|1|2|3|4|5|6|7|8|9/g, (n) => "零一二三四五六七八九"[+n])), "phonetic");
             ui.done(log);
-        } else if (line.english && util.isLearnEnglish() && line.type === "word" && !line.phonetic) {
-            // 英文课，词汇查字典获得音标，句子的 Phonetic 字段留空，不需要拼音或音标
+        } else if (line.english && util.isLearnEnglish() && line.type === "word" && (force || !line.phonetic)) {
+            // 英文课，phonetic放的是音标，词汇查字典获得音标，句子的 Phonetic 字段留空，不需要拼音或音标
             log = ui.log(`标注音标：${line.english}`);
             await util.updateMaterial(line.id, dict.e2c[line.english.toLowerCase()].accent, "phonetic");
             ui.done(log);
@@ -224,16 +227,15 @@ let action = {
         let videoName = util.getNewVideoName(),
             log = ui.log(`生成作品：${videoName}`, "highlight"),
             program = setup.program[conf.info.program],
-            duration = util.fmtDuration(ret.duration),
             time = new Date().toISOString().replace(/T/, " ").replace(/\..*/, ""),
             ret = await net.ffmpegContact();
         if (ret.result === "success") {
+            let duration = util.fmtDuration(ret.duration);
             ui.done(log);
             ui.log(`视频实际长度：${duration}秒`, "highlight");
             conf.videos.push([videoName, program, conf.range.start, conf.range.end, `[${duration}]`, `[${time}]`]);
             ui.log(`7.作品已经生成`, "pass");
             window.open(`media/${conf.info.book_cn}/dist/${videoName}`, "preview");
-            action.doExportData(); //立刻导出新版xls
         } else {
             ui.err(`生成作品 ${videoName} 时遇到错误`);
         }
