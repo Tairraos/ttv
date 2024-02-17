@@ -100,7 +100,7 @@
 
             <div class="console"><div id="log"></div></div>
         </nav>
-        <div id="content"><table id="material"></table></div>
+        <div id="content"><table id="material"><thead></thead><tbody></tbody></table></div>
         <div id="edittool" style="display:none;">
             <div id="edittool-unlocked">
                 <button id="doCellEdit">编辑</button><button id="doMakeSentence">造句</button><button id="doCellTranslate">翻译</button><button id="doCellPinyin">拼音</button>
@@ -122,7 +122,7 @@
                     <ul id="sd-materials"></ul>
                 </div>
                 <div id="sd-action">
-                    <button id="doSentenceSwitchMode">切换模式，当前：编辑</button>
+                    <div id="sd-modesetting"><button id="doSentenceSwitchMode">切换模式</button> 当前模式：<span id="sd-status" style="color: #4b4;">编辑</span></div>
                     <button id="doSentenceConfirm">插入素材</button>
                     <button id="doSentenceCancel">取消操作</button>
                 </div>

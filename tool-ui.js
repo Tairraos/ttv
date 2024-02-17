@@ -3,7 +3,7 @@ let $basket = document.getElementById("basket"),
     $export = document.getElementById("doExportData"),
     $info = document.getElementById("info"),
     $content = document.getElementById("content"),
-    $materials = document.getElementById("material"),
+    $materials = document.querySelector("#material tbody"),
     $log = document.getElementById("log"),
     $edittool = document.getElementById("edittool"),
     $server = document.getElementById("server"),
@@ -20,6 +20,7 @@ let $basket = document.getElementById("basket"),
     $sdDict = document.getElementById("sd-dict"),
     $sdMaterials = document.getElementById("sd-materials"),
     $sdInput = document.getElementById("sd-input"),
+    $sdStatus = document.getElementById("sd-status"),
     $doSentenceSwitchMode = document.getElementById("doSentenceSwitchMode");
 
 let $tool_a = document.getElementById("tool_a"),
@@ -33,14 +34,13 @@ let ui = {
     /*********************/
 
     initMaterialsTable() {
-        $materials.innerHTML = "<tr>" + setup.uiFields.map((item) => `<th>${item}</th>`).join("") + "</tr>";
+        document.querySelector("#material thead").innerHTML = "<tr>" + setup.uiFields.map((item) => `<th>${item}</th>`).join("") + "</tr>";
     },
 
     initRangeBox() {
         let r = conf.range;
-        r.idList = Object.keys(conf.materials).map((i) => +i);
-        r.min = Math.min(...r.idList, 1);
-        r.max = Math.max(...r.idList, 1);
+        r.min = Math.min(...Object.keys(conf.materials), 1);
+        r.max = Math.max(...Object.keys(conf.materials), 1);
         ui.putInputData("startid", r.min); //填上缺省值
         ui.putInputData("endid", r.max);
         ui.rangeConfirm(); // confirm一次
@@ -112,7 +112,7 @@ let ui = {
     onProgramChange() {
         let program = ui.getSelectData("program");
         conf.info.program = program;
-        conf.rules = conf.programRules[program];
+        conf.rules = setup.programRules[program];
         conf.tasks = []; // 风格变化后，要重新估算生成task
         util.checkMaterials(); // 检查所有语料的素材是否准备完全
         ui.log(`视频风格选择：${conf.program[program]}`, "highlight");
@@ -134,11 +134,10 @@ let ui = {
             r.end = end;
             ui.putInputData("startid", start);
             ui.putInputData("endid", end);
-            r.rangeList = [...Array.from({ length: r.end - r.start + 1 }, (_, i) => i + r.start)];
             conf.tasks = []; // 范围变化后，要重新估算生成task
-            r.idList.forEach((id) => {
-                let dom = document.getElementById(`material-${id}`);
-                id >= r.start && id <= r.end ? dom.classList.remove("skip") : dom.classList.add("skip");
+            $materials.querySelectorAll("tr").forEach((line) => {
+                let id = line.dataset.id;
+                id >= r.start && id <= r.end ? line.classList.remove("skip") : line.classList.add("skip");
             });
             r.selected = false; // 选择重置
             ui.log(`素材范围：${r.start} 到 ${r.end}，共 ${r.end - (r.start || 1) + 1} 条素材`, "highlight");
@@ -169,12 +168,13 @@ let ui = {
     // 批量检查范围内的Slide
     /*********************/
     rangeVerify() {
-        if (conf.range.rangeList.length > 80) {
+        let r = conf.range;
+        if (r.end - r.start > 79) {
             return ui.err("当前作用范围超过允许值：80");
         }
         ui.openPostPage(`html-verify.php`, {
             book_cn: conf.info.book_cn,
-            ids: JSON.stringify(conf.range.rangeList)
+            ids: JSON.stringify([...Array.from({ length: r.end - r.start + 1 }, (_, i) => i + r.start)])
         });
     },
 
@@ -183,7 +183,7 @@ let ui = {
     /*********************/
     lineLocate() {
         let locateid = +ui.getInputData("locateid"),
-            materials = util.getMaterial();
+            materials = util.getAllMaterial();
         for (let line of materials) {
             if (line.sid === locateid) {
                 return document.querySelector(`#material-${line.id}`).scrollIntoView({ behavior: "smooth" });
@@ -295,7 +295,7 @@ let ui = {
                 field = dom.closest("td").className,
                 target = dom.className.replace(/svg|required|exist| /g, "");
             if (target === "id") {
-                ui.putInputData("startid", id);
+                ui.putInputData(event.shiftKey ? "endid" : "startid", id);
             } else if (target === "sid") {
                 ui.putInputData("endid", id);
             } else if (target === "theme") {
@@ -320,8 +320,7 @@ let ui = {
                     rows: JSON.stringify(util.getMaterialByGroup(id))
                 });
             }
-            if (field === "id" && conf.range.selected && event.shiftKey) {
-                ui.putInputData("endid", id);
+            if (field === "id" && event.shiftKey && conf.range.selected) {
                 ui.updateSelecting(conf.range.selected, id);
             } else if (conf.range.selected) {
                 ui.rangeReset();
@@ -383,7 +382,8 @@ let ui = {
 
     doSentenceSwitchMode() {
         conf.editTool.sdmode = conf.editTool.sdmode === "edit" ? "remove" : "edit";
-        $doSentenceSwitchMode.innerText = `切换模式，当前：${conf.editTool.sdmode === "edit" ? "编辑" : "删除"}`;
+        $sdStatus.innerText = conf.editTool.sdmode === "edit" ? "编辑" : "删除";
+        $sdStatus.style.color = conf.editTool.sdmode === "edit" ? "#4b4" : "#911";
     },
 
     async doSentenceConfirm() {

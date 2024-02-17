@@ -17,15 +17,18 @@ let util = {
     /*********************/
     // 从localStorage里恢复Materials
     /*********************/
-    restoreMaterials() {
+    async restoreMaterials() {
         let backupData = JSON.parse(localStorage.getItem("conf"));
         delete backupData.serverAvailable;
         Object.assign(conf, backupData);
-        for (let data of util.getMaterial()) {
-            ui.loadMaterial(data, true); // true: 从localStorage里恢复
+        let materials = util.getAllMaterial();
+        for (let data of materials) {
+            await ui.loadMaterial(data, true); // true: 从localStorage里恢复
         }
+        conf.files = (await net.filesList()).files;
+        ui.initRangeBox();
         util.checkMaterials();
-        if (conf.lastTouchedId){
+        if (conf.lastTouchedId) {
             document.querySelector(`#material-${conf.lastTouchedId}`).scrollIntoView({ behavior: "smooth" });
         }
         ui.updateBasket();
@@ -155,7 +158,10 @@ let util = {
     // 从字段名和媒体列表获取素材文件名
     /*********************/
     getPadStr: (num) => String(num).padStart(4, "0"),
-    getNewVideoName: () => `${conf.info.book_abbr}-${conf.info.program}-${util.getPadStr(conf.range.start)}-${util.getPadStr(conf.range.end)}.mp4`,
+    getNewVideoName() {
+        let sidList = util.getMaterial((line) => line.sid).map((line) => line.sid);
+        return `${conf.info.book_abbr}-${conf.info.program}-${util.getPadStr(Math.min(...sidList))}-${util.getPadStr(Math.max(...sidList))}.mp4`;
+    },
 
     /*********************/
     // 从voice和basename获取素材文件名，如果指定了voice，则仅生成了第1套音频，把2换成1，用第1套代替
@@ -215,6 +221,10 @@ let util = {
     getMaterial(condition) {
         let validMaterials = Object.values(conf.materials).filter((line) => line.id >= conf.range.start && line.id <= conf.range.end);
         return condition ? validMaterials.filter(condition) : validMaterials;
+    },
+
+    getAllMaterial() {
+        return Object.values(conf.materials);
     },
 
     /*********************/
