@@ -90,13 +90,15 @@
 <script>
     if (style !== "listen" && language === "chinese" && vol === 1) {
         let chars = document.querySelectorAll(".char"),
-            leftRef = chars[0].offsetLeft,
-            issueChars = Array.from(document.querySelectorAll(".char")).filter(line => line.offsetLeft === leftRef && line.innerText.match(/[，。！]/));
-        if (issueChars.length) {
-            Array.from(document.styleSheets).filter(line => String(line.href).match(/page\.css/)).forEach(
-                sheets => Array.from(sheets.cssRules).filter(rule => String(rule.selectorText).match(/\.subtitle\.vol-\d \.book-chinese \.cn/))
-                    .forEach(rule => rule.style["font-size"] = +rule.style["font-size"].replace(/px/, "") - 5 + "px")
-            );
+            leftRef = chars[0].offsetLeft;
+        for (let times = 0; times < 15; times++) {
+            let issueChars = Array.from(document.querySelectorAll(".char")).filter(line => line.offsetLeft === leftRef && line.innerText.match(/[，。！？]/));
+            if (issueChars.length) {
+                Array.from(document.styleSheets).filter(line => String(line.href).match(/page\.css/)).forEach(
+                    sheets => Array.from(sheets.cssRules).filter(rule => String(rule.selectorText).match(/\.subtitle\.vol-\d \.book-chinese \.cn/))
+                        .forEach(rule => rule.style["font-size"] = +rule.style["font-size"].replace(/px/, "") - 1 + "px")
+                );
+            }
         }
     }
 </script>
