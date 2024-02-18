@@ -242,6 +242,19 @@ let action = {
         util.backupParam2Storage();
     },
 
+    async doGenLineMedia(id) {
+        let line = conf.materials[id];
+        await action.genSetupAudioPiece(id, "chinese"); //生成中文语料音频
+        await action.genSetupAudioPiece(id, "english"); //生成英文语料音频
+        await action.genSlidePiece(id, "listen");
+        await action.genSlidePiece(id, "text");
+        for (let [field, target] of Object.keys(line)
+            .filter((item) => item.match(/video-/) && line[item])
+            .map((item) => item.split("."))) {
+            await action.genVideoPiece(line.id, field, target);
+        }
+    },
+
     /*********************/
     // ping
     /*********************/

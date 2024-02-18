@@ -11,6 +11,7 @@ let $basket = document.getElementById("basket"),
     $doCellTranslate = document.getElementById("doCellTranslate"),
     $doMakeSentence = document.getElementById("doMakeSentence"),
     $doCellPinyin = document.getElementById("doCellPinyin"),
+    $doGenLineMedia = document.getElementById("doGenLineMedia"),
     $doEditDone = document.getElementById("doEditDone"),
     $doEditRestore = document.getElementById("doEditRestore"),
     $unlocked = document.getElementById("edittool-unlocked"),
@@ -453,11 +454,13 @@ let ui = {
                 conf.range.selected = conf.onselect;
             } else if (!e.locker) {
                 // 这些字段可以编辑
-                if (field.match(/group|voice|chinese|english|comment/)) {
+                if (field.match(/group|voice|chinese|english|comment|media_cn1/)) {
                     ui.showEditTool({ target: dom, isInCell: true });
                     $doMakeSentence.style.display = field === "chinese" && conf.materials[id].type === "word" ? "inline-block" : "none";
                     $doCellTranslate.style.display = field.match(/chinese|english/) ? "inline-block" : "none";
                     $doCellPinyin.style.display = field === "chinese" ? "inline-block" : "none";
+                    $doGenLineMedia.style.display = field === "media_cn1" ? "inline-block" : "none";
+                    $doCellEdit.style.display = field !== "media_cn1" ? "inline-block" : "none";
                 } else {
                     ui.hideEditTool();
                 }
@@ -513,6 +516,11 @@ let ui = {
     },
 
     doCellPinyin: async () => await action.genPhoneticPiece(conf.editTool.id, true),
+
+    async doGenLineMedia() {
+        $materials.querySelectorAll(`#material-${conf.editTool.id} span.exist`).forEach((line) => line.classList.replace("exist", "required"));
+        await action.doGenLineMedia(conf.editTool.id);
+    },
 
     async cellEditDone() {
         let e = conf.editTool;
@@ -639,6 +647,7 @@ $doEditRestore.addEventListener("click", ui.cellEditRestore, false);
 $doMakeSentence.addEventListener("click", ui.doMakeSentence, false);
 $doCellTranslate.addEventListener("click", ui.doCellTranslate, false);
 $doCellPinyin.addEventListener("click", ui.doCellPinyin, false);
+$doGenLineMedia.addEventListener("click", ui.doGenLineMedia, false);
 
 /*********************/
 // 素材工具
