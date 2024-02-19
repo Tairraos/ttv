@@ -314,20 +314,7 @@ let action = {
         );
     },
 
-    doGenPublishText() {
-        let dist = ui.getSelectData("video_dist"),
-            [level, type, startid, endid] = dist.replace(/HSK/, "").split("-");
-        navigator.clipboard.writeText(`
-HSK Chinese Practice Level ${level}: ${+startid}-${+endid} ${type.charAt(0).toUpperCase() + type.slice(1)}ing, Daily Chinese
-
-This is HSK learning video series, the level 1 plan is to practice 10 entries and about 20 sentences every day to learn Chinese easily.
-
-The courseware of this course: [Click to download](http)
-
-Levels 1 to 6 have 500, 772, 973, 1000, 1071, and 1140 entries.
-
-All entries in the series come from the HSK syllabus, [outline document download](https://drive.google.com/file/d/1H3uQ3tFE03x3lah7rp8oUP2E1T-y3r-6/view?usp=drive_link) [Document source: Education of the People’s Republic of China Ministry official website](http://www.moe.gov.cn/jyb_xwfb/gzdt_gzdt/s5987/202103/t20210329_523304.html)
-
-Welcome to like, forward, and leave comments.`);
+    doOpenPublishTool() {
+        window.open(`html-publish.php`, "publish");
     }
 };

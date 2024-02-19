@@ -47,15 +47,6 @@ let ui = {
         ui.rangeConfirm(); // confirm一次
     },
 
-    initVideoSelector() {
-        let $videoSelector = document.getElementById("video_dist");
-        $videoSelector.innerHTML = conf.videos.length ? "" : `<option value="none" selected>生成的视频</option>`;
-        for (let line of conf.videos) {
-            let text = line[0].replace(".mp4", "");
-            $videoSelector.innerHTML += `<option value="${text}">${text}</option>`;
-        }
-    },
-
     /*********************/
     // 切换工具
     /*********************/
@@ -66,7 +57,6 @@ let ui = {
             $panel1.className = "selected";
             $panel2.className = "unselected";
         } else {
-            ui.initVideoSelector();
             $tool_a.style.display = "none";
             $tool_b.style.display = "block";
             $panel2.className = "selected";
@@ -178,6 +168,11 @@ let ui = {
             book_cn: conf.info.book_cn,
             ids: JSON.stringify([...Array.from({ length: r.end - r.start + 1 }, (_, i) => i + r.start)])
         });
+    },
+
+    publishTool() {
+        let items = Array.from(new Set(conf.videos.map((item) => item[0].replace(/.*(\d{4}-\d{4}).*/, "$1"))));
+        ui.openPostPage(`html-publish.php`, { items: JSON.stringify(items) });
     },
 
     /*********************/
@@ -671,7 +666,7 @@ document.getElementById("panel2").addEventListener("click", ui.switchPanel, fals
 document.getElementById("doNewBook").addEventListener("click", action.doNewBook, false);
 document.getElementById("doMoveTemplate").addEventListener("click", action.doMoveTemplate, false);
 document.getElementById("doGenTranasCmd").addEventListener("click", action.doGenTranasCmd, false);
-document.getElementById("doGenPublishText").addEventListener("click", action.doGenPublishText, false);
+document.getElementById("doOpenPublishTool").addEventListener("click", action.doOpenPublishTool, false);
 
 /*********************/
 // 造句工具
@@ -686,15 +681,16 @@ $doSentenceSwitchMode.addEventListener("click", ui.doSentenceSwitchMode, false);
 /*********************/
 document.body.addEventListener("keypress", (e) => {
     if (e.code === "Enter") {
-        if (e.id === "startid" || e.id === "endid") {
+        let target = e.target;
+        if (target.id === "startid" || target.id === "endid") {
             ui.rangeConfirm();
-        } else if (e.id === "marknum") {
+        } else if (target.id === "marknum") {
             ui.lineMark();
-        } else if (e.id === "locatenum") {
+        } else if (target.id === "locateid") {
             ui.lineLocate();
-        } else if (e.id === "sd-input") {
+        } else if (target.id === "sd-input") {
             ui.doAddInput();
-        } else if ((e.tagName === "td")) {
+        } else if (target.tagName === "td") {
             ui.cellEditDone();
         }
     }

@@ -487,12 +487,6 @@ ul {
     margin-top: 10px;
 }
 
-#video_dist {
-    width: 190px;
-    border-radius: 4px;
-    margin-right: 10px;
-}
-
 #book_cn {
     width: 95px;
     margin-right: 10px;
@@ -509,7 +503,7 @@ ul {
 }
 #doGenTranasCmd {
 }
-#doGenPublishText {
+#doOpenPublishTool {
 }
 #doMoveTemplate {
     width: 95px;
