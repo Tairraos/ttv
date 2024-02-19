@@ -150,7 +150,9 @@ let action = {
     },
 
     async genSlidePiece(id, style, force = false) {
-        if (force || conf.materials[id][`slide.slide-${style}`] === `required`) {
+        let line = conf.materials[id];
+
+        if ((force && util.checkMediaStatus(line, `slide.slide-${style}`)) || conf.materials[id][`slide.slide-${style}`] === `required`) {
             let filename = `${id}.${style}.png`;
             let log = ui.log(`生成slide：${filename}`);
             await net.slide(id, style, filename);
@@ -178,7 +180,8 @@ let action = {
     },
 
     async genVideoPiece(id, field, target, force = false) {
-        if (force || conf.materials[id][`${field}.${target}`] === `required`) {
+        let line = conf.materials[id];
+        if ((force && util.checkMediaStatus(line, `${field}.${target}`)) || conf.materials[id][`${field}.${target}`] === `required`) {
             let filename = util.getMediaFilename(id, field, target),
                 audioname = target === "video-ding" ? "DING" : conf.materials[id][`${field}.audio`],
                 slidename = conf.materials[id][`slide.slide-${target === "video-text" ? "text" : "listen"}`],
@@ -208,7 +211,7 @@ let action = {
         conf.info.duration = +conf.tasks.reduce((target, file) => target + conf.durations[file], 0).toFixed(3);
 
         ui.log(`6.工程估算完成`, "pass");
-        ui.log(`目标视频名字：${util.getNewVideoName()}`);
+        ui.log(`目标视频名字：${util.getFilename("dist")}`);
         ui.log(`视频长度预计：${util.fmtDuration(conf.info.duration)}秒`);
         ui.log(`视频片段计数：${conf.tasks.length}`);
     },
@@ -223,8 +226,14 @@ let action = {
         if (!util.checkMaterials() || !conf.tasks.length) {
             return ui.log(`先进行工程估算，确认视频长度。`, "error");
         }
+        if (!conf.files.video.includes(util.getFilename("intro"))) {
+            return ui.err(`缺少 ${util.getFilename("intro")}`);
+        }
+        if (!conf.files.cover.includes(util.getFilename("coverimg"))) {
+            return ui.err(`缺少 ${util.getFilename("coverimg")}`);
+        }
 
-        let videoName = util.getNewVideoName(),
+        let videoName = util.getFilename("dist"),
             log = ui.log(`生成作品：${videoName}`, "highlight"),
             program = setup.program[conf.info.program],
             time = new Date().toISOString().replace(/T/, " ").replace(/\..*/, ""),
@@ -239,19 +248,20 @@ let action = {
         } else {
             ui.err(`生成作品 ${videoName} 时遇到错误`);
         }
+        ui.updateBasket();
         util.backupParam2Storage();
     },
 
     async doGenLineMedia(id) {
         let line = conf.materials[id];
-        await action.genSetupAudioPiece(id, "chinese"); //生成中文语料音频
-        await action.genSetupAudioPiece(id, "english"); //生成英文语料音频
-        await action.genSlidePiece(id, "listen");
-        await action.genSlidePiece(id, "text");
+        await action.genSetupAudioPiece(id, "chinese", true); //生成中文语料音频
+        await action.genSetupAudioPiece(id, "english", true); //生成英文语料音频
+        await action.genSlidePiece(id, "listen", true);
+        await action.genSlidePiece(id, "text", true);
         for (let [field, target] of Object.keys(line)
             .filter((item) => item.match(/video-/) && line[item])
             .map((item) => item.split("."))) {
-            await action.genVideoPiece(line.id, field, target);
+            await action.genVideoPiece(line.id, field, target, true);
         }
     },
 
@@ -300,18 +310,24 @@ let action = {
         let intro = ui.getInputData("video_intro");
 
         navigator.clipboard.writeText(
-            [
-                `ffmpeg -i "${intro}" -hwaccel cuda`,
-                `-c:a aac -b:a 128k -ar 44100 -ac 2`,
-                `-c:v h264_nvenc -pix_fmt yuv420p`,
-                `-v quiet -y "formated.${intro}"`
-            ].join("")
+            [`ffmpeg -hwaccel cuda -i "${intro}"`, `-c:a aac -b:a 128k -ar 44100 -ac 2`, `-c:v h264_nvenc -r 25 -pix_fmt yuv420p`, `-y "0.intro.mp4"`].join(" ")
         );
     },
 
-    doGenMergeCmd() {
-        let intro = ui.getInputData("video_intro"),
-            dist = ui.getSelectData("video_dist");
-        navigator.clipboard.writeText(`ffmpeg -f concat -safe 0 -i "${intro}" -i "${dist}" -c copy -async 1000 -v quiet -y "merged.${dist}"`);
+    doGenPublishText() {
+        let dist = ui.getSelectData("video_dist"),
+            [level, type, startid, endid] = dist.replace(/HSK/, "").split("-");
+        navigator.clipboard.writeText(`
+HSK Chinese Practice Level ${level}: ${+startid}-${+endid} ${type.charAt(0).toUpperCase() + type.slice(1)}ing, Daily Chinese
+
+This is HSK learning video series, the level 1 plan is to practice 10 entries and about 20 sentences every day to learn Chinese easily.
+
+The courseware of this course: [Click to download](http)
+
+Levels 1 to 6 have 500, 772, 973, 1000, 1071, and 1140 entries.
+
+All entries in the series come from the HSK syllabus, [outline document download](https://drive.google.com/file/d/1H3uQ3tFE03x3lah7rp8oUP2E1T-y3r-6/view?usp=drive_link) [Document source: Education of the People’s Republic of China Ministry official website](http://www.moe.gov.cn/jyb_xwfb/gzdt_gzdt/s5987/202103/t20210329_523304.html)
+
+Welcome to like, forward, and leave comments.`);
     }
 };

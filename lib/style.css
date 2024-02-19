@@ -488,8 +488,9 @@ ul {
 }
 
 #video_dist {
-    width: 250px;
+    width: 190px;
     border-radius: 4px;
+    margin-right: 10px;
 }
 
 #book_cn {
@@ -502,20 +503,22 @@ ul {
 }
 
 #book_abbr,
-#doGenTranasCmd,
 #doNewBook {
     width: 95px;
     margin-right: 10px;
 }
-
-#doGenMergeCmd,
+#doGenTranasCmd {
+}
+#doGenPublishText {
+}
 #doMoveTemplate {
     width: 95px;
     margin-bottom: 15px;
 }
 
 #video_intro {
-    width: 235px;
+    width: 177px;
+    margin-right: 10px;
 }
 
 #style {

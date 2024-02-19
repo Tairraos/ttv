@@ -156,7 +156,24 @@ let setup = {
             }
         }
     },
-    program: { listen: "听力练习", read: "双语朗读", pure: "单语朗读" }
+    program: { listen: "听力练习", read: "双语朗读", pure: "单语朗读" },
+    mediaList: [
+        "media_cn1.audio",
+        "media_cn1.video-listen",
+        "media_cn1.video-text",
+        "media_cn2.audio",
+        "media_cn2.video-listen",
+        "media_cn2.video-text",
+        "media_en1.audio",
+        "media_en1.video-listen",
+        "media_en1.video-text",
+        "media_en2.audio",
+        "media_en2.video-listen",
+        "media_en2.video-text",
+        "slide.slide-listen",
+        "slide.slide-text",
+        "slide.video-ding"
+    ]
 };
 
 // UI显示的字段名

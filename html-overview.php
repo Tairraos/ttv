@@ -81,7 +81,7 @@
     conf.files = <?= json_encode($files, JSON_UNESCAPED_UNICODE); ?>;
     conf.info.language = "<?= $language ?>";
     conf.info.book_cn = "<?= $book_cn ?>";
-    conf.rules = conf.programRules.listen;
+    conf.rules = setup.programRules.listen;
     conf.materials = {};
     for (let line of lines) {
         conf.materials[line.id] = line;

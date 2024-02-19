@@ -26,6 +26,7 @@ let util = {
             await ui.loadMaterial(data, true); // true: 从localStorage里恢复
         }
         conf.files = (await net.filesList()).files;
+        conf.info.program = "listen";
         ui.initRangeBox();
         util.checkMaterials();
         if (conf.lastTouchedId) {
@@ -90,8 +91,7 @@ let util = {
         let answer = true,
             materials = id ? [conf.materials[id]] : util.getMaterial();
         for (let line of materials) {
-            util.checkMedias(line, ["media_cn1", "media_cn2", "media_en1", "media_en2"], ["audio", "video-text", "video-listen"]);
-            util.checkMedias(line, ["slide"], ["slide-text", "slide-listen", "video-ding"]);
+            util.checkMedias(line, setup.mediaList);
             let line_ready = util.checkIsReady(line.id);
             answer = answer && line_ready;
         }
@@ -101,18 +101,17 @@ let util = {
     /*********************/
     // 检查medias列表里的素材是否已经生成
     /*********************/
-    checkMedias(line, fields, medias) {
-        for (let field of fields) {
-            for (let media of medias) {
-                if (util.checkMediaStatus(line, field, media)) {
-                    let filename = util.getMediaFilename(line.id, field, media),
-                        is_exist = conf.files[util.getFolder(filename)].includes(filename);
-                    conf.materials[line.id][`${field}.${media}`] = is_exist ? filename : "required";
-                    ui.updateCell(line.id, field, media, is_exist ? "exist" : "required");
-                } else {
-                    delete conf.materials[line.id][`${field}.${media}`];
-                    ui.updateCell(line.id, field, media, "ignored");
-                }
+    checkMedias(line, medias) {
+        for (let item of medias) {
+            let [field, media] = item.split(".");
+            if (util.checkMediaStatus(line, item)) {
+                let filename = util.getMediaFilename(line.id, field, media),
+                    is_exist = conf.files[util.getFolder(filename)].includes(filename);
+                conf.materials[line.id][item] = is_exist ? filename : "required";
+                ui.updateCell(line.id, field, media, is_exist ? "exist" : "required");
+            } else {
+                delete conf.materials[line.id][`${field}.${media}`];
+                ui.updateCell(line.id, field, media, "ignored");
             }
         }
     },
@@ -122,10 +121,9 @@ let util = {
     /*********************/
     // 检查medias某一个文件是否需要生成
     /*********************/
-    checkMediaStatus(line, field, media) {
+    checkMediaStatus(line, key) {
         let rule = conf.rules[conf.info.language][line.type],
-            has = (item) => rule.includes(item),
-            key = `${field}.${media}`;
+            has = (item) => rule.includes(item);
         if (key === "media_cn1.audio") return has("cn1.listen") || has("cn1.text");
         if (key === "media_cn1.video-listen") return has("cn1.listen");
         if (key === "media_cn1.video-text") return has("cn1.text");
@@ -158,9 +156,13 @@ let util = {
     // 从字段名和媒体列表获取素材文件名
     /*********************/
     getPadStr: (num) => String(num).padStart(4, "0"),
-    getNewVideoName() {
-        let sidList = util.getMaterial((line) => line.sid).map((line) => line.sid);
-        return `${conf.info.book_abbr}-${conf.info.program}-${util.getPadStr(Math.min(...sidList))}-${util.getPadStr(Math.max(...sidList))}.mp4`;
+    getFilename(type) {
+        let sidList = util.getMaterial((line) => line.sid).map((line) => line.sid),
+            range = `${util.getPadStr(Math.min(...sidList))}-${util.getPadStr(Math.max(...sidList))}`;
+        if (type === "intro") return `0.intro.mp4`;
+        if (type === "dist") return `${conf.info.book_abbr}-${conf.info.program}-${range}.mp4`;
+        if (type === "coverimg") return `${conf.info.book_abbr}-${conf.info.program}-${range}.png`;
+        if (type === "covermp4") return `0.${conf.info.program}-${range}.mp4`;
     },
 
     /*********************/

@@ -51,7 +51,8 @@ let ui = {
         let $videoSelector = document.getElementById("video_dist");
         $videoSelector.innerHTML = conf.videos.length ? "" : `<option value="none" selected>生成的视频</option>`;
         for (let line of conf.videos) {
-            $videoSelector.innerHTML += `<option value="${line[0]}"${line === conf.videos.slice(-1)[0] ? " selected" : ""}>${line[0]}</option>`;
+            let text = line[0].replace(".mp4", "");
+            $videoSelector.innerHTML += `<option value="${text}">${text}</option>`;
         }
     },
 
@@ -116,7 +117,7 @@ let ui = {
         conf.rules = setup.programRules[program];
         conf.tasks = []; // 风格变化后，要重新估算生成task
         util.checkMaterials(); // 检查所有语料的素材是否准备完全
-        ui.log(`视频风格选择：${conf.program[program]}`, "highlight");
+        ui.log(`视频风格选择：${setup.program[program]}`, "highlight");
     },
 
     /*********************/
@@ -670,7 +671,7 @@ document.getElementById("panel2").addEventListener("click", ui.switchPanel, fals
 document.getElementById("doNewBook").addEventListener("click", action.doNewBook, false);
 document.getElementById("doMoveTemplate").addEventListener("click", action.doMoveTemplate, false);
 document.getElementById("doGenTranasCmd").addEventListener("click", action.doGenTranasCmd, false);
-document.getElementById("doGenMergeCmd").addEventListener("click", action.doGenMergeCmd, false);
+document.getElementById("doGenPublishText").addEventListener("click", action.doGenPublishText, false);
 
 /*********************/
 // 造句工具
@@ -679,3 +680,22 @@ document.getElementById("sd-custom-input").addEventListener("click", ui.doAddInp
 document.getElementById("doSentenceConfirm").addEventListener("click", ui.doSentenceConfirm, false);
 document.getElementById("doSentenceCancel").addEventListener("click", ui.doSentenceClose, false);
 $doSentenceSwitchMode.addEventListener("click", ui.doSentenceSwitchMode, false);
+
+/*********************/
+// 回车确认工具
+/*********************/
+document.body.addEventListener("keypress", (e) => {
+    if (e.code === "Enter") {
+        if (e.id === "startid" || e.id === "endid") {
+            ui.rangeConfirm();
+        } else if (e.id === "marknum") {
+            ui.lineMark();
+        } else if (e.id === "locatenum") {
+            ui.lineLocate();
+        } else if (e.id === "sd-input") {
+            ui.doAddInput();
+        } else if ((e.tagName === "td")) {
+            ui.cellEditDone();
+        }
+    }
+});

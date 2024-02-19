@@ -44,8 +44,8 @@ exports.videoGenerator = async function (args) {
         process.chdir(`media/${args.book_cn}`);
         await execCommand(
             [
-                `ffmpeg -hwaccel cuda -loop 1 -i "${slidename}" -i "${audioname}"`,
-                `-c:v h264_nvenc -pix_fmt yuv420p`, // 视频用x264编码，stillimage优化静态图像，象素格式yuv420p
+                `ffmpeg -hwaccel cuda -framerate 25 -loop 1 -i "${slidename}" -i "${audioname}"`,
+                `-c:v h264_nvenc -r 25 -pix_fmt yuv420p`, // 视频用x264编码，stillimage优化静态图像，象素格式yuv420p
                 `-c:a copy`, // 音频直接复制，否则会有bug
                 `-shortest -v quiet -y "video/${filename}` // 视频长度和audio一致，静默执行，覆盖目标文件
             ].join(" ")
@@ -54,6 +54,27 @@ exports.videoGenerator = async function (args) {
         let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ${audioname}`);
         process.chdir(base_path);
         return { result: "success", action, filename, duration: +(+duration).toFixed(3) };
+
+
+    } else if (action === "cover") {
+        /********************************/
+        // 生成静音封面
+        /********************************/
+        let imgname = `cover/${args.imgname}`,
+            audioname = "../common/silence.m4a";
+
+        process.chdir(`media/${args.book_cn}`);
+        await execCommand(
+            [
+                `ffmpeg -hwaccel cuda -framerate 25 -loop 1 -i "${imgname}" -i "${audioname}"`,
+                `-c:v h264_nvenc -r 25 -pix_fmt yuv420p`, // 视频用x264编码，stillimage优化静态图像，象素格式yuv420p
+                `-c:a copy`,
+                `-shortest -v quiet -y "video/${filename}` // 视频长度和audio一致，静默执行，覆盖目标文件
+            ].join(" ")
+        );
+
+        process.chdir(base_path);
+        return { result: "success", action, filename };
 
 
     } else if (action === "concat") {
@@ -66,7 +87,7 @@ exports.videoGenerator = async function (args) {
         await fs.writeFileSync("filelist.txt", videolist.map((line) => `file 'video/${line}'`).join("\n")); // 生成文件列表
         saveLog(`生成文件列表: filelist.txt`);
 
-        await execCommand(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -async 1000 -v quiet -y "dist/${filename}"`); // 合并
+        await execCommand(`ffmpeg -f concat -safe 0 -i "filelist.txt" -c copy -strict -2 -async 1000 -v quiet -y "dist/${filename}"`); // 合并
         let duration = await execCommand(`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "dist/${filename}"`);
 
         //删除文件 filelist.txt
@@ -86,7 +107,7 @@ exports.videoGenerator = async function (args) {
             [
                 `ffmpeg -hwaccel cuda -i "${inputvideo}"`,
                 `-c:a aac -b:a 128k -ar 44100 -ac 2`,
-                `-c:v h264_nvenc -pix_fmt yuv420p`,
+                `-c:v h264_nvenc -r 25 -pix_fmt yuv420p`,
                 `-v quiet -y "dist/${filename}"`
             ].join(" ")
         ); // 合并
