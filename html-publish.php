@@ -28,6 +28,13 @@
             padding: 4px 20px;
             margin: 2px 10px;
         }
+
+        #copys hr {
+            height: 0;
+            padding: 0;
+            margin: 5px;
+            border: 0 solid #fff;
+        }
     </style>
 </head>
 
@@ -36,6 +43,8 @@
     <div class="container">
         <select name="idList" id="idList" size="10"></select>
         <div id="copys">
+            <button id="copyCourseWare">课件名称</button>
+            <hr>
             <button id="copyListenTitle">听力标题</button>
             <button id="copyReadTitle">阅读标题</button>
             <hr>

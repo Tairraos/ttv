@@ -4,8 +4,8 @@ let conf = {
     "1-0021-0030": "https://drive.google.com/file/d/1QBk5bZL65k7gbA3GiAkz22SfrpvUn2U3/view?usp=drive_link",
     "1-0031-0040": "https://drive.google.com/file/d/1zjAYJNCXhUubaB_1eR1gl9lF-6a051Sx/view?usp=drive_link",
     "1-0041-0050": "https://drive.google.com/file/d/1HIWZ0SYKzAox_T9tbt_lNWt-PYjtq-Ut/view?usp=drive_link",
-    "1-0051-0060": "",
-    "1-0061-0070": "",
+    "1-0051-0060": "https://drive.google.com/file/d/1KjUMOnQVbzekdzwejsXclg1wgwFXjqaM/view?usp=drive_link",
+    "1-0061-0070": "https://drive.google.com/file/d/146OXT1lVM3D-AKS_EEgvjaAu5KfU-Z8n/view?usp=drive_link",
     "1-0071-0080": "",
     "1-0081-0090": "",
     "1-0091-0100": "",
@@ -383,7 +383,8 @@ let conf = {
     "6-1126-1140": ""
 };
 let $idList = document.querySelector("#idList"), level, plan, startid, endid, link;
-let getTitle = (type) => `HSK Chinese Practice Level ${level}: ${+startid}-${+endid} ${type}, Daily Chinese`,
+let getWarename = () => `HSK${$idList.value}.pdf`,
+    getTitle = (type) => `HSK Chinese Practice Level ${level}: ${+startid}-${+endid} ${type}, Daily Chinese`,
     getDescription = () => [
         `HSK practice video series, HSK${level} practice plan is ${plan} entries (single words or words) and about ${plan * 2} sentences every day. Courseware for this video course: ${link}`,
         ``,
@@ -404,10 +405,12 @@ $idList.addEventListener("click", () => {
     plan = +level === 1 ? 10 : 15;
 });
 
+document.querySelector("#copyCourseWare").addEventListener("click",        () => navigator.clipboard.writeText(getWarename()));
+
 document.querySelector("#copyListenTitle").addEventListener("click",       () => navigator.clipboard.writeText(getTitle("Listening")));
 document.querySelector("#copyReadTitle").addEventListener("click",         () => navigator.clipboard.writeText(getTitle("Reading")));
 
-document.querySelector("#copyDescription").addEventListener("click", () => navigator.clipboard.writeText(getDescription()));
+document.querySelector("#copyDescription").addEventListener("click",       () => navigator.clipboard.writeText(getDescription()));
 
 document.querySelector("#copyListenThemename").addEventListener("click"  , () => navigator.clipboard.writeText(getThemename("listen")));
 document.querySelector("#copyReadThemename").addEventListener("click",     () => navigator.clipboard.writeText(getThemename("read")));
