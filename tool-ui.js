@@ -690,7 +690,7 @@ document.body.addEventListener("keypress", (e) => {
             ui.lineLocate();
         } else if (target.id === "sd-input") {
             ui.doAddInput();
-        } else if (target.tagName === "td") {
+        } else if (target.tagName === "TD" && conf.editTool.locker) {
             ui.cellEditDone();
         }
     }
