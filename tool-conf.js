@@ -70,7 +70,7 @@ let setup = {
         chinese: [
             {}, // 空行
             { font: { name: "Mulish", sz: "12", bold: true } }, // 拼音
-            { font: { name: "Noto Sans SC", sz: "15", bold: true } }, // 中文
+            { font: { name: "Noto Sans SC", sz: "14", bold: true } }, // 中文
             { font: { name: "Encode Sans Semi Expanded", sz: "11" } } // 英文
         ],
         english: [

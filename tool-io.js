@@ -116,7 +116,7 @@ let io = {
             let id = line.sid ? line.sid.toString() : "";
             util.isLearnEnglish()
                 ? ware.push([id], [line.english + line.phonetic], [line.chinese], [""])
-                : ware.push(["", line.phonetic], [id, line.chinese], ["", line.english], [""]);
+                : ware.push(["", line.phonetic.replace(/[？。！”]$/, "")], [id, line.chinese], ["", line.english], [""]);
         }
         io.saveXlsxBinary(book, info, duration, video, ware);
     },
