@@ -18,7 +18,7 @@ $root = "media/" . $book_cn;
 
 
 if ($action == "create") {
-    foreach (["", "audio", "video", "slide", "cover", "theme", "dist"] as $name) {
+    foreach (["", "audio", "video", "slide", "cover", "theme", "dist", "courseware"] as $name) {
         $path = $root . "/" . $name;
         !file_exists($path) && mkdir($path);
     }
@@ -26,7 +26,7 @@ if ($action == "create") {
 
 } else if ($action == "list") {
     $files = [];
-    foreach (["", "audio", "video", "slide", "cover", "theme", "dist"] as $name) {
+    foreach (["", "audio", "video", "slide", "cover", "theme", "dist", "courseware"] as $name) {
         $path = $root . "/" . $name;
         !file_exists($path) && mkdir($path);
         $list = scandir($path);
