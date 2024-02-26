@@ -384,7 +384,7 @@ let conf = {
 };
 let $idList = document.querySelector("#idList"), level, plan, startid, endid, link;
 let getWarename = () => `HSK${$idList.value}.pdf`,
-    getTitle = (type) => `HSK Chinese Practice Level ${level}: ${+startid}-${+endid} ${type}, Daily Chinese`,
+    getTitle = (type) => `HSK${level}: [${+startid}-${+endid}] ${type}, Daily Chinese, Chinese Practice`,
     getDescription = () => [
         `Courseware for this video course: ${link}`,
         `HSK practice video series, HSK${level} practice plan is ${plan} entries (single words or words) and about ${plan * 2} sentences every day.`,

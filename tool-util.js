@@ -33,9 +33,13 @@ let util = {
             document.querySelector(`#material-${conf.lastTouchedId}`).scrollIntoView({ behavior: "smooth" });
         }
         ui.updateBasket();
+        ui.locateNoVideoId();
     },
 
-    backupParam2Storage() {
+    backupParam2Storage(needBackup) {
+        if (needBackup) {
+            localStorage.setItem("conf.bak", localStorage.getItem("conf"));
+        }
         localStorage.setItem("conf", JSON.stringify(conf));
         conf.noExport = true;
     },

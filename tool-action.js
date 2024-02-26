@@ -14,9 +14,10 @@ let action = {
             await io.importXlsx(data);
             conf.files = (await net.filesList()).files;
             conf.tasks = []; // 每次导入都清空任务列表，需要重新估算新产生任务列表
-            util.backupParam2Storage();
+            util.backupParam2Storage(true); // 导入后的保存需要备份
             ui.initRangeBox();
             ui.updateBasket();
+            ui.locateNoVideoId(); // 定位到没生成过video的id
         };
         reader.readAsBinaryString(file);
     },

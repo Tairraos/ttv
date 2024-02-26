@@ -176,16 +176,24 @@ let ui = {
     },
 
     /*********************/
-    // 定位行，移到屏幕中来
+    // 定位sid，移到屏幕中来
     /*********************/
-    lineLocate() {
-        let locateid = +ui.getInputData("locateid"),
+    locateSid() {
+        let targetsid = +ui.getInputData("targetsid"),
             materials = util.getAllMaterial();
         for (let line of materials) {
-            if (line.sid === locateid) {
+            if (line.sid === targetsid) {
                 return document.querySelector(`#material-${line.id}`).scrollIntoView({ behavior: "smooth" });
             }
         }
+    },
+
+    /*********************/
+    // 定位没生成过video的id
+    /*********************/
+    locateNoVideoId() {
+        let targetid = Math.max(Math.max(...conf.videos.map((item) => item[3])) - 2, 1);
+        document.querySelector(`#material-${targetid}`).scrollIntoView({ behavior: "smooth" });
     },
 
     /*********************/
@@ -653,7 +661,7 @@ document.getElementById("icon-minus").addEventListener("click", ui.themeIdDecrea
 document.getElementById("icon-save").addEventListener("click", ui.themeIdSave, false);
 document.getElementById("icon-confirm").addEventListener("click", ui.rangeConfirm, false);
 document.getElementById("icon-verify").addEventListener("click", ui.rangeVerify, false);
-document.getElementById("icon-locate").addEventListener("click", ui.lineLocate, false);
+document.getElementById("icon-locate").addEventListener("click", ui.locateSid, false);
 document.getElementById("icon-mark").addEventListener("click", ui.lineMark, false);
 document.getElementById("program").addEventListener("change", ui.onProgramChange, false);
 
@@ -686,8 +694,8 @@ document.body.addEventListener("keypress", (e) => {
             ui.rangeConfirm();
         } else if (target.id === "marknum") {
             ui.lineMark();
-        } else if (target.id === "locateid") {
-            ui.lineLocate();
+        } else if (target.id === "targetsid") {
+            ui.locateSid();
         } else if (target.id === "sd-input") {
             ui.doAddInput();
         } else if (target.tagName === "TD" && conf.editTool.locker) {
