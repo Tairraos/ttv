@@ -7,6 +7,7 @@ let conf = {
     tasks: [], // 任务就是素材列表，素材可能会重复使用，读多遍
     files: {}, // material目录下的素材文件列表
     range: {}, // 素材范围
+    hidhen: { book: "", id: 1 },
 
     // 生成视频需要的信息在此
     info: {

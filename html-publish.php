@@ -55,6 +55,23 @@
         </div>
     </div>
 </body>
+<?php
+echo "<script>";
+$bookList = [1 => "HSK1 练习", 2 => "HSK2 练习", 3 => "HSK3 练习", 4 => "HSK4 练习", 5 => "HSK5 练习", 6 => "HSK6 练习"];
+$ids = [];
+foreach ($bookList as $index => $book) {
+    $path = "media/" . $book . "/dist";
+    $list = scandir($path);
+    $list = array_values(array_filter($list, fn($item) => !is_dir($path . "/" . $item)));
+    foreach ($list as $video) {
+        if (strpos($video, "listen") !== false) {
+            array_push($ids, $index . "-" . preg_replace("/HSK.*(\d{4}-\d{4})\.mp4/", "$1", $video));
+        }
+    }
+}
+echo "let ids = " . json_encode($ids) . ";";
+echo "</script>";
+?>
 <script src="tool-publish.js"></script>
 
 </html>

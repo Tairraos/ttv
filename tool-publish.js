@@ -1,3 +1,4 @@
+/* global ids */
 let conf = {
     "1-0001-0010": "https://drive.google.com/file/d/18M1DnE34bD1hOAr2nFpdc3j4v16RdOE2/view?usp=drive_link",
     "1-0011-0020": "https://drive.google.com/file/d/1n2abroaDLAzOOXP3o_5hXDBka_XHe5Ay/view?usp=drive_link",
@@ -10,9 +11,9 @@ let conf = {
     "1-0081-0090": "https://drive.google.com/file/d/1eWYpU4rAYb8-ikW49ubMWBKJExsVWUA0/view?usp=drive_link",
     "1-0091-0100": "https://drive.google.com/file/d/1GoCF8Fs5av2OhvTzq_WDIWWhY0pkS4sU/view?usp=drive_link",
     "1-0101-0110": "https://drive.google.com/file/d/1cWC7itW5OFiw3nkFvVxAYTgXZvLRC9aU/view?usp=drive_link",
-    "1-0111-0120": "",
-    "1-0121-0130": "",
-    "1-0131-0140": "",
+    "1-0111-0120": "https://drive.google.com/file/d/1-24k2kXY7efLvKob0dXiHp4qjDUWUaHC/view?usp=sharing",
+    "1-0121-0130": "https://drive.google.com/file/d/1QG5RLx0om_xpMiPvioe1JVWYA-Hyhdw9/view?usp=sharing",
+    "1-0131-0140": "https://drive.google.com/file/d/1t185WuaZDsiV2pthZuJ7aASUCFl-Iiq8/view?usp=sharing",
     "1-0141-0150": "",
     "1-0151-0160": "",
     "1-0161-0170": "",
@@ -403,6 +404,7 @@ let getWarename = () => `HSK${$idList.value}.pdf`,
 $idList.addEventListener("click", () => {
     [level, startid, endid] = $idList.value.split("-");
     link = conf[$idList.value];
+    document.querySelector("#copyDescription").style.borderColor = link ? "" : "#f00";
     plan = +level === 1 ? 10 : 15;
 });
 
@@ -417,7 +419,7 @@ document.querySelector("#copyListenThemename").addEventListener("click"  , () =>
 document.querySelector("#copyReadThemename").addEventListener("click",     () => navigator.clipboard.writeText(getThemename("read")));
 
 
-for (let line of Object.keys(conf)) {
+for (let line of ids) {
     if(conf[line] !== ""){
         $idList.innerHTML += `<option value="${line}">${line}</option>`;
     }

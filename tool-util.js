@@ -8,6 +8,7 @@ let util = {
         if (!backupData.noExport) {
             ui.highlightRestoreBtn();
         }
+        util.inithidhenData();
         ui.initMaterialsTable();
         dict.e2c = await net.importDict();
         ui.log("读取到字典数据 " + Object.keys(dict.e2c).length + " 条");
@@ -21,6 +22,7 @@ let util = {
         let backupData = JSON.parse(localStorage.getItem("conf"));
         delete backupData.serverAvailable;
         Object.assign(conf, backupData);
+        util.inithidhenData();
         let materials = util.getAllMaterial();
         for (let data of materials) {
             await ui.loadMaterial(data, true); // true: 从localStorage里恢复
@@ -34,6 +36,13 @@ let util = {
         }
         ui.updateBasket();
         ui.locateNoVideoId();
+    },
+
+    inithidhenData() {
+        conf.hidhen = {
+            book: localStorage.getItem("ui_hidhen_book") || "",
+            id: +(localStorage.getItem("ui_hidhen_id") || 1)
+        };
     },
 
     backupParam2Storage(needBackup) {

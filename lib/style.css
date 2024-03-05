@@ -497,15 +497,23 @@ ul {
 }
 
 #book_abbr,
-#doNewBook {
+#doNewBook,
+#doSavehidhenConfig {
     width: 95px;
     margin-right: 10px;
 }
-#doGenTranasCmd {
+
+#ui_hidhen_book {
+    width: 95px;
+    margin-right: 10px;
 }
+
+#ui_hidhen_id {
+    width: 140px;
+}
+
+#doMoveTemplate,
 #doOpenPublishTool {
-}
-#doMoveTemplate {
     width: 95px;
     margin-bottom: 15px;
 }
@@ -623,4 +631,8 @@ ul {
 
 #sd-modesetting {
     float: left;
+}
+
+.hide {
+    display: none;
 }

@@ -61,6 +61,7 @@ let ui = {
             $tool_b.style.display = "block";
             $panel2.className = "selected";
             $panel1.className = "unselected";
+            ui.initPanel2();
         }
     },
 
@@ -235,7 +236,10 @@ let ui = {
     loadMaterial(data, isLoadFromStorage = false) {
         let row = $materials.insertRow();
         row.id = "material-" + data.id;
-        row.className = "type-" + data.type;
+        row.classList.add("type-" + data.type);
+        if (conf.info.book_abbr === conf.hidhen.book && data.id <= conf.hidhen.id) {
+            row.classList.add("hide");
+        }
         row.dataset.id = +data.id;
         setup.uiFields.forEach((item, index) => {
             let cell = row.insertCell(-1);
@@ -608,6 +612,19 @@ let ui = {
     serverError() {
         ui.log("摩耳视频助手服务不可用，请检查。", "error");
         return "error";
+    },
+
+    /*********************/
+    // 保存忽略列表
+    /*********************/
+    doSavehidhenConfig() {
+        localStorage.setItem("ui_hidhen_book", ui.getInputData("ui_hidhen_book"));
+        localStorage.setItem("ui_hidhen_id", ui.getInputData("ui_hidhen_id"));
+    },
+
+    initPanel2() {
+        ui.putInputData("ui_hidhen_book", localStorage.getItem("ui_hidhen_book") || "");
+        ui.putInputData("ui_hidhen_id", localStorage.getItem("ui_hidhen_id") || 1);
     }
 };
 
@@ -675,6 +692,7 @@ document.getElementById("doNewBook").addEventListener("click", action.doNewBook,
 document.getElementById("doMoveTemplate").addEventListener("click", action.doMoveTemplate, false);
 document.getElementById("doGenTranasCmd").addEventListener("click", action.doGenTranasCmd, false);
 document.getElementById("doOpenPublishTool").addEventListener("click", action.doOpenPublishTool, false);
+document.getElementById("doSavehidhenConfig").addEventListener("click", ui.doSavehidhenConfig, false);
 
 /*********************/
 // 造句工具
