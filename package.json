@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^1.6.7",
+    "bingai-js": "1.7.5-rc6",
     "microsoft-cognitiveservices-speech-sdk": "^1.34.0",
     "puppeteer": "^21.9.0",
     "socks-proxy-agent": "^8.0.2",

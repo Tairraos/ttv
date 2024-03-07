@@ -28,9 +28,8 @@ let util = {
             await ui.loadMaterial(data, true); // true: 从localStorage里恢复
         }
         conf.files = (await net.filesList()).files;
-        conf.info.program = "listen";
         ui.initRangeBox();
-        util.checkMaterials();
+        ui.onProgramChange();
         if (conf.lastTouchedId) {
             document.querySelector(`#material-${conf.lastTouchedId}`).scrollIntoView({ behavior: "smooth" });
         }

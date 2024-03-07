@@ -2,3 +2,4 @@
 /media/**
 !/media/common
 !/media/common/**
+/test

@@ -40,7 +40,7 @@ let ui = {
 
     initRangeBox() {
         let r = conf.range;
-        r.min = Math.min(...Object.keys(conf.materials), 1);
+        r.min = Math.max(Math.min(...Object.keys(conf.materials), 1), conf.info.book_abbr === conf.hidhen.book ? conf.hidhen.id + 1 : 1);
         r.max = Math.max(...Object.keys(conf.materials), 1);
         ui.putInputData("startid", r.min); //填上缺省值
         ui.putInputData("endid", r.max);
@@ -462,7 +462,7 @@ let ui = {
                 conf.range.selected = conf.onselect;
             } else if (!e.locker) {
                 // 这些字段可以编辑
-                if (field.match(/group|voice|chinese|english|comment|media_cn1/)) {
+                if (field.match(/group|voice|chinese|english|phonetic|comment|media_cn1/)) {
                     ui.showEditTool({ target: dom, isInCell: true });
                     $doMakeSentence.style.display = field === "chinese" && conf.materials[id].type === "word" ? "inline-block" : "none";
                     $doCellTranslate.style.display = field.match(/chinese|english/) ? "inline-block" : "none";

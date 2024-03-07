@@ -16,6 +16,29 @@ $action = $_REQUEST['action'];
 $book_cn = $_REQUEST['book_cn'];
 $root = "media/" . $book_cn;
 
+function getAllFilesRecursive($path) {
+    if (!is_dir($path)) {
+        return false;
+    }
+
+    $fileList = array();
+    $data = scandir($path);
+    foreach ($data as $value) {
+        if ($value != '.' && $value != '..') {
+            $subPath = $path . "/" . $value;
+            if (is_dir($subPath)) {
+                // 递归处理子目录
+                $subFiles = getAllFilesRecursive($subPath);
+                $fileList = array_merge($fileList, $subFiles);
+            } else {
+                // 添加文件到列表
+                $fileList[] = $subPath;
+            }
+        }
+    }
+
+    return $fileList;
+}
 
 if ($action == "create") {
     foreach (["", "audio", "video", "slide", "cover", "theme", "dist", "courseware"] as $name) {
@@ -33,7 +56,12 @@ if ($action == "create") {
         $list = array_values(array_filter($list, fn($item) => !is_dir($path . "/" . $item)));
         $files[$name == '' ? "root" : $name] = $list;
     }
+
+    $list = scandir($root);
+    $list = array_values(array_filter($list, fn($item) => !is_dir($root . "/" . $item)));
+    $files['root'] = $list;
     echo json_encode(['result' => 'success', 'files' => $files], JSON_UNESCAPED_UNICODE);
+
 
 } else if ($action == "move") {
     $file = $_REQUEST['filename'];
@@ -43,6 +71,16 @@ if ($action == "create") {
     } else {
         echo json_encode(['result' => 'failed', 'reason' => "文件不存在"], JSON_UNESCAPED_UNICODE);
     }
+
+
+} else if ($action == "test") {
+    $path = $root . "/dist";
+
+//遍历$path下的所有文件，包括子目录
+    $files = getAllFilesRecursive($path);
+
+
+    echo json_encode(['result' => 'success', 'files' => $files], JSON_UNESCAPED_UNICODE);
 
 
 } else {

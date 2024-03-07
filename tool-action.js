@@ -186,8 +186,11 @@ let action = {
             let filename = util.getMediaFilename(id, field, target),
                 audioname = target === "video-ding" ? "DING" : conf.materials[id][`${field}.audio`],
                 slidename = conf.materials[id][`slide.slide-${target === "video-text" ? "text" : "listen"}`],
-                log = ui.log(`生成视频片段：${filename}`),
-                ret = await net.ffmpegPiece(filename, slidename, audioname);
+                log = ui.log(`生成视频片段：${filename}`);
+            if (audioname === "required" || slidename === "required") {
+                return ui.log(`第${id}行记录的音频或字幕素材未准备完整，无法继续。`, "error");
+            }
+            let ret = await net.ffmpegPiece(filename, slidename, audioname);
             if (ret.result === "success") {
                 conf.durations[filename] = ret.duration;
                 await util.updateMaterial(id, filename, "video");
@@ -316,6 +319,10 @@ let action = {
     },
 
     doOpenPublishTool() {
-        window.open(`html-publish.php`, "publish");
+        window.open(
+            `html-publish.php`,
+            "publish",
+            `toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=280, height=360, top=0, left=${window.screen.availWidth}`
+        );
     }
 };

@@ -1,10 +1,21 @@
+<?php
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="pragma" content="no-cache" />
     <title>Moore's Materials Previewer</title>
     <style>
+        body {
+            margin: 20px 0 0 20px;
+        }
+
         .container {
             display: flex;
             text-align: center;
@@ -55,8 +66,8 @@
         </div>
     </div>
 </body>
+
 <?php
-echo "<script>";
 $bookList = [1 => "HSK1 练习", 2 => "HSK2 练习", 3 => "HSK3 练习", 4 => "HSK4 练习", 5 => "HSK5 练习", 6 => "HSK6 练习"];
 $ids = [];
 foreach ($bookList as $index => $book) {
@@ -69,9 +80,11 @@ foreach ($bookList as $index => $book) {
         }
     }
 }
-echo "let ids = " . json_encode($ids) . ";";
-echo "</script>";
 ?>
+
+<script>
+    let ids = <?= json_encode($ids) ?>;
+</script>
 <script src="tool-publish.js"></script>
 
 </html>

@@ -14,10 +14,10 @@ let conf = {
     "1-0111-0120": "https://drive.google.com/file/d/1-24k2kXY7efLvKob0dXiHp4qjDUWUaHC/view?usp=sharing",
     "1-0121-0130": "https://drive.google.com/file/d/1QG5RLx0om_xpMiPvioe1JVWYA-Hyhdw9/view?usp=sharing",
     "1-0131-0140": "https://drive.google.com/file/d/1t185WuaZDsiV2pthZuJ7aASUCFl-Iiq8/view?usp=sharing",
-    "1-0141-0150": "",
-    "1-0151-0160": "",
-    "1-0161-0170": "",
-    "1-0171-0180": "",
+    "1-0141-0150": "https://drive.google.com/file/d/1AIdFaaB5TmXK4eCTD8SMaCG73Oeyh8ed/view?usp=sharing",
+    "1-0151-0160": "https://drive.google.com/file/d/122Cm1JReGV6Bd93jsOIG5PIb6uvcTSXE/view?usp=sharing",
+    "1-0161-0170": "https://drive.google.com/file/d/1Cppm3hJQ6yqjzrZoPkxlN6_G3gtQB1Dn/view?usp=sharing",
+    "1-0171-0180": "https://drive.google.com/file/d/1stD51MQi9d04dNqkkGNZnnWfBBuQbklq/view?usp=sharing",
     "1-0181-0190": "",
     "1-0191-0200": "",
     "1-0201-0210": "",
@@ -420,7 +420,5 @@ document.querySelector("#copyReadThemename").addEventListener("click",     () =>
 
 
 for (let line of ids) {
-    if(conf[line] !== ""){
-        $idList.innerHTML += `<option value="${line}">${line}</option>`;
-    }
+    $idList.innerHTML += `<option value="${line}">${line}</option>`;
 }

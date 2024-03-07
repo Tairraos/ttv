@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Moore's Materials Previewer</title>
-    <link rel="stylesheet" href="lib/preview.css">
+    <link rel="stylesheet" href="lib/overview.css">
 </head>
 
 <body>
@@ -88,6 +88,6 @@
     }
 </script>
 <script src="tool-util.js"></script>
-<script src="lib/preview.js"></script>
+<script src="lib/overview.js"></script>
 
 </html>
