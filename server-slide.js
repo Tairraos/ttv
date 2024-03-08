@@ -15,19 +15,14 @@
 
 exports.captureSlide = async function (args) {
     let puppeteer = require("puppeteer"),
-        fs = require("fs"),
-        path = require("path"),
-        base_path = process.cwd(),
+        util = require("./server-util.js"),
+        book_cn = args.book_cn,
+        targetslide = util.getFullname(book_cn, args.filename) ,
         browser = await puppeteer.launch({ headless: "new", args: ["--window-size=1920,1080"] }),
         page = await browser.newPage(),
         query = Object.keys(args)
             .map((s) => `${s}=${args[s]}`)
             .join("&");
-
-    let saveLog = async function (text) {
-        await fs.appendFileSync(path.join(base_path, `media/${args.book_cn}/process_log.txt`), `${new Date().toISOString()} - ${text}\n`, "utf8");
-        return text;
-    };
 
     try {
         console.log(`抓图参数: ${JSON.stringify(args)}`);
@@ -48,10 +43,10 @@ exports.captureSlide = async function (args) {
         });
 
         await page.goto(`https://ttv.localweb.com/html-slide.php`);
-        await page.screenshot({ path: `media/${args.book_cn}/slide/${args.filename}` });
+        await page.screenshot({ path: targetslide});
         await browser.close();
 
-        saveLog(`生成slide: media/${args.book_cn}/slide/${args.filename}`);
+        util.saveLog(book_cn, `生成slide: ${targetslide}`);
         return { result: "success", filename: args.filename, id: args.id };
     } catch (error) {
         return { result: "failed", reason: "遇到错误" };

@@ -2,12 +2,11 @@
 
 let conf = {
     materials: {}, // 库里的语料都在此，对应屏幕上的表格
-    dict: null, // 英文单词翻译用字典加载在此
     durations: {}, // 所有已经生成的视频素材，长度记录在此
     tasks: [], // 任务就是素材列表，素材可能会重复使用，读多遍
     files: {}, // material目录下的素材文件列表
     range: {}, // 素材范围
-    hidhen: { book: "", id: 1 },
+    hidden: { book: "", id: 1 },
 
     // 生成视频需要的信息在此
     info: {

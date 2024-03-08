@@ -32,7 +32,7 @@ function getAllFilesRecursive($path) {
                 $fileList = array_merge($fileList, $subFiles);
             } else {
                 // 添加文件到列表
-                $fileList[] = $subPath;
+                $fileList[] = $value;
             }
         }
     }
@@ -52,8 +52,7 @@ if ($action == "create") {
     foreach (["", "audio", "video", "slide", "cover", "theme", "dist", "courseware"] as $name) {
         $path = $root . "/" . $name;
         !file_exists($path) && mkdir($path);
-        $list = scandir($path);
-        $list = array_values(array_filter($list, fn($item) => !is_dir($path . "/" . $item)));
+        $list = getAllFilesRecursive($path);
         $files[$name == '' ? "root" : $name] = $list;
     }
 
@@ -78,8 +77,6 @@ if ($action == "create") {
 
 //遍历$path下的所有文件，包括子目录
     $files = getAllFilesRecursive($path);
-
-
     echo json_encode(['result' => 'success', 'files' => $files], JSON_UNESCAPED_UNICODE);
 
 

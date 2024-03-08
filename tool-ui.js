@@ -40,7 +40,7 @@ let ui = {
 
     initRangeBox() {
         let r = conf.range;
-        r.min = Math.max(Math.min(...Object.keys(conf.materials), 1), conf.info.book_abbr === conf.hidhen.book ? conf.hidhen.id + 1 : 1);
+        r.min = Math.max(Math.min(...Object.keys(conf.materials), 1), conf.info.book_abbr === conf.hidden.book ? conf.hidden.id + 1 : 1);
         r.max = Math.max(...Object.keys(conf.materials), 1);
         ui.putInputData("startid", r.min); //填上缺省值
         ui.putInputData("endid", r.max);
@@ -237,7 +237,7 @@ let ui = {
         let row = $materials.insertRow();
         row.id = "material-" + data.id;
         row.classList.add("type-" + data.type);
-        if (conf.info.book_abbr === conf.hidhen.book && data.id <= conf.hidhen.id) {
+        if (conf.info.book_abbr === conf.hidden.book && data.id <= conf.hidden.id) {
             row.classList.add("hide");
         }
         row.dataset.id = +data.id;
@@ -617,14 +617,14 @@ let ui = {
     /*********************/
     // 保存忽略列表
     /*********************/
-    doSavehidhenConfig() {
-        localStorage.setItem("ui_hidhen_book", ui.getInputData("ui_hidhen_book"));
-        localStorage.setItem("ui_hidhen_id", ui.getInputData("ui_hidhen_id"));
+    doSavehiddenConfig() {
+        localStorage.setItem("ui_hidden_book", ui.getInputData("ui_hidden_book"));
+        localStorage.setItem("ui_hidden_id", ui.getInputData("ui_hidden_id"));
     },
 
     initPanel2() {
-        ui.putInputData("ui_hidhen_book", localStorage.getItem("ui_hidhen_book") || "");
-        ui.putInputData("ui_hidhen_id", localStorage.getItem("ui_hidhen_id") || 1);
+        ui.putInputData("ui_hidden_book", localStorage.getItem("ui_hidden_book") || "");
+        ui.putInputData("ui_hidden_id", localStorage.getItem("ui_hidden_id") || 1);
     }
 };
 
@@ -692,7 +692,7 @@ document.getElementById("doNewBook").addEventListener("click", action.doNewBook,
 document.getElementById("doMoveTemplate").addEventListener("click", action.doMoveTemplate, false);
 document.getElementById("doGenTranasCmd").addEventListener("click", action.doGenTranasCmd, false);
 document.getElementById("doOpenPublishTool").addEventListener("click", action.doOpenPublishTool, false);
-document.getElementById("doSavehidhenConfig").addEventListener("click", ui.doSavehidhenConfig, false);
+document.getElementById("doSavehiddenConfig").addEventListener("click", ui.doSavehiddenConfig, false);
 
 /*********************/
 // 造句工具

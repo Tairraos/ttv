@@ -498,17 +498,17 @@ ul {
 
 #book_abbr,
 #doNewBook,
-#doSavehidhenConfig {
+#doSavehiddenConfig {
     width: 95px;
     margin-right: 10px;
 }
 
-#ui_hidhen_book {
+#ui_hidden_book {
     width: 95px;
     margin-right: 10px;
 }
 
-#ui_hidhen_id {
+#ui_hidden_id {
     width: 140px;
 }
 

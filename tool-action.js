@@ -286,7 +286,7 @@ let action = {
             net.filesMove(filename, conf.info.book_cn);
         }, 2000);
         ui.updateBasket();
-        conf.noExport = false;
+        conf.justExported = true;
         util.backupParam2Storage();
     },
 

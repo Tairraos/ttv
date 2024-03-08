@@ -16,8 +16,10 @@
 
 exports.textToSpeech = async function (args) {
     let fs = require("fs"),
-        path = require("path"),
-        thread = require("child_process"),
+        util = require("./server-util.js"),
+        book_cn = args.book_cn,
+        source_name = util.getShortname(book_cn, `${args.basename}.mp3`),
+        target_name = util.getShortname(book_cn, `${args.basename}.m4a`),
         base_path = process.cwd(),
         is_rate = args.rate && +args.rate !== 0,
         ssml = [
@@ -38,16 +40,6 @@ exports.textToSpeech = async function (args) {
         ].join(""),
         progress;
     console.log(ssml);
-    let saveLog = async function (text) {
-        await fs.appendFileSync(path.join(base_path, `media/${args.book_cn}/process_log.txt`), `${new Date().toISOString()} - ${text}\n`, "utf8");
-        return text;
-    };
-
-    let execCommand = async function (command) {
-        await saveLog(command);
-        return await thread.execSync(command);
-    };
-
     console.log(`TTS参数: ${JSON.stringify(args)}`);
 
     let sdk = require("microsoft-cognitiveservices-speech-sdk"),
@@ -59,7 +51,7 @@ exports.textToSpeech = async function (args) {
         speech_config.speechSynthesisOutputFormat = sdk.SpeechSynthesisOutputFormat.Audio48Khz192KBitRateMonoMp3;
         let speech_synthesizer = new sdk.SpeechSynthesizer(speech_config, audio_config);
 
-        progress = saveLog(`通过api生成语音：${args.model} => ${args.text}`);
+        progress = util.saveLog(book_cn, `通过api生成语音：${args.model} => ${args.text}`);
         let result = await new Promise((resolve, reject) => {
             speech_synthesizer.speakSsmlAsync(
                 ssml,
@@ -76,15 +68,16 @@ exports.textToSpeech = async function (args) {
             );
         });
 
-        process.chdir(`media/${args.book_cn}/audio`);
+        process.chdir(`media/${args.book_cn}`);
 
-        progress = saveLog(`保存文件：${args.basename}.mp3`);
-        await fs.writeFileSync(`${args.basename}.mp3`, result); // 写临时文件
+        progress = util.saveLog(book_cn, `保存文件：${source_name}`);
+        await fs.writeFileSync(`${source_name}`, result); // 写临时文件
 
-        progress = saveLog(`修正静音，输出成：${args.basename}.m4a`);
-        await execCommand(
+        progress = util.saveLog(book_cn, `修正静音，输出成：${target_name}`);
+        await util.execCommand(
+            book_cn,
             [
-                `ffmpeg -i "${args.basename}.mp3"`,
+                `ffmpeg -i "${source_name}"`,
                 `-filter_complex`,
                 [
                     `"`,
@@ -105,15 +98,15 @@ exports.textToSpeech = async function (args) {
                     `"`
                 ].join(""),
                 `-c:a aac -b:a 128k -ar 44100 -ac 2`,
-                `-v quiet -y "${args.basename}.m4a"`
+                `-v quiet -y "${target_name}"`
             ].join(" ")
         );
 
-        progress = saveLog(`删除mp3源文件：${args.basename}.mp3`);
-        await fs.unlinkSync(`${args.basename}.mp3`);
+        progress = util.saveLog(book_cn, `删除mp3源文件：${source_name}`);
+        await fs.unlinkSync(`${source_name}`);
 
         process.chdir(base_path);
-        return { result: "success", filename: `${args.basename}.m4a` };
+        return { result: "success", filename: `${target_name}` };
     } catch (error) {
         return { result: "failed", progress, data: error };
     }
