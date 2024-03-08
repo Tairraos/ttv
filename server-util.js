@@ -13,7 +13,7 @@ util.saveLog = async function (book_cn, text) {
     return text;
 };
 
-util.nameParse = function (book_cn, filename) {
+util.nameParser = function (book_cn, filename) {
     let typecheck = filename.match(/\.(mp3|m4a|mp4|png)$/),
         idcheck = filename.match(/^(\d+)\./),
         types = { mp3: "audio", m4a: "audio", mp4: "video", png: "slide" },
@@ -26,14 +26,14 @@ util.nameParse = function (book_cn, filename) {
 };
 
 util.getFullname = function (book_cn, filename) {
-    let parsed = util.nameParse(book_cn, filename);
+    let parsed = util.nameParser(book_cn, filename);
     fs.existsSync(parsed.folderpath) || fs.mkdirSync(parsed.folderpath);
     return parsed.fullname;
 };
 
 // 如果要cd到media目录里去操作的，就getShortname
 util.getShortname = function (book_cn, filename) {
-    let parsed = util.nameParse(book_cn, filename);
+    let parsed = util.nameParser(book_cn, filename);
     fs.existsSync(parsed.folderpath) || fs.mkdirSync(parsed.folderpath);
     return parsed.shortname;
 };
