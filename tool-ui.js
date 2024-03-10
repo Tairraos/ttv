@@ -450,7 +450,7 @@ let ui = {
     /*********************/
     // hover 单元格的处理，可能是选择范围，也可能是显示editTool工具
     /*********************/
-    onMouseOverCell(event) {
+    async onMouseOverCell(event) {
         let e = conf.editTool,
             dom = event.target;
         if (dom.tagName === "TD") {
@@ -475,6 +475,9 @@ let ui = {
                     $doCellEdit.style.display = field !== "media_cn1" ? "inline-block" : "none";
                     $doFetchWordPair.style.display = field === "english" ? "inline-block" : "none";
                     $doFillSentence.style.display = field === "english" ? "inline-block" : "none";
+                    if (field === "english") {
+                        $doFillSentence.setAttribute("title", await navigator.clipboard.readText());
+                    }
                 } else {
                     ui.hideEditTool();
                 }
@@ -543,7 +546,7 @@ let ui = {
 
     async doFillSentence() {
         let id = +conf.editTool.id,
-            clipboard = (await navigator.clipboard.readText()).split("\n"),
+            clipboard = (await navigator.clipboard.readText()).split(/[\n\t]/),
             materials = [{ chinese: clipboard[0], english: clipboard[1] }];
         let ids = util.insertMaterial(id, materials);
         action.genPhoneticPiece(ids[0], true);

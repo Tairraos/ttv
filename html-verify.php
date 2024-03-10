@@ -28,7 +28,7 @@
     $book_cn = $_REQUEST['book_cn'];
     $ids = json_decode($_REQUEST['ids']);
     foreach ($ids as $id) {
-        echo ('<span class="slide"><span class="id">' . $id . '</span><img src="media/' . $book_cn . '/slide/' . $id . '.text.png" /></span>');
+        echo ('<span class="slide"><span class="id">' . $id . '</span><img src="media/' . $book_cn . '/slide/' . $id . '/' . $id . '.text.png" /></span>');
     }
     ?>
 </body>

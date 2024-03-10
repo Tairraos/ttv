@@ -297,5 +297,13 @@ let util = {
         let line = conf.materials[id],
             abbr = language === "chinese" ? "cn" : "en";
         return line.voice !== "" ? [`media_${abbr}1`] : [`media_${abbr}1`, `media_${abbr}2`];
+    },
+
+    splitLine(line) {
+        if (line[0] === `"`) {
+            line = line.replace(/^"(.*)"$/, "$1");
+            return line.split(/[", ]+/);
+        }
+        return line.replace(/。 */, "。\n").split("\n");
     }
 };

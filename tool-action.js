@@ -322,7 +322,7 @@ let action = {
         window.open(
             `html-publish.php`,
             "publish",
-            `toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=280, height=360, top=0, left=${window.screen.availWidth}`
+            `toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=300, height=360, top=0, left=${window.screen.availWidth}`
         );
     }
 };

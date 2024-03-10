@@ -23,21 +23,21 @@
     }
     checkFile('media/' . $book_cn . '/theme/', $theme . '.png');
     foreach ($rows as $row) {
-        checkFile('media/' . $book_cn . '/audio/', $row['id'] . '.cn1.m4a');
-        checkFile('media/' . $book_cn . '/video/', $row['id'] . '.cn1.listen.mp4');
-        checkFile('media/' . $book_cn . '/video/', $row['id'] . '.cn1.text.mp4');
-        checkFile('media/' . $book_cn . '/audio/', $row['id'] . '.cn2.m4a');
-        checkFile('media/' . $book_cn . '/video/', $row['id'] . '.cn2.listen.mp4');
-        checkFile('media/' . $book_cn . '/video/', $row['id'] . '.cn2.text.mp4');
-        checkFile('media/' . $book_cn . '/audio/', $row['id'] . '.en1.m4a');
-        checkFile('media/' . $book_cn . '/video/', $row['id'] . '.en1.listen.mp4');
-        checkFile('media/' . $book_cn . '/video/', $row['id'] . '.en1.text.mp4');
-        checkFile('media/' . $book_cn . '/audio/', $row['id'] . '.en2.m4a');
-        checkFile('media/' . $book_cn . '/video/', $row['id'] . '.en2.listen.mp4');
-        checkFile('media/' . $book_cn . '/video/', $row['id'] . '.en2.text.mp4');
-        checkFile('media/' . $book_cn . '/slide/', $row['id'] . '.text.png');
-        checkFile('media/' . $book_cn . '/slide/', $row['id'] . '.listen.png');
-        checkFile('media/' . $book_cn . '/video/', $row['id'] . '.ding.mp4');
+        checkFile('media/' . $book_cn . '/audio/', $row['id'] . '/' . $row['id'] . '.cn1.m4a');
+        checkFile('media/' . $book_cn . '/video/', $row['id'] . '/' . $row['id'] . '.cn1.listen.mp4');
+        checkFile('media/' . $book_cn . '/video/', $row['id'] . '/' . $row['id'] . '.cn1.text.mp4');
+        checkFile('media/' . $book_cn . '/audio/', $row['id'] . '/' . $row['id'] . '.cn2.m4a');
+        checkFile('media/' . $book_cn . '/video/', $row['id'] . '/' . $row['id'] . '.cn2.listen.mp4');
+        checkFile('media/' . $book_cn . '/video/', $row['id'] . '/' . $row['id'] . '.cn2.text.mp4');
+        checkFile('media/' . $book_cn . '/audio/', $row['id'] . '/' . $row['id'] . '.en1.m4a');
+        checkFile('media/' . $book_cn . '/video/', $row['id'] . '/' . $row['id'] . '.en1.listen.mp4');
+        checkFile('media/' . $book_cn . '/video/', $row['id'] . '/' . $row['id'] . '.en1.text.mp4');
+        checkFile('media/' . $book_cn . '/audio/', $row['id'] . '/' . $row['id'] . '.en2.m4a');
+        checkFile('media/' . $book_cn . '/video/', $row['id'] . '/' . $row['id'] . '.en2.listen.mp4');
+        checkFile('media/' . $book_cn . '/video/', $row['id'] . '/' . $row['id'] . '.en2.text.mp4');
+        checkFile('media/' . $book_cn . '/slide/', $row['id'] . '/' . $row['id'] . '.text.png');
+        checkFile('media/' . $book_cn . '/slide/', $row['id'] . '/' . $row['id'] . '.listen.png');
+        checkFile('media/' . $book_cn . '/video/', $row['id'] . '/' . $row['id'] . '.ding.mp4');
     }
     ?>
     <div id="title">素材预览</div>
