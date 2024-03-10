@@ -82,7 +82,18 @@ let util = {
         }
         // 插入造句的句子
         for (let line of materials) {
-            ui.loadMaterial({ id: ++id, sid: 0, type: "sentence", group: 0, voice: "", chinese: line, english: "", phonetic: "", comment: "", theme });
+            ui.loadMaterial({
+                id: ++id,
+                sid: 0,
+                type: "sentence",
+                group: 0,
+                voice: "",
+                chinese: line.chinese,
+                english: line.english || "",
+                phonetic: "",
+                comment: "",
+                theme
+            });
             ids.push(id);
         }
         // 插入oldMaterials

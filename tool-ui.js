@@ -12,6 +12,8 @@ let $basket = document.getElementById("basket"),
     $doMakeSentence = document.getElementById("doMakeSentence"),
     $doCellPinyin = document.getElementById("doCellPinyin"),
     $doGenLineMedia = document.getElementById("doGenLineMedia"),
+    $doFetchWordPair = document.getElementById("doFetchWordPair"),
+    $doFillSentence = document.getElementById("doFillSentence"),
     $doEditDone = document.getElementById("doEditDone"),
     $doEditRestore = document.getElementById("doEditRestore"),
     $unlocked = document.getElementById("edittool-unlocked"),
@@ -397,7 +399,9 @@ let ui = {
 
     async doSentenceConfirm() {
         let id = +$sdInfo.dataset["id"],
-            materials = Array.from($sdMaterials.querySelectorAll("li")).map((i) => i.innerText);
+            materials = Array.from($sdMaterials.querySelectorAll("li")).map((i) => {
+                return { chinese: i.innerText };
+            });
         ui.doSentenceClose();
         if (materials.length) {
             let ids = util.insertMaterial(id, materials);
@@ -469,6 +473,8 @@ let ui = {
                     $doCellPinyin.style.display = field === "chinese" ? "inline-block" : "none";
                     $doGenLineMedia.style.display = field === "media_cn1" ? "inline-block" : "none";
                     $doCellEdit.style.display = field !== "media_cn1" ? "inline-block" : "none";
+                    $doFetchWordPair.style.display = field === "english" ? "inline-block" : "none";
+                    $doFillSentence.style.display = field === "english" ? "inline-block" : "none";
                 } else {
                     ui.hideEditTool();
                 }
@@ -528,6 +534,21 @@ let ui = {
     async doGenLineMedia() {
         $materials.querySelectorAll(`#material-${conf.editTool.id} span.exist`).forEach((line) => line.classList.replace("exist", "required"));
         await action.doGenLineMedia(conf.editTool.id);
+    },
+
+    doFetchWordPair() {
+        let line = conf.materials[conf.editTool.id];
+        navigator.clipboard.writeText(`"${line.chinese}", "${line.english}"`);
+    },
+
+    async doFillSentence() {
+        let id = +conf.editTool.id,
+            clipboard = (await navigator.clipboard.readText()).split("\n"),
+            materials = [{ chinese: clipboard[0], english: clipboard[1] }];
+        let ids = util.insertMaterial(id, materials);
+        action.genPhoneticPiece(ids[0], true);
+        conf.lastTouchedId = id;
+        util.backupParam2Storage();
     },
 
     async cellEditDone() {
@@ -669,6 +690,8 @@ $doMakeSentence.addEventListener("click", ui.doMakeSentence, false);
 $doCellTranslate.addEventListener("click", ui.doCellTranslate, false);
 $doCellPinyin.addEventListener("click", ui.doCellPinyin, false);
 $doGenLineMedia.addEventListener("click", ui.doGenLineMedia, false);
+$doFetchWordPair.addEventListener("click", ui.doFetchWordPair, false);
+$doFillSentence.addEventListener("click", ui.doFillSentence, false);
 
 /*********************/
 // 素材工具
