@@ -709,6 +709,14 @@ document.getElementById("icon-mark").addEventListener("click", ui.lineMark, fals
 document.getElementById("program").addEventListener("change", ui.onProgramChange, false);
 
 /*********************/
+// 外部工具
+/*********************/
+document.getElementById("exFolder").addEventListener("click", action.doOpenFolder, false);
+document.getElementById("exPublish").addEventListener("click", action.doOpenPublishTool, false);
+document.getElementById("exDriver").addEventListener("click", action.doOpenDriver, false);
+document.getElementById("exYoutube").addEventListener("click", action.doOpenYoutube, false);
+
+/*********************/
 // 管理工具
 /*********************/
 document.getElementById("doPing").addEventListener("click", action.doPing, false);
@@ -717,7 +725,6 @@ document.getElementById("panel2").addEventListener("click", ui.switchPanel, fals
 document.getElementById("doNewBook").addEventListener("click", action.doNewBook, false);
 document.getElementById("doMoveTemplate").addEventListener("click", action.doMoveTemplate, false);
 document.getElementById("doGenTranasCmd").addEventListener("click", action.doGenTranasCmd, false);
-document.getElementById("doOpenPublishTool").addEventListener("click", action.doOpenPublishTool, false);
 document.getElementById("doSavehiddenConfig").addEventListener("click", ui.doSavehiddenConfig, false);
 
 /*********************/

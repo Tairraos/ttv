@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.2.1",
     "axios": "^1.6.7",
     "bingai-js": "1.7.5-rc6",
     "microsoft-cognitiveservices-speech-sdk": "^1.34.0",

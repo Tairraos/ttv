@@ -60,8 +60,6 @@ let net = {
     async filesMove(filename, book_cn) {
         // 这里的book_cn有可能不是conf里的，是input里填的
         await net.fetchApi("api-files.php", { action: "move", book_cn, filename });
-        // 打开目标文件夹
-        // await net.openBookFolder(book_cn);
     },
 
     /*********************/

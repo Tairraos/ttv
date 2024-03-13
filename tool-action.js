@@ -240,7 +240,7 @@ let action = {
         let videoName = util.getFilename("dist"),
             log = ui.log(`生成作品：${videoName}`, "highlight"),
             program = setup.program[conf.info.program],
-            time = new Date().toISOString().replace(/T/, " ").replace(/\..*/, ""),
+            time = new Date().toLocaleString(),
             ret = await net.ffmpegContact();
         if (ret.result === "success") {
             let duration = util.fmtDuration(ret.duration);
@@ -280,6 +280,9 @@ let action = {
     // 文件操作
     /*********************/
     doExportData() {
+        if(!conf.info.book_cn){
+            return ui.err("没有导入或恢复内存，无法导出！");
+        }
         io.exportData();
         window.setTimeout(() => {
             let filename = `${conf.info.book_cn}.${conf.info.version}.xlsx`;
@@ -318,11 +321,26 @@ let action = {
         );
     },
 
+    /*********************/
+    // 外部工具
+    /*********************/
+    async doOpenFolder() {
+        await net.openBookFolder(conf.info.book_cn);
+    },
+
     doOpenPublishTool() {
         window.open(
             `html-publish.php`,
             "publish",
             `toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=300, height=360, top=0, left=${window.screen.availWidth}`
         );
+    },
+
+    doOpenDriver() {
+        window.open(`https://drive.google.com/drive/u/1/folders/1wVLpoqKGNfc_cNC8xSCGbLszb__adTz4`, "driver");
+    },
+
+    doOpenYoutube() {
+        window.open(`https://studio.youtube.com/channel/UCuFOE1XJaNI_W-svW1tZwbw`, "driver");
     }
 };

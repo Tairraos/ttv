@@ -472,6 +472,22 @@ ul {
     padding-top: 10px;
 }
 
+.external button {
+    margin-top: 10px;
+    font: 12px/24px system;
+    cursor: pointer;
+    fill: #555;
+}
+
+.external svg {
+    vertical-align: top;
+}
+
+.external button:hover {
+    color: #976;
+    fill: #976;
+}
+
 .switcher button {
     margin: 10px 10px 0 10px;
     font: 14px/20px system;
@@ -497,23 +513,20 @@ ul {
 }
 
 #book_abbr,
-#doNewBook,
-#doSavehiddenConfig {
+#doNewBook {
     width: 95px;
     margin-right: 10px;
 }
 
-#ui_hidden_book {
-    width: 95px;
-    margin-right: 10px;
-}
-
+#ui_hidden_book,
 #ui_hidden_id {
-    width: 140px;
+    width: 60px;
+    margin-right: 10px;
 }
 
 #doMoveTemplate,
-#doOpenPublishTool {
+#doOpenPublishTool,
+#doSavehiddenConfig {
     width: 95px;
     margin-bottom: 15px;
 }

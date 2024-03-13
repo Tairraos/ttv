@@ -11,14 +11,49 @@
         <nav id="nav">
             <h1>摩耳视频生成助手</h1>
             <div class="info">助手服务状态：<span id="server" class="error"></span><button id="doPing">刷新</button></div>
+            <div class="external">
+                <button id="exFolder">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M20 6h-8l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2m-3 7v4h-2v-3h-2v3h-2v-4H9l5-4l5 4Z" />
+                    </svg>
+                    目录
+                </button>
+                <button id="exPublish">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path
+                            d="M6 22q-.825 0-1.412-.587T4 20V4q0-.825.588-1.412T6 2h12q.825 0 1.413.588T20 4v16q0 .825-.587 1.413T18 22zm5-11l2.5-1.5L16 11V4h-5z"
+                        />
+                    </svg>
+                    发布
+                </button>
+                <button id="exDriver">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path
+                            d="m21.423 13.888l-6.09-10.55H8.668l6.09 10.55ZM8.09 4.338L2 14.888l3.334 5.774l6.089-10.55Zm1.733 10.55L6.49 20.662h12.178L22 14.887Z"
+                        />
+                    </svg>
+                    云盘
+                </button>
+                <button id="exYoutube">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path
+                            d="M18 3a5 5 0 0 1 5 5v8a5 5 0 0 1-5 5H6a5 5 0 0 1-5-5V8a5 5 0 0 1 5-5zM9 9v6a1 1 0 0 0 1.514.857l5-3a1 1 0 0 0 0-1.714l-5-3A1 1 0 0 0 9 9"
+                        />
+                    </svg>
+                    油管
+                </button>
+            </div>
             <div class="switcher"><button id="panel1" class="selected">生成工具</button><button id="panel2" class="unselected">管理工具</button></div>
             <div class="controls" id="tool_a">
                 <div>
                     <ul id="left-panel">
                         <li class="menu subtitle">素材准备</li>
                         <li class="menu">
-                            <div id="basket" style="display: flex;"><div>拖放导入数据</div><div id="doRestoreStorage">点击恢复内存</div></div>
-                            <div id="info" style="display: none;"></div>
+                            <div id="basket" style="display: flex">
+                                <div>拖放导入数据</div>
+                                <div id="doRestoreStorage">点击恢复内存</div>
+                            </div>
+                            <div id="info" style="display: none"></div>
                         </li>
                         <li class="menu files">
                             <button id="doExportData">导出数据</button>
@@ -27,32 +62,47 @@
                         <li class="menu subtitle">操作范围和 slide</li>
                         <li class="menu subsetting">
                             <input type="text" id="themename" value="" placeholder="背景图名称" />
-                            <svg id="icon-plus" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>背景图id+</title>
-                                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m3 11h-2v2a1 1 0 0 1-2 0v-2H9a1 1 0 0 1 0-2h2V9a1 1 0 0 1 2 0v2h2a1 1 0 0 1 0 2" />
-                            </svg><svg id="icon-minus" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>背景图id-</title>
-                                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m3 11H9a1 1 0 0 1 0-2h6a1 1 0 0 1 0 2" />
-                            </svg><svg id="icon-save" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>背景图名字写入范围</title>
+                            <svg id="icon-plus" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <title>背景图id+</title>
+                                <path
+                                    d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m3 11h-2v2a1 1 0 0 1-2 0v-2H9a1 1 0 0 1 0-2h2V9a1 1 0 0 1 2 0v2h2a1 1 0 0 1 0 2"
+                                /></svg
+                            ><svg id="icon-minus" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <title>背景图id-</title>
+                                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m3 11H9a1 1 0 0 1 0-2h6a1 1 0 0 1 0 2" /></svg
+                            ><svg id="icon-save" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <title>背景图名字写入范围</title>
                                 <path d="M5 21h14a2 2 0 0 0 2-2V8l-5-5H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2M7 5h4v2h2V5h2v4H7zm0 8h10v6H7z" />
                             </svg>
                         </li>
                         <li class="menu subsetting">
                             <input type="text" id="startid" /> 到 <input type="text" id="endid" />
-                            <svg id="icon-confirm" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>修改作用范围</title>
-                                <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10M8 10l-2 2l5 5l7-7l-2-2l-5 5z"/>
-                            </svg><svg id="icon-verify" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>检查范围内素材的背景图</title>
-                                <path d="M4 21q-.825 0-1.412-.587T2 19V5q0-.825.588-1.412T4 3h16q.825 0 1.413.588T22 5v14q0 .825-.587 1.413T20 21zm1-4h5v-2H5zm9.55-2l4.95-4.95l-1.425-1.425l-3.525 3.55l-1.425-1.425l-1.4 1.425zM5 13h5v-2H5zm0-4h5V7H5z"/>
+                            <svg id="icon-confirm" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <title>修改作用范围</title>
+                                <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10M8 10l-2 2l5 5l7-7l-2-2l-5 5z" /></svg
+                            ><svg id="icon-verify" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <title>检查范围内素材的背景图</title>
+                                <path
+                                    d="M4 21q-.825 0-1.412-.587T2 19V5q0-.825.588-1.412T4 3h16q.825 0 1.413.588T22 5v14q0 .825-.587 1.413T20 21zm1-4h5v-2H5zm9.55-2l4.95-4.95l-1.425-1.425l-3.525 3.55l-1.425-1.425l-1.4 1.425zM5 13h5v-2H5zm0-4h5V7H5z"
+                                />
                             </svg>
                         </li>
                         <li class="menu"><hr /></li>
                         <li class="menu subtitle">定位和标记 sid</li>
                         <li class="menu subsetting">
                             <input type="text" id="targetsid" value="" placeholder="查找" />
-                            <svg id="icon-locate" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>在屏幕内显示sid素材</title>
-                                <path d="M12 11.5A2.5 2.5 0 0 1 9.5 9A2.5 2.5 0 0 1 12 6.5A2.5 2.5 0 0 1 14.5 9a2.5 2.5 0 0 1-2.5 2.5M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7"/>
+                            <svg id="icon-locate" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <title>在屏幕内显示sid素材</title>
+                                <path
+                                    d="M12 11.5A2.5 2.5 0 0 1 9.5 9A2.5 2.5 0 0 1 12 6.5A2.5 2.5 0 0 1 14.5 9a2.5 2.5 0 0 1-2.5 2.5M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7"
+                                />
                             </svg>
                             <input type="text" id="marknum" value="" placeholder="标记" />
-                            <svg id="icon-mark" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>按指定sid间隔标记素材</title>
-                                <path d="M15.586 3a2 2 0 0 1 2.828 0L21 5.586a2 2 0 0 1 0 2.828L19.414 10L14 4.586zm-3 3l-9 9A2 2 0 0 0 3 16.414V19a2 2 0 0 0 2 2h2.586A2 2 0 0 0 9 20.414l9-9z" />
+                            <svg id="icon-mark" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <title>按指定sid间隔标记素材</title>
+                                <path
+                                    d="M15.586 3a2 2 0 0 1 2.828 0L21 5.586a2 2 0 0 1 0 2.828L19.414 10L14 4.586zm-3 3l-9 9A2 2 0 0 0 3 16.414V19a2 2 0 0 0 2 2h2.586A2 2 0 0 0 9 20.414l9-9z"
+                                />
                             </svg>
                         </li>
                     </ul>
@@ -86,13 +136,9 @@
                         <option value="english">练习英语</option>
                     </select>
                 </div>
+                <div><button id="doNewBook">新建书本</button><button id="doMoveTemplate">移动模板</button></div>
                 <div>
-                    <button id="doNewBook">新建书本</button
-                    ><button id="doMoveTemplate">移动模板</button>
-                </div>
-                <div class="subtitle">UI 忽略</div>
-                <div><input id="ui_hidden_book" type="text" placeholder="书名缩写" /><input id="ui_hidden_id" type="text" placeholder="忽略 1 到多少的 ID" /></div>
-                <div><button id="doSavehiddenConfig">写入配置</button><button id="doOpenPublishTool">视频发布工具</button></div>
+                    <input id="ui_hidden_book" type="text" placeholder="书名缩写" /><input id="ui_hidden_id" type="text" placeholder="忽略ID" /><button id="doSavehiddenConfig">忽略ID</button></div>
 
                 <div class="subtitle">片头转码命令</div>
                 <div><input id="video_intro" type="text" placeholder="片头文件名" /><button id="doGenTranasCmd">复制命令</button></div>
@@ -100,14 +146,19 @@
 
             <div class="console"><div id="log"></div></div>
         </nav>
-        <div id="content"><table id="material"><thead></thead><tbody></tbody></table></div>
-        <div id="edittool" style="display:none;">
+        <div id="content">
+            <table id="material">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="edittool" style="display: none">
             <div id="edittool-unlocked">
-                <button id="doCellEdit">编辑</button><button id="doMakeSentence">造句</button><button id="doCellTranslate">翻译</button><button id="doCellPinyin">拼音</button><button id="doGenLineMedia">素材</button><button id="doFetchWordPair">提取</button><button id="doFillSentence">回填</button>
+                <button id="doCellEdit">编辑</button><button id="doMakeSentence">造句</button><button id="doCellTranslate">翻译</button
+                ><button id="doCellPinyin">拼音</button><button id="doGenLineMedia">素材</button><button id="doFetchWordPair">提取</button
+                ><button id="doFillSentence">回填</button>
             </div>
-            <div id="edittool-locked" style="display:none;">
-                <button id="doEditDone">完成</button><button id="doEditRestore">恢复</button>
-            </div>
+            <div id="edittool-locked" style="display: none"><button id="doEditDone">完成</button><button id="doEditRestore">恢复</button></div>
         </div>
         <div id="sd-container">
             <div id="sd-info">造句框</div>
@@ -122,7 +173,9 @@
                     <ul id="sd-materials"></ul>
                 </div>
                 <div id="sd-action">
-                    <div id="sd-modesetting"><button id="doSentenceSwitchMode">切换模式</button> 当前模式：<span id="sd-status" style="color: #4b4;">编辑</span></div>
+                    <div id="sd-modesetting">
+                        <button id="doSentenceSwitchMode">切换模式</button> 当前模式：<span id="sd-status" style="color: #4b4">编辑</span>
+                    </div>
                     <button id="doSentenceConfirm">插入素材</button>
                     <button id="doSentenceCancel">取消操作</button>
                 </div>
