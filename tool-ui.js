@@ -501,6 +501,7 @@ let ui = {
             e.field = event.target.className;
             $edittool.style.left = rect.left + "px";
             $edittool.style.top = rect.top - 20 + "px";
+            $edittool.style.width = rect.width + "px";
         }
         $edittool.style.display = "block";
     },
