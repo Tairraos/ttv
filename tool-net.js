@@ -72,7 +72,7 @@ let net = {
 
     async ffmpegContact() {
         let book_cn = conf.info.book_cn,
-            videolist = [util.getFilename("intro"), util.getFilename("covermp4"), ...conf.tasks].join("|");
+            videolist = [util.getFilename("intro"), util.getFilename("covermp4"), ...conf.tasks, util.getFilename("ending")].join("|");
         await net.fetchApi("api/ffmpeg", { action: "cover", book_cn, filename: `${util.getFilename("covermp4")}`, imgname: `${util.getFilename("coverimg")}` });
         return await net.fetchApi("api/ffmpeg", { action: "concat", book_cn, filename: `${util.getFilename("dist")}`, videolist });
     },

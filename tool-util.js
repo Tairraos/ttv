@@ -29,7 +29,6 @@ let util = {
         }
         conf.files = (await net.filesList()).files;
         ui.initRangeBox();
-        ui.onProgramChange();
         if (conf.lastTouchedId) {
             document.querySelector(`#material-${conf.lastTouchedId}`).scrollIntoView({ behavior: "smooth" });
         }
@@ -56,6 +55,7 @@ let util = {
     // 修改单元格数据，会同时修改界面，内存
     /*********************/
     async updateMaterial(id, data, field, toid = 0) {
+        data = data.replace(/[\n\r]/g, "");
         if (setup.dataFields.includes(field)) {
             toid = +toid < +id ? +id : +toid;
             for (let i = +id; i <= toid; i++) {
@@ -183,6 +183,7 @@ let util = {
         let sidList = util.getMaterial((line) => line.sid).map((line) => line.sid),
             range = `${util.getPadStr(Math.min(...sidList))}-${util.getPadStr(Math.max(...sidList))}`;
         if (type === "intro") return `0.intro.mp4`;
+        if (type === "ending") return `0.ending.mp4`;
         if (type === "dist") return `${conf.info.book_abbr}-${conf.info.program}-${range}.mp4`;
         if (type === "coverimg") return `${conf.info.book_abbr}-${conf.info.program}-${range}.png`;
         if (type === "covermp4") return `0.${conf.info.program}-${range}.mp4`;
@@ -216,7 +217,30 @@ let util = {
     /*********************/
     // 检查当前行是否所有素材都准备好了, media或slide有一个是required就说明没准备好
     /*********************/
-    checkIsReady: (id) => !Object.entries(conf.materials[id]).filter((item) => item[0].match(/^(media|slide)/) && item[1] === "required").length,
+    checkIsReady(id) {
+        let material = conf.materials[id],
+            mediaReady = !Object.entries(material).filter((item) => item[0].match(/^(media|slide)/) && item[1] === "required").length;
+        return mediaReady && util.checkPhonetic(id);
+    },
+
+    checkPhonetic(id) {
+        let material = conf.materials[id],
+            cParsing = material.chinese.split(""),
+            pParsing = material.phonetic.split(" "),
+            phoneticReady = cParsing.length === pParsing.length;
+        if (!phoneticReady) {
+            ui.err(`${id}拼音有错误`);
+            ui.log(
+                `${JSON.stringify({
+                    中文: cParsing,
+                    拼音: pParsing,
+                    中文长度: cParsing.length,
+                    拼音长度: pParsing.length
+                })}`
+            );
+        }
+        return phoneticReady;
+    },
 
     /*********************/
     // 检查素材时长

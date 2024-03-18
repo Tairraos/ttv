@@ -104,8 +104,8 @@ let ui = {
     /*********************/
     // 听力和阅读选择
     /*********************/
-    onProgramChange() {
-        let program = ui.getSelectData("program");
+    onProgramChange(e) {
+        let program = e.currentTarget.id.replace(/.*-(\w+)/, "$1");
         conf.info.program = program;
         conf.rules = setup.programRules[program];
         conf.tasks = []; // 风格变化后，要重新估算生成task
@@ -141,6 +141,14 @@ let ui = {
         document.querySelectorAll(`#material tr`).forEach((line) => line.classList.remove("selecting"));
     },
 
+    rangeCheck() {
+        let r = conf.range,
+            start = Math.max(+ui.getInputData("startid"), r.min) || 0,
+            end = Math.min(ui.getInputData("endid"), r.max) || 0,
+            rangeStatus = r.start === start && r.end === end;
+        return rangeStatus;
+    },
+
     /*********************/
     // 重置范围，第一次恢复已经确认的范围，再点一次恢复到全部
     /*********************/
@@ -163,13 +171,14 @@ let ui = {
     // 批量检查范围内的Slide
     /*********************/
     rangeVerify() {
-        let r = conf.range;
-        if (r.end - r.start > 79) {
-            return ui.err("当前作用范围超过允许值：80");
-        }
+        let r = conf.range,
+            allIds = conf.files.slide
+                .filter((item) => item.match(/text/))
+                .map((item) => +item.replace(/(\d+).*/, "$1"))
+                .sort((a, b) => a - b);
         ui.openPostPage(`html-verify.php`, {
             book_cn: conf.info.book_cn,
-            ids: JSON.stringify([...Array.from({ length: r.end - r.start + 1 }, (_, i) => i + r.start)])
+            ids: JSON.stringify(allIds.filter((id) => id >= r.start && id <= r.end))
         });
     },
 
@@ -195,8 +204,11 @@ let ui = {
     // 定位没生成过video的id
     /*********************/
     locateNoVideoId() {
-        let targetid = Math.max(Math.max(...conf.videos.map((item) => item[3])) - 2, 1);
-        document.querySelector(`#material-${targetid}`).scrollIntoView({ behavior: "smooth" });
+        let targetid = Math.max(...conf.videos.map((item) => item[3]), 0) + 1,
+            line = document.querySelector(`#material-${targetid}`);
+        if (line) {
+            line.scrollIntoView({ behavior: "smooth" });
+        }
     },
 
     /*********************/
@@ -236,18 +248,17 @@ let ui = {
     // 把数据加载到UI里
     /*********************/
     loadMaterial(data, isLoadFromStorage = false) {
-        let row = $materials.insertRow();
-        row.id = "material-" + data.id;
-        row.classList.add("type-" + data.type);
-        if (conf.info.book_abbr === conf.hidden.book && data.id <= conf.hidden.id) {
-            row.classList.add("hide");
+        if (conf.info.book_abbr !== conf.hidden.book || data.id > conf.hidden.id) {
+            let row = $materials.insertRow();
+            row.id = "material-" + data.id;
+            row.classList.add("type-" + data.type);
+            row.dataset.id = +data.id;
+            setup.uiFields.forEach((item, index) => {
+                let cell = row.insertCell(-1);
+                cell.className = setup.uiFields[index];
+                cell.innerHTML = data[item] || ui.getInitMedia(data.id, item);
+            });
         }
-        row.dataset.id = +data.id;
-        setup.uiFields.forEach((item, index) => {
-            let cell = row.insertCell(-1);
-            cell.className = setup.uiFields[index];
-            cell.innerHTML = data[item] || ui.getInitMedia(data.id, item);
-        });
         if (!isLoadFromStorage) {
             conf.materials[data.id] = data;
         }
@@ -402,6 +413,9 @@ let ui = {
             materials = Array.from($sdMaterials.querySelectorAll("li")).map((i) => {
                 return { chinese: i.innerText };
             });
+        if ($sdInput.value) {
+            materials.push({ chinese: $sdInput.value });
+        }
         ui.doSentenceClose();
         if (materials.length) {
             let ids = util.insertMaterial(id, materials);
@@ -475,7 +489,7 @@ let ui = {
                     $doCellEdit.style.display = field !== "media_cn1" ? "inline-block" : "none";
                     $doFetchWordPair.style.display = field === "english" ? "inline-block" : "none";
                     $doFillSentence.style.display = field === "english" ? "inline-block" : "none";
-                    if (field === "english") {
+                    if (field === "english" && document.hasFocus()) {
                         $doFillSentence.setAttribute("title", await navigator.clipboard.readText());
                     }
                 } else {
@@ -501,7 +515,7 @@ let ui = {
             e.field = event.target.className;
             $edittool.style.left = rect.left + "px";
             $edittool.style.top = rect.top - 20 + "px";
-            $edittool.style.width = rect.width + "px";
+            $edittool.style.width = rect.width - 4 + "px";
         }
         $edittool.style.display = "block";
     },
@@ -547,7 +561,7 @@ let ui = {
 
     async doFillSentence() {
         let id = +conf.editTool.id,
-            clipboard = (await navigator.clipboard.readText()).split(/[\n\t]/),
+            clipboard = (await navigator.clipboard.readText()).replaceAll("\r", "").split(/[\n\t]/),
             materials = [{ chinese: clipboard[0], english: clipboard[1] }];
         let ids = util.insertMaterial(id, materials);
         action.genPhoneticPiece(ids[0], true);
@@ -671,7 +685,7 @@ document.getElementById("doGenPhonetic").addEventListener("click", action.doGenP
 document.getElementById("doGenAudio").addEventListener("click", action.doGenAudio, false); // 3.音频素材
 document.getElementById("doGenSlide").addEventListener("click", action.doGenSlide, false); // 4.字幕素材
 document.getElementById("doGenVideo").addEventListener("click", action.doGenVideo, false); // 5.视频素材
-document.getElementById("doEstimate").addEventListener("click", action.doEstimate, false); // 6.工程估算
+document.getElementById("doEstimate").addEventListener("click", action.doEstimate, false); // 6.素材检查
 document.getElementById("doBuild").addEventListener("click", action.doBuild, false); // 7.生成作品
 
 /*********************/
@@ -707,7 +721,9 @@ document.getElementById("icon-confirm").addEventListener("click", ui.rangeConfir
 document.getElementById("icon-verify").addEventListener("click", ui.rangeVerify, false);
 document.getElementById("icon-locate").addEventListener("click", ui.locateSid, false);
 document.getElementById("icon-mark").addEventListener("click", ui.lineMark, false);
-document.getElementById("program").addEventListener("change", ui.onProgramChange, false);
+document.getElementById("program-listen").addEventListener("click", ui.onProgramChange, false);
+document.getElementById("program-read").addEventListener("click", ui.onProgramChange, false);
+document.getElementById("program-pure").addEventListener("click", ui.onProgramChange, false);
 
 /*********************/
 // 外部工具

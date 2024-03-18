@@ -68,6 +68,9 @@ let action = {
     // 2.拼音音标
     /*********************/
     async doGenPhonetic() {
+        if (!ui.rangeCheck()){
+            return ui.err(`注意，请确认数据筛范围。`);
+        }
         // 尝试给所有phonetic没有值的字段标注册拼音或音标
         let rangeMaterials = util.getMaterial(),
             force = rangeMaterials.length >= 50 && !util.isLearnEnglish() ? true : false; //如果处理量小于50，学习的是中文，重新标注拼音
@@ -99,6 +102,9 @@ let action = {
     // 3.音频素材
     /*********************/
     async doGenAudio() {
+        if (!ui.rangeCheck()){
+            return ui.err(`注意，请确认数据筛范围。`);
+        }
         for (let line of util.getMaterial()) {
             await action.genSetupAudioPiece(line.id, "chinese", false); //生成中文语料音频
             await action.genSetupAudioPiece(line.id, "english", false); //生成英文语料音频
@@ -140,6 +146,9 @@ let action = {
     // 4.字幕素材
     /*********************/
     async doGenSlide() {
+        if (!ui.rangeCheck()){
+            return ui.err(`注意，请确认数据筛范围。`);
+        }
         if (!conf.serverAvailable) {
             return ui.serverError(); // 服务不可用则退出生成
         }
@@ -167,6 +176,9 @@ let action = {
     // 5.视频素材
     /*********************/
     async doGenVideo() {
+        if (!ui.rangeCheck()){
+            return ui.err(`注意，请确认数据筛范围。`);
+        }
         if (!conf.serverAvailable) {
             return ui.serverError(); // 服务不可用则退出生成
         }
@@ -188,7 +200,7 @@ let action = {
                 slidename = conf.materials[id][`slide.slide-${target === "video-text" ? "text" : "listen"}`],
                 log = ui.log(`生成视频片段：${filename}`);
             if (audioname === "required" || slidename === "required") {
-                return ui.log(`第${id}行记录的音频或字幕素材未准备完整，无法继续。`, "error");
+                return ui.log(`${id}缺少音频或字幕素材。`, "error");
             }
             let ret = await net.ffmpegPiece(filename, slidename, audioname);
             if (ret.result === "success") {
@@ -201,9 +213,12 @@ let action = {
     },
 
     /*********************/
-    // 6.工程估算
+    // 6.素材检查
     /*********************/
     async doEstimate() {
+        if (!ui.rangeCheck()){
+            return ui.err(`注意，请确认数据筛范围。`);
+        }
         if (!conf.serverAvailable) {
             return ui.serverError(); // 服务不可用则退出生成
         }
@@ -214,7 +229,7 @@ let action = {
         conf.tasks = util.getTasksList();
         conf.info.duration = +conf.tasks.reduce((target, file) => target + conf.durations[file], 0).toFixed(3);
 
-        ui.log(`6.工程估算完成`, "pass");
+        ui.log(`6.素材检查完成`, "pass");
         ui.log(`目标视频名字：${util.getFilename("dist")}`);
         ui.log(`视频长度预计：${util.fmtDuration(conf.info.duration)}秒`);
         ui.log(`视频片段计数：${conf.tasks.length}`);
@@ -228,10 +243,13 @@ let action = {
             return ui.serverError(); // 服务不可用则退出生成
         }
         if (!util.checkMaterials() || !conf.tasks.length) {
-            return ui.log(`先进行工程估算，确认视频长度。`, "error");
+            return ui.log(`先进行素材检查，确认视频长度。`, "error");
         }
         if (!conf.files.video.includes(util.getFilename("intro"))) {
             return ui.err(`缺少 ${util.getFilename("intro")}`);
+        }
+        if (!conf.files.video.includes(util.getFilename("ending"))) {
+            return ui.err(`缺少 ${util.getFilename("ending")}`);
         }
         if (!conf.files.cover.includes(util.getFilename("coverimg"))) {
             return ui.err(`缺少 ${util.getFilename("coverimg")}`);

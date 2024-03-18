@@ -302,6 +302,7 @@ ul {
 #material .english,
 #material .phonetic {
     text-align: left;
+    min-width: 200px;
 }
 
 #server.ok::after {
@@ -345,7 +346,7 @@ ul {
 }
 
 #themename {
-    width: 70px;
+    width: 66px;
     text-align: center;
     padding: 3px;
     vertical-align: middle;
@@ -390,6 +391,16 @@ ul {
     cursor: pointer;
 }
 
+#program-listen,
+#program-read,
+#program-pure {
+    height: 24px;
+    width: 24px;
+    fill: #333;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
 #startid,
 #endid,
 #targetsid,
@@ -406,7 +417,10 @@ ul {
 #icon-confirm:hover,
 #icon-verify:hover,
 #icon-locate:hover,
-#icon-mark:hover {
+#icon-mark:hover,
+#program-listen:hover,
+#program-read:hover,
+#program-pure:hover {
     fill: #2a2;
 }
 

@@ -16,6 +16,17 @@ let io = {
             range,
             log;
 
+        //导入信息
+        worksheet = workbook.Sheets["信息"];
+        range = XLSX.utils.decode_range(worksheet["!ref"]);
+        log = ui.log(`导入课本信息...`);
+        conf.info.book_cn = g(`A2`); //中文名
+        conf.info.book_en = g(`B2`); //英文名
+        conf.info.book_abbr = g(`C2`); //缩写
+        conf.info.language = g(`D2`); //课程语言
+        conf.info.version = g(`E2`); //数据文件版本
+        ui.done(log);
+
         //导入课本
         worksheet = workbook.Sheets["课本"];
         range = XLSX.utils.decode_range(worksheet["!ref"]);
@@ -43,17 +54,6 @@ let io = {
                 ui.loadMaterial({ id, sid, type, group, voice, chinese, english, phonetic, comment, theme });
             }
         }
-        ui.done(log);
-
-        //导入信息
-        worksheet = workbook.Sheets["信息"];
-        range = XLSX.utils.decode_range(worksheet["!ref"]);
-        log = ui.log(`导入课本信息...`);
-        conf.info.book_cn = g(`A2`); //中文名
-        conf.info.book_en = g(`B2`); //英文名
-        conf.info.book_abbr = g(`C2`); //缩写
-        conf.info.language = g(`D2`); //课程语言
-        conf.info.version = g(`E2`); //数据文件版本
         ui.done(log);
 
         //导入素材时长
