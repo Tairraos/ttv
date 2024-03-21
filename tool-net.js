@@ -122,3 +122,5 @@ let net = {
         return await net.fetchApi("api/os", { action: "open", book_cn });
     }
 };
+
+window.net = net;

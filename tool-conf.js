@@ -5,8 +5,10 @@ let conf = {
     durations: {}, // 所有已经生成的视频素材，长度记录在此
     tasks: [], // 任务就是素材列表，素材可能会重复使用，读多遍
     files: {}, // material目录下的素材文件列表
-    range: {}, // 素材范围
-    hidden: { book: "", id: 1 },
+    range: {
+        lastVideoId: 0, // 最后一个用作生成video的id，可以隐藏用过的id
+        lastSentenceId: 0 // 最后一个造句的id，新加载会自动滚屏到此处
+    }, // 素材范围
 
     // 生成视频需要的信息在此
     info: {
@@ -181,3 +183,5 @@ setup.uiFields = setup.dataFields.concat(["media_cn1", "media_cn2", "media_en1",
 
 // 初始值
 conf.rules = setup.programRules.listen;
+
+window.conf = conf;

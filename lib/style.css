@@ -9,6 +9,8 @@ body {
     overflow-y: scroll;
     border-right: 1px solid #888;
     height: 100%;
+    background: #fff;
+    top: 0;
 }
 
 #nav h1 {
@@ -18,6 +20,21 @@ body {
 #nav h3 {
     margin: 10px 0 0;
     font-family: fangsong;
+}
+
+.switcher {
+    text-align: left;
+    padding: 0 40px;
+    font-size: 12px;
+    height: 32px;
+}
+
+.switcher svg {
+    height: 20px;
+    width: 20px;
+    fill: #333;
+    vertical-align: middle;
+    cursor: pointer;
 }
 
 li {
@@ -272,7 +289,7 @@ ul {
 #material .media_en1,
 #material .media_en2,
 #material .slide {
-    width: 80px;
+    min-width: 80px;
     padding: 6px 6px;
 }
 
@@ -302,7 +319,7 @@ ul {
 #material .english,
 #material .phonetic {
     text-align: left;
-    min-width: 200px;
+    min-width: 300px;
 }
 
 #server.ok::after {
@@ -420,7 +437,9 @@ ul {
 #icon-mark:hover,
 #program-listen:hover,
 #program-read:hover,
-#program-pure:hover {
+#program-pure:hover,
+#cont-show-all:hover,
+#cont-show-part:hover {
     fill: #2a2;
 }
 
@@ -503,7 +522,7 @@ ul {
 }
 
 .switcher button {
-    margin: 10px 10px 0 10px;
+    margin: 10px 5px 0 0;
     font: 14px/20px system;
     border: 1px solid #ccc;
     border-radius: 6px 6px 0 0;
@@ -532,15 +551,8 @@ ul {
     margin-right: 10px;
 }
 
-#ui_hidden_book,
-#ui_hidden_id {
-    width: 60px;
-    margin-right: 10px;
-}
-
 #doMoveTemplate,
-#doOpenPublishTool,
-#doSavehiddenConfig {
+#doOpenPublishTool {
     width: 95px;
     margin-bottom: 15px;
 }
@@ -662,4 +674,100 @@ ul {
 
 .hide {
     display: none;
+}
+
+/***********************************************************/
+/*    Loading    */
+/***********************************************************/
+
+#loading > div {
+    display: inline-block;
+    background-color: currentColor;
+    border: 0 solid currentColor;
+}
+
+#loading {
+    width: 102px;
+    height: 102px;
+    position: fixed;
+    left: calc(50% + 100px);
+    top: calc(50% - 50px);
+    display: none;
+    font-size: 0;
+    color: #258;
+    box-sizing: border-box;
+}
+
+#loading > div {
+    width: 18px;
+    height: 18px;
+    margin: 8px;
+    border-radius: 100%;
+    outline: 16px solid #fff;
+    position: relative;
+    box-sizing: border-box;
+    animation-name: ball-grid-pulse;
+    animation-iteration-count: infinite;
+}
+
+#loading > div:nth-child(1) {
+    animation-duration: 0.65s;
+    animation-delay: 0.03s;
+}
+
+#loading > div:nth-child(2) {
+    animation-duration: 1.02s;
+    animation-delay: 0.09s;
+}
+
+#loading > div:nth-child(3) {
+    animation-duration: 1.06s;
+    animation-delay: -0.69s;
+}
+
+#loading > div:nth-child(4) {
+    animation-duration: 1.5s;
+    animation-delay: -0.41s;
+}
+
+#loading > div:nth-child(5) {
+    animation-duration: 1.6s;
+    animation-delay: 0.04s;
+}
+
+#loading > div:nth-child(6) {
+    animation-duration: 0.84s;
+    animation-delay: 0.07s;
+}
+
+#loading > div:nth-child(7) {
+    animation-duration: 0.68s;
+    animation-delay: -0.66s;
+}
+
+#loading > div:nth-child(8) {
+    animation-duration: 0.93s;
+    animation-delay: -0.76s;
+}
+
+#loading > div:nth-child(9) {
+    animation-duration: 1.24s;
+    animation-delay: -0.76s;
+}
+
+@keyframes ball-grid-pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.25;
+        transform: scale(0.45);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

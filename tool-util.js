@@ -1,4 +1,4 @@
-/* global conf, setup, dict, ui, net */
+/* global conf, setup, dict, ui, net, pinyinPro */
 let util = {
     /*********************/
     // 初始化UI
@@ -8,7 +8,6 @@ let util = {
         if (!backupData.justExported) {
             ui.highlightRestoreBtn();
         }
-        util.inithiddenData();
         ui.initMaterialsTable();
         dict.e2c = await net.importDict();
         ui.log("读取到字典数据 " + Object.keys(dict.e2c).length + " 条");
@@ -19,28 +18,23 @@ let util = {
     // 从localStorage里恢复Materials
     /*********************/
     async restoreMaterials() {
+        await ui.showLoading();
         let backupData = JSON.parse(localStorage.getItem("conf"));
         delete backupData.serverAvailable;
+
         Object.assign(conf, backupData);
-        util.inithiddenData();
+        util.updateVideoUsedId(); // 从conf里计算哪些素材是用过的
         let materials = util.getAllMaterial();
         for (let data of materials) {
             await ui.loadMaterial(data, true); // true: 从localStorage里恢复
         }
         conf.files = (await net.filesList()).files;
         ui.initRangeBox();
-        if (conf.lastTouchedId) {
-            document.querySelector(`#material-${conf.lastTouchedId}`).scrollIntoView({ behavior: "smooth" });
-        }
         ui.updateBasket();
-        ui.locateNoVideoId();
-    },
-
-    inithiddenData() {
-        conf.hidden = {
-            book: localStorage.getItem("ui_hidden_book") || "",
-            id: +(localStorage.getItem("ui_hidden_id") || 1)
-        };
+        ui.hideLoading();
+        if (conf.range.lastSentenceId) {
+            ui.locateId(conf.range.lastSentenceId);
+        }
     },
 
     backupParam2Storage(needBackup) {
@@ -49,6 +43,10 @@ let util = {
         }
         localStorage.setItem("conf", JSON.stringify(conf));
         conf.justExported = false;
+    },
+
+    updateVideoUsedId() {
+        conf.range.lastVideoId = Math.max(...conf.videos.map((item) => item[3]), 0);
     },
 
     /*********************/
@@ -102,7 +100,7 @@ let util = {
             ui.loadMaterial({ ...line });
         }
         ui.log(`已经添加造句数据 ${materials.length} 条`, "pass");
-        ui.initRangeBox();
+        ui.extendRange(materials.length);
 
         return ids;
     },
@@ -114,17 +112,17 @@ let util = {
         let answer = true,
             materials = id ? [conf.materials[id]] : util.getMaterial();
         for (let line of materials) {
-            util.checkMedias(line, setup.mediaList);
-            let line_ready = util.checkIsReady(line.id);
+            util.updateStatusFromFiles(line, setup.mediaList);
+            let line_ready = util.checkPhonetic(line.id) && util.checkMediaReady(line.id);
             answer = answer && line_ready;
         }
         return answer;
     },
 
     /*********************/
-    // 检查medias列表里的素材是否已经生成
+    // 把文件状态更新到素材行里
     /*********************/
-    checkMedias(line, medias) {
+    updateStatusFromFiles(line, medias) {
         for (let item of medias) {
             let [field, media] = item.split(".");
             if (util.checkMediaStatus(line, item)) {
@@ -217,27 +215,21 @@ let util = {
     /*********************/
     // 检查当前行是否所有素材都准备好了, media或slide有一个是required就说明没准备好
     /*********************/
-    checkIsReady(id) {
+    checkMediaReady(id) {
         let material = conf.materials[id],
             mediaReady = !Object.entries(material).filter((item) => item[0].match(/^(media|slide)/) && item[1] === "required").length;
-        return mediaReady && util.checkPhonetic(id);
+        return mediaReady;
     },
 
     checkPhonetic(id) {
-        let material = conf.materials[id],
-            cParsing = material.chinese.split(""),
-            pParsing = material.phonetic.split(" "),
-            phoneticReady = cParsing.length === pParsing.length;
+        let line = conf.materials[id],
+            newPinYin = pinyinPro.pinyin(line.chinese.replace(/0|1|2|3|4|5|6|7|8|9/g, (n) => "零一二三四五六七八九"[+n])),
+            phoneticReady = newPinYin === line.phonetic;
         if (!phoneticReady) {
-            ui.err(`${id}拼音有错误`);
-            ui.log(
-                `${JSON.stringify({
-                    中文: cParsing,
-                    拼音: pParsing,
-                    中文长度: cParsing.length,
-                    拼音长度: pParsing.length
-                })}`
-            );
+            ui.err(`请检查 ${line.id}, 现有拼音和检验拼音不一致`);
+            console.log(` id: ${line.id}`);
+            console.log(` 现有: ${line.phonetic}`);
+            console.log(` 校验: ${newPinYin}`);
         }
         return phoneticReady;
     },
@@ -277,6 +269,15 @@ let util = {
         return Object.values(conf.materials);
     },
 
+    getMaterialBySid(sid) {
+        let materials = util.getAllMaterial();
+        for (let line of materials) {
+            if (line.sid === sid) {
+                return line;
+            }
+        }
+    },
+
     /*********************/
     // 按line.group打包放进新数组
     /*********************/
@@ -312,7 +313,13 @@ let util = {
     /*********************/
     // 格式化视频时长
     /*********************/
-    fmtDuration: (s) => ("0" + Math.floor(s / 60)).slice(-2) + ":" + ("0" + Math.floor(s % 60)).slice(-2) + (s % 1).toFixed(1).slice(1),
+    fmtDuration: (seconds) => {
+        let hours = Math.floor(seconds / 3600),
+            minutes = Math.floor((seconds % 3600) / 60),
+            sec = (seconds % 60).toFixed(1),
+            pad = (num) => (num < 10 ? "0" + num : num);
+        return `${pad(hours)}:${pad(minutes)}:${pad(sec)}`;
+    },
 
     /*********************/
     // 生成音频配置
@@ -331,3 +338,5 @@ let util = {
         return line.replace(/。 */, "。\n").split("\n");
     }
 };
+
+window.util = util;

@@ -24,7 +24,10 @@ let $basket = document.getElementById("basket"),
     $sdMaterials = document.getElementById("sd-materials"),
     $sdInput = document.getElementById("sd-input"),
     $sdStatus = document.getElementById("sd-status"),
-    $doSentenceSwitchMode = document.getElementById("doSentenceSwitchMode");
+    $doSentenceSwitchMode = document.getElementById("doSentenceSwitchMode"),
+    $iconShowPart = document.getElementById("cont-show-part"),
+    $iconShowAll = document.getElementById("cont-show-all"),
+    $loading = document.getElementById("loading");
 
 let $tool_a = document.getElementById("tool_a"),
     $tool_b = document.getElementById("tool_b"),
@@ -42,11 +45,17 @@ let ui = {
 
     initRangeBox() {
         let r = conf.range;
-        r.min = Math.max(Math.min(...Object.keys(conf.materials), 1), conf.info.book_abbr === conf.hidden.book ? conf.hidden.id + 1 : 1);
+        r.min = Math.max(Math.min(...Object.keys(conf.materials), 1), 1);
         r.max = Math.max(...Object.keys(conf.materials), 1);
         ui.putInputData("startid", r.min); //填上缺省值
         ui.putInputData("endid", r.max);
         ui.rangeConfirm(); // confirm一次
+    },
+
+    extendRange(length) {
+        let r = conf.range;
+        r.max += length;
+        ui.putInputData("endid", r.max);
     },
 
     /*********************/
@@ -63,8 +72,27 @@ let ui = {
             $tool_b.style.display = "block";
             $panel2.className = "selected";
             $panel1.className = "unselected";
-            ui.initPanel2();
         }
+    },
+
+    showUsedItem() {
+        $iconShowPart.style.display = "none";
+        $iconShowAll.style.display = "inline-block";
+        ui.setMaterialsVisiable(true);
+    },
+
+    hideUsedItem() {
+        $iconShowPart.style.display = "inline-block";
+        $iconShowAll.style.display = "none";
+        ui.setMaterialsVisiable(false);
+    },
+
+    setMaterialsVisiable(status) {
+        let css = status ? "table-row" : "none";
+
+        util.getMaterial((line) => line.id <= conf.range.lastVideoId).forEach((line) => {
+            document.getElementById(`material-${line.id}`).style.display = css;
+        });
     },
 
     /*********************/
@@ -191,26 +219,14 @@ let ui = {
     // 定位sid，移到屏幕中来
     /*********************/
     locateSid() {
-        let targetsid = +ui.getInputData("targetsid"),
-            materials = util.getAllMaterial();
-        for (let line of materials) {
-            if (line.sid === targetsid) {
-                return document.querySelector(`#material-${line.id}`).scrollIntoView({ behavior: "smooth" });
-            }
-        }
+        let sid = +ui.getInputData("targetsid"),
+            line = util.getMaterialBySid(sid);
+        ui.locateId(line.id);
     },
 
-    /*********************/
-    // 定位没生成过video的id
-    /*********************/
-    locateNoVideoId() {
-        let targetid = Math.max(...conf.videos.map((item) => item[3]), 0) + 1,
-            line = document.querySelector(`#material-${targetid}`);
-        if (line) {
-            line.scrollIntoView({ behavior: "smooth" });
-        }
+    locateId(id) {
+        document.querySelector(`#material-${id}`).scrollIntoView({ behavior: "smooth", inline: "start" });
     },
-
     /*********************/
     // 为指定间隔的间做上颜色标记
     /*********************/
@@ -248,17 +264,18 @@ let ui = {
     // 把数据加载到UI里
     /*********************/
     loadMaterial(data, isLoadFromStorage = false) {
-        if (conf.info.book_abbr !== conf.hidden.book || data.id > conf.hidden.id) {
-            let row = $materials.insertRow();
-            row.id = "material-" + data.id;
-            row.classList.add("type-" + data.type);
-            row.dataset.id = +data.id;
-            setup.uiFields.forEach((item, index) => {
-                let cell = row.insertCell(-1);
-                cell.className = setup.uiFields[index];
-                cell.innerHTML = data[item] || ui.getInitMedia(data.id, item);
-            });
+        let row = $materials.insertRow();
+        if (data.id <= conf.range.lastVideoId) {
+            row.style.display = "none";
         }
+        row.id = "material-" + data.id;
+        row.classList.add("type-" + data.type);
+        row.dataset.id = +data.id;
+        setup.uiFields.forEach((item, index) => {
+            let cell = row.insertCell(-1);
+            cell.className = setup.uiFields[index];
+            cell.innerHTML = data[item] || ui.getInitMedia(data.id, item);
+        });
         if (!isLoadFromStorage) {
             conf.materials[data.id] = data;
         }
@@ -422,7 +439,7 @@ let ui = {
             await action.fetchTranslationBundle(ids, "chinese", "english", true);
             ids.forEach((id) => action.genPhoneticPiece(id, true));
         }
-        conf.lastTouchedId = id;
+        conf.range.lastSentenceId = id;
         util.backupParam2Storage();
     },
 
@@ -565,7 +582,7 @@ let ui = {
             materials = [{ chinese: clipboard[0], english: clipboard[1] }];
         let ids = util.insertMaterial(id, materials);
         action.genPhoneticPiece(ids[0], true);
-        conf.lastTouchedId = id;
+        conf.range.lastSentenceId = id;
         util.backupParam2Storage();
     },
 
@@ -654,16 +671,19 @@ let ui = {
     },
 
     /*********************/
-    // 保存忽略列表
+    // loading动画
     /*********************/
-    doSavehiddenConfig() {
-        localStorage.setItem("ui_hidden_book", ui.getInputData("ui_hidden_book"));
-        localStorage.setItem("ui_hidden_id", ui.getInputData("ui_hidden_id"));
+    sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
     },
 
-    initPanel2() {
-        ui.putInputData("ui_hidden_book", localStorage.getItem("ui_hidden_book") || "");
-        ui.putInputData("ui_hidden_id", localStorage.getItem("ui_hidden_id") || 1);
+    async showLoading() {
+        $loading.style.display = "block";
+        await ui.sleep(20);
+    },
+
+    hideLoading() {
+        $loading.style.display = "none";
     }
 };
 
@@ -689,12 +709,14 @@ document.getElementById("doEstimate").addEventListener("click", action.doEstimat
 document.getElementById("doBuild").addEventListener("click", action.doBuild, false); // 7.生成作品
 
 /*********************/
-// 绑表格点击事件
+// 表格用工具
 /*********************/
 $content.addEventListener("click", ui.doCellClick, false);
 $content.addEventListener("mouseover", ui.onMouseOverCell, false);
 $edittool.addEventListener("mouseover", ui.showEditTool, false);
 $content.addEventListener("mouseleave", ui.hideEditTool, false);
+$iconShowPart.addEventListener("click", ui.showUsedItem, false);
+$iconShowAll.addEventListener("click", ui.hideUsedItem, false);
 
 /*********************/
 // 编辑工具
@@ -742,7 +764,6 @@ document.getElementById("panel2").addEventListener("click", ui.switchPanel, fals
 document.getElementById("doNewBook").addEventListener("click", action.doNewBook, false);
 document.getElementById("doMoveTemplate").addEventListener("click", action.doMoveTemplate, false);
 document.getElementById("doGenTranasCmd").addEventListener("click", action.doGenTranasCmd, false);
-document.getElementById("doSavehiddenConfig").addEventListener("click", ui.doSavehiddenConfig, false);
 
 /*********************/
 // 造句工具
@@ -771,3 +792,5 @@ document.body.addEventListener("keypress", (e) => {
         }
     }
 });
+
+window.ui = ui;

@@ -27,35 +27,6 @@ let io = {
         conf.info.version = g(`E2`); //数据文件版本
         ui.done(log);
 
-        //导入课本
-        worksheet = workbook.Sheets["课本"];
-        range = XLSX.utils.decode_range(worksheet["!ref"]);
-        let autosid = 1,
-            group = 0,
-            last_group = 0,
-            counter = 0;
-        log = ui.log(`导入课本内容...`);
-        for (let row = 2; row <= range.e.r + 1; row++) {
-            // 跳过第一行title
-            if (g(`A${row}`) !== "") {
-                let id = ++counter,
-                    sid = g(`B${row}`),
-                    type = t(g(`C${row}`)),
-                    current_group = +g(`D${row}`),
-                    voice = g(`E${row}`),
-                    chinese = g(`F${row}`),
-                    english = g(`G${row}`),
-                    phonetic = g(`H${row}`),
-                    comment = g(`I${row}`),
-                    theme = g(`J${row}`);
-                group = current_group === 0 ? 0 : current_group !== last_group ? id : group;
-                sid = sid !== "auto" ? +sid : type === "title" ? 0 : autosid++;
-                last_group = current_group;
-                ui.loadMaterial({ id, sid, type, group, voice, chinese, english, phonetic, comment, theme });
-            }
-        }
-        ui.done(log);
-
         //导入素材时长
         worksheet = workbook.Sheets["素材时长"];
         range = XLSX.utils.decode_range(worksheet["!ref"]);
@@ -87,6 +58,36 @@ let io = {
             //[文件名, 类型, 起始课本ID, 结束课本ID, 视频长度, 生成时间]
             if (g(`A${row}`) !== "") {
                 conf.videos.push([g(`A${row}`), g(`B${row}`), +g(`C${row}`), +g(`D${row}`), g(`E${row}`), g(`F${row}`)]);
+            }
+        }
+        ui.done(log);
+
+        //导入课本放在最后
+        util.updateVideoUsedId(); // 从conf里计算哪些素材是用过的
+        worksheet = workbook.Sheets["课本"];
+        range = XLSX.utils.decode_range(worksheet["!ref"]);
+        let autosid = 1,
+            group = 0,
+            last_group = 0,
+            counter = 0;
+        log = ui.log(`导入课本内容...`);
+        for (let row = 2; row <= range.e.r + 1; row++) {
+            // 跳过第一行title
+            if (g(`A${row}`) !== "") {
+                let id = ++counter,
+                    sid = g(`B${row}`),
+                    type = t(g(`C${row}`)),
+                    current_group = +g(`D${row}`),
+                    voice = g(`E${row}`),
+                    chinese = g(`F${row}`),
+                    english = g(`G${row}`),
+                    phonetic = g(`H${row}`),
+                    comment = g(`I${row}`),
+                    theme = g(`J${row}`);
+                group = current_group === 0 ? 0 : current_group !== last_group ? id : group;
+                sid = sid !== "auto" ? +sid : type === "title" ? 0 : autosid++;
+                last_group = current_group;
+                ui.loadMaterial({ id, sid, type, group, voice, chinese, english, phonetic, comment, theme });
             }
         }
         ui.done(log);
@@ -168,3 +169,5 @@ let io = {
         return sheet;
     }
 };
+
+window.io = io;

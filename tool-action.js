@@ -8,6 +8,7 @@ let action = {
             return ui.err(`拖入的文件不是xlsx: "${file.name}"`);
         }
         ui.log(`开始导入 ${file.name}...`);
+        await ui.showLoading();
         let reader = new FileReader();
         reader.onload = async function (e) {
             let data = e.target.result;
@@ -17,7 +18,7 @@ let action = {
             util.backupParam2Storage(true); // 导入后的保存需要备份
             ui.initRangeBox();
             ui.updateBasket();
-            ui.locateNoVideoId(); // 定位到没生成过video的id
+            ui.hideLoading();
         };
         reader.readAsBinaryString(file);
     },
@@ -106,6 +107,7 @@ let action = {
             return ui.err(`注意，请确认数据筛范围。`);
         }
         for (let line of util.getMaterial()) {
+            util.checkPhonetic(line.id);
             await action.genSetupAudioPiece(line.id, "chinese", false); //生成中文语料音频
             await action.genSetupAudioPiece(line.id, "english", false); //生成英文语料音频
         }
@@ -153,6 +155,7 @@ let action = {
             return ui.serverError(); // 服务不可用则退出生成
         }
         for (let line of util.getMaterial()) {
+            util.diffPhoneticSpell(line.id);
             await action.genSlidePiece(line.id, "listen");
             await action.genSlidePiece(line.id, "text");
         }
@@ -266,6 +269,7 @@ let action = {
             ui.log(`视频实际长度：${duration}秒`, "highlight");
             conf.videos.push([videoName, program, conf.range.start, conf.range.end, `[${duration}]`, `[${time}]`]);
             ui.log(`7.作品已经生成`, "pass");
+            util.updateVideoUsedId(); // 重新计算哪些素材是用过的
             window.open(`media/${conf.info.book_cn}/dist/${videoName}`, "preview");
         } else {
             ui.err(`生成作品 ${videoName} 时遇到错误`);
@@ -350,7 +354,7 @@ let action = {
         window.open(
             `html-publish.php`,
             "publish",
-            `toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=300, height=360, top=0, left=${window.screen.availWidth}`
+            `toolbar=yes, location=yes, status=no, menubar=no, scrollbars=yes, resizable=yes, width=300, height=360, top=0, left=${window.screen.availWidth}`
         );
     },
 
@@ -362,3 +366,5 @@ let action = {
         window.open(`https://studio.youtube.com/channel/UCuFOE1XJaNI_W-svW1tZwbw`, "driver");
     }
 };
+
+window.action = action;
