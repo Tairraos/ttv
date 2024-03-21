@@ -155,7 +155,7 @@ let action = {
             return ui.serverError(); // 服务不可用则退出生成
         }
         for (let line of util.getMaterial()) {
-            util.diffPhoneticSpell(line.id);
+            util.checkPhonetic(line.id);
             await action.genSlidePiece(line.id, "listen");
             await action.genSlidePiece(line.id, "text");
         }
